@@ -1,0 +1,111 @@
+import axios from 'axios'
+import { Message } from 'element-ui'
+const URL = 'http://10.0.0.74:8080/bishuiwan/api/'
+
+axios.defaults.baseURL = URL
+// 超时时间
+axios.defaults.timeout = 300000
+
+// http请求拦截器
+axios.interceptors.request.use(config => {
+  console.log(config)
+  return config
+}, error => {
+  Message.closeAll()
+  Message.error({
+    message: '加载超时',
+    customClass: 'messageClass',
+    center: true
+  })
+  return Promise.reject(error)
+})
+
+// http响应拦截器
+axios.interceptors.response.use(data => {
+  // 响应成功关闭loading
+  Message.closeAll()
+  if (data.data.code !== 1) {
+    Message.error({
+      message: data.data.desc,
+      customClass: 'messageClass',
+      center: true
+    })
+  }
+  return data
+}, error => {
+  Message.closeAll()
+  Message.error({
+    message: '加载失败',
+    customClass: 'messageClass',
+    center: true
+  })
+  return Promise.reject(error)
+})
+// 	登录页图片接口
+export const getLoginPic = obj => {
+  return axios.get('configure/get', {params: obj}).then(res => res.data)
+}
+// 登录
+export const checkLogin = params => axios.post('user/login', params).then(res => res.data)
+
+// 用户退出
+export const outLogin = params => axios.post('user/logout', params).then(res => res.data)
+
+// 6.1.11	按层级获取部门
+export const getDepartment = params => axios.post('department/getDepartment', params).then(res => res.data)
+
+// 7.1.2	(集团,子公司,部门)(月度,阶段性,累计)报表
+export const scorePageScore = params => axios.post('score/pageScore', params).then(res => res.data)
+
+// 7.1.7	获取所有自定义报表
+export const getAllReport = params => axios.post('report/getAllReport', params).then(res => res.data)
+
+// 7.2.1	所有小组 
+export const pageGroup = params => axios.post('group/pageGroup', params).then(res => res.data)
+
+// 7.2.1	新建小组 group/createGroup
+export const createGroup = params => axios.post('group/createGroup', params).then(res => res.data)
+
+// 7.2.1	修改小组 group/editGroup
+export const editGroup = params => axios.post('group/editGroup', params).then(res => res.data)
+
+// 7.2.1	删除小组 group/deleteGroup
+export const deleteGroup = params => axios.post('group/deleteGroup', params).then(res => res.data)
+
+// 7.2.1	小组详情 group/groupDetails
+export const groupDetails = params => axios.post('group/groupDetails', params).then(res => res.data)
+
+// 7.2.1	添加小组成员 addGroupUser
+export const addGroupUser = params => axios.post('group/addGroupUser', params).then(res => res.data)
+
+// 7.3.1	所有报表 report/pageReport
+export const pageReport = params => axios.post('report/pageReport', params).then(res => res.data)
+
+// 7.3.2	新建自定义报表 report/createReport
+export const createReport = params => axios.post('report/createReport', params).then(res => res.data)
+
+// 7.3.3	修改自定义报表 report/editReport
+export const editReport = params => axios.post('report/editReport', params).then(res => res.data)
+
+// 7.3.4	删除自定义报表 report/deleteReport
+export const deleteReport = params => axios.post('report/deleteReport', params).then(res => res.data)
+
+// 7.3.1	报表详情 group/groupDetails
+export const reportDetails = params => axios.post('report/reportDetails', params).then(res => res.data)
+
+// 8.1.1	任务大厅任务列表 task/taskList
+export const taskList = params => axios.post('task/taskList', params).then(res => res.data)
+
+// 8.1.3	查看任务大厅任务详情 task/getTask
+export const getTask = params => axios.post('task/getTask', params).then(res => res.data)
+
+// 8.1.4	查看我的任务列表  task/getCurrentTaskList
+export const getCurrentTaskList = params => axios.post('task/getCurrentTaskList', params).then(res => res.data)
+
+// 8.1.5	查看我的任务详情 task/getMyTask
+export const getMyTask = params => axios.post('task/getMyTask', params).then(res => res.data)
+
+// 8.1.9	查看我的草稿任务列表 task/getDraftTask
+export const getDraftTask = params => axios.post('task/getDraftTask', params).then(res => res.data)
+
+export default axios  

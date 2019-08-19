@@ -1,0 +1,588 @@
+<template>
+  <div class="hall">
+    <!-- <router-vew></router-vew> -->
+    <el-form ref="form" label-width="80px">
+    <!-- <el-tabs type="border-card"> -->
+  <!-- <el-tab-pane label="月度排名报表"> -->
+    <ul class="navTitle">
+      <li class="active"><router-link to="/integralReport">月度排名报表</router-link></li>
+      <li><router-link to="/phased">阶段性排名报表</router-link></li>
+       <li><router-link to="/accumulate">累积排名报表</router-link></li>
+
+    </ul>
+    <div class="divOne">
+       <el-form :inline="true">
+         <el-row label-width="80px" type="flex" >
+           <el-col :span="10">
+                  <el-form-item  >
+                  <el-radio v-model="radio" label="1" @change="radioChange()" >默认报表</el-radio>
+                    <el-cascader
+                      placeholder="默认报表" size='small' style="width:200px;margin-left:13px"
+                      expand-trigger="hover"
+                      :options="option"
+                      :props="prop"
+                      change-on-select
+                      v-model="selectedOptions2"
+                      @change="handleChange">
+                    </el-cascader>
+                </el-form-item>
+           </el-col>
+          <el-col :span="10">
+            <el-form-item>
+              <el-radio v-model="radio" label="2" @change="radio_Change()">自定义报表</el-radio>
+            <!-- </el-form-item>
+            <el-form-item  > -->
+              <!-- <el-select v-model="value" placeholder="请选择自定义报表" size='small' style="width:200px;"> -->
+                <!-- <el-option
+                  v-for="item in getAllReport"
+                  :key="item.id"
+                  :label="item.reportName"
+                      :props="prop"                  
+                  v-model="selectedOptions3"                  
+                  :value="item.description">
+                </el-option> -->
+                <el-cascader
+                      placeholder="自定义报表" size='small' style="width:200px;margin-left:13px"
+                      :options="getAllReport"
+                      :props="prop2"
+                      change-on-select
+                      v-model="selectedOptions3"
+                      @change="handleChangezidingyi">
+                    </el-cascader>
+              <!-- </el-select> -->
+         </el-form-item>
+          </el-col>
+       </el-row>
+
+       <el-row  type="flex" >
+            <el-col :span="10">
+              <el-form-item label="姓名或工号" style="margin-left:30px">
+               <el-input v-model="keyword" size="small" style="width:200px"></el-input>
+            </el-form-item>
+            </el-col>
+            <el-col :span="10">
+              <el-form-item label="选择月份"  style="margin-left:10px;">
+              <el-date-picker type="month" placeholder="选择日期" v-model="month" size="small" style="width:200px" @change="getSTime" value-format="yyyy-MM-dd"></el-date-picker>
+            </el-form-item>
+            </el-col>
+             <!-- <el-button type="primary" size="small">主要按钮</el-button> -->
+             <el-col :span="2">
+               <el-form-item>
+               <el-button type="primary"  size="small" style="margin-left:10px" @click="check()">查询</el-button>
+             </el-form-item>
+             </el-col>
+       </el-row>
+       </el-form>
+              <el-form class="spppp" :inline="true">
+                <el-form-item>
+                  <span style="height:40px; line-height:40px; ">积分类型:</span>
+                </el-form-item>
+                        <el-form-item  v-for="(item,index) in btnParams" :key="index">
+                            <el-button  size="small">{{ item.name }}</el-button>
+                        </el-form-item>
+                <el-form-item>
+                      <el-button type="primary" size="small" plain>奖扣任务分</el-button>
+                      <el-button type="primary" size="small" plain>固定积分</el-button>
+                      <el-button type="primary" size="small" plain>总积分</el-button>
+                </el-form-item>
+            </el-form>
+        <el-table
+        :row-style="tableRowStyle"
+        :header-cell-style="{background:'rgba(66,172,254,1)',width:'980px',height:'55px','text-align':'center','box-sizing': 'border-box'}"
+      :data="tableData"
+      style="width: 100%; height:400px; overflow:auto;"
+      size='small'>
+      <el-table-column
+        type="index"
+        width="100"
+        label="序号"
+        >
+      </el-table-column>
+      <el-table-column
+      prop="head"
+        label="头像"
+        width="105"
+        >
+        <template slot-scope="scope">
+            <img :src='scope.row.head' alt=""  min-width="40" height="40">  
+          </template>
+      </el-table-column>
+      <el-table-column
+        prop="realName"
+        width="100"
+        label="姓名"
+        >
+      </el-table-column>
+          <template >
+                <el-table-column  :prop="col.type"  :label="col.name" v-for="(col ,index) in tableData2" :key="index" >
+                </el-table-column>
+          </template>
+                  <el-table-column
+                    prop="address" width="95"
+                      label="奖扣任务分">
+                    </el-table-column>
+                    <el-table-column
+                    prop="address" width="100"
+                      label="固定积分">
+                    </el-table-column>
+                    <el-table-column
+                    prop="total" width="100"
+                      label="总积分">
+                    </el-table-column>
+                    <el-table-column
+                    prop="address" width="100"
+                      label="排名">
+                    </el-table-column>
+    </el-table>
+      <el-form-item type='flex' style="margin-top:10px;text-align:left">
+        <el-button type="primary"  size="small" @click="exportReport()" ref="exportReport" >导出报表</el-button>
+    <el-button type="primary" size="small" @click="toEcharts()">积分分析</el-button>
+      </el-form-item>
+    <div class="block" style="margin-top:10px">
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pageNumber"
+      :page-sizes="[100, 200, 300, 400]"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total=length>
+    </el-pagination>
+    </div>
+
+  </div>
+<!-- </el-tabs> -->
+<!-- 导出小组弹窗 -->
+      <el-dialog
+        title="选择要导出的小组"
+        :visible.sync="centerDialogVisible"
+        width="30%"
+        center>
+        <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+        <div style="margin: 15px 0;"></div>
+        <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+          <el-checkbox v-for="city in cities" :label="city" :key="city">{{city}}</el-checkbox>
+        </el-checkbox-group>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="centerDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="commitReport()">确 定</el-button>
+        </span>
+      </el-dialog>
+    </el-form>
+  </div>
+</template>
+
+<script>
+import {getDepartment,scorePageScore,getAllReport,getScoreType,exportScorelExcel,getAllDepartment,pageCustomizeScore} from '@/utils/axios/axios'
+const cityOptions = ['上海', '北京', '广州', '深圳']
+export default {
+  name: 'integralReport',
+  data () {
+    return {
+      centerDialogVisible: false,
+      checkAll: false,
+      checkedCities: ['上海', '北京'],
+      cities: cityOptions,
+      isIndeterminate: true,
+      getAllReport: [],
+      value: '',
+      radio: '1',
+      keyword: '',
+      month: '',
+      currentPage4: 4,
+      tableData: [],
+      tableData2:[],
+      option: [],
+      selectedOptions2: [],
+      selectedOptions3:[],
+      departmentId:'',
+      prop: {
+        value: 'id',
+        children: 'children',
+        label: 'name'
+      },
+      prop2: {
+        value: 'value',
+        children: 'children',
+        label: 'label'
+      },
+      btnParams:[],
+      test:[],
+      doingWork :false ,
+      newtable:[],
+      length:0,
+      pageNumber:1,
+      pageSize:10,
+      groupId:'',
+      reportId:''
+    }
+  },
+
+  methods: {
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
+      this.pageSize = val
+      this.check()
+    },
+    handleCurrentChange (val) {
+      console.log(`当前页: ${val}`)
+      this.pageNumber = val
+      this.check()
+    },
+    toEcharts () {
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        keyword:this.keyword,
+        departmentId:this.departmentId,
+        data:this.month     
+      }   
+      console.log(params,'发送参数');
+         
+      this.$router.push({path:'/echarts',query:params})
+    },
+    // 选择默认报表
+    handleChange (value) {
+      console.log(this.selectedOptions2[this.selectedOptions2.length-1],'选中部门',value)
+      this.departmentId = this.selectedOptions2[this.selectedOptions2.length-1]
+    },
+    // 选择自定义报表
+    handleChangezidingyi (value) {
+      // console.log(this.selectedOptions3,'选中自定义部门',value)
+      // this.departmentId = this.selectedOptions3[this.selectedOptions3.length-1]
+      // for (let item of this.selectedOptions3) {
+      //   console.log(item,'======');
+        
+      // }
+      if ( this.selectedOptions3.length ==1 ) {
+        this.reportId = this.selectedOptions3[this.selectedOptions3.length-1]
+        console.log('报表',this.reportId);
+      } else if (this.selectedOptions3.length ==2) {
+        this.groupId = this.selectedOptions3[this.selectedOptions3.length-1]
+        console.log('小组',this.groupId)
+      }
+    },
+    // 每一行的样式
+    tableRowStyle ({ row, rowIndex }) {
+      return 'text-align: center '
+    },
+    // 选择默认报表
+    radioChange () {
+      // this.radio = 10
+      console.log('单选',this.radio);
+      
+    },
+    // 选择自定义
+    radio_Change () {
+      // this.radio = 20
+      console.log(this.radio,'二');
+      
+    },
+    exportReport () {
+      console.log('导出报表')
+      // this.centerDialogVisible = true
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        pageNumber:'',
+        pageSize:'',
+        departmentId:this.departmentId,
+        keyword:this.keyword,
+        EventTypes:'',
+        dateType:'',
+        date:this.month,
+        begin:'',
+        end:''
+      }
+      exportScorelExcel( this.$qs.stringify(params) ).then(res=>{
+        if (res.code ===0) {
+          this.$message.error('错误');          
+        } else {
+                
+        let str = 'http://112.74.105.6:8080/bishuiwan/api/score/exportScorelExcel?sessionId='+localStorage.getItem('sessionId')+"&departmentId="+this.departmentId+"&date="+this.month+"&keyword"+this.keyword
+        console.log( str,'跳转链接');
+        alert(577658989)
+        window.location.href = str
+        }
+        
+      })
+    },
+    handleCheckAllChange (val) {
+      this.checkedCities = val ? cityOptions : []
+      this.isIndeterminate = false
+    },
+    handleCheckedCitiesChange (value) {
+      let checkedCount = value.length
+      this.checkAll = checkedCount === this.cities.length
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length
+    },
+    commitReport () {
+      // console.log(this.checkedCities, '选中的项')
+
+      this.centerDialogVisible = false
+    },
+    // 时间
+    getSTime(val) {
+                this.month=val;//这个sTime是在data中声明的，也就是v-model绑定的值
+                // console.log(this.month,val);
+                
+    },
+    // 6.1.11	按层级获取部门
+    init() {
+      // console.log(new Date(),'当前日期')
+      // this.month = new Date()
+      let sessionId = localStorage.getItem('sessionId')
+      let departmentId = this.departmentId
+      let params = {
+        sessionId:sessionId,
+        departmentId:departmentId
+      }      
+      getAllDepartment ( this.$qs.stringify(params) ).then(res => {
+        if ( res.code === 1){
+          // for (let item of this.option) {
+          //       item = res.data
+          //       console.log(item,'没');
+                
+          //   }
+          // this.option.push(res.data)
+          this.option = res.data          
+        }        
+      })
+      // 7.1.2	(集团,子公司,部门)(月度,阶段性,累计)报表
+      // scorePageScore (this.$qs.stringify()).then(res=>{
+      //   console.log(res);
+        
+      // })
+      let getAllReportParams = {
+        sessionId:sessionId,
+        reportId:''
+      }
+      getAllReport (this.$qs.stringify(getAllReportParams)).then(res=> {
+        this.getAllReport = res.data
+      })
+      let jifenparams = {
+        sessionId:localStorage.getItem('sessionId'),    
+        // head:''    
+      }
+      getScoreType(  this.$qs.stringify(jifenparams) ).then(res=>{
+        this.btnParams = res.data
+        console.log(this.btnParams,'888888');
+        
+      })
+    },
+    // btnn ( value ) {
+    //   console.log(value);
+    //   let num = this.getNum(value)+','
+    //   // console.log(this.test,'前');    
+    //   // let param = num + ',' + this.test
+    //   var arr=new Array();
+    //   this.test.push(num);
+    //   // arr.push(this.test);
+    //   var param=this.test.join("");
+    //   console.log(param,'后');   
+    //   // this.test  = num    
+    //   // this.test = num 
+    //   // if(this.test != '') {
+    //   //   console.log(this.test,'追加');
+    //   //    param  = this.test + ','+num
+    //   //   console.log(this.test,'追加后');         
+    //   // } else {
+    //   //   param = num
+    //   //   this.test = num
+    //   // }     
+
+    //   this.doingjifen = true
+    //   let params = {
+    //     sessionId:localStorage.getItem('sessionId'),
+    //     pageNumber:this.pageNumber,
+    //     pageSize:this.pageSize,
+    //     departmentId:this.selectedOptions2[0],
+    //     keyword:this.keyword,
+    //     EventTypes:param, 
+    //     dateType:'',
+    //     date:'',
+    //     begin:'',
+    //     end:''
+    //   }      
+    //   scorePageScore( this.$qs.stringify(params) ).then(res=>{
+    //     console.log(res,'查询',params);
+    //     if (res.code === 1 ){
+    //       this.tableData = res.data.list
+    //       // this.marketing + "value" = true      
+    //       // switch (param) {
+    //       //   case param == 79:
+    //       //     this.doingWork = true
+    //       //     // break;
+    //       //   case param == 80:
+    //       //     this.doingWork = true
+    //       //   default:
+    //       //     break;
+    //       // }
+    //       console.log(this.tableData,'少时诵诗书');
+    //       this.newtable = this.tableData
+    //       for(let item of this.tableData){
+    //         console.log(item,'遍历');
+    //         for(let index in this.newtable) {
+    //           // if (index.)
+    //         }
+    //       }
+    //     }
+    //   })
+    // },
+    // 截取数字
+     getNum(text){
+        var index=text.lastIndexOf("@");
+        var obj=text.substring(index+1,text.length);
+    //  console.log(obj);
+        return obj;
+        },
+    // 7.1.2	(集团,子公司,部门)(月度,阶段性,累计)报表
+    check() {
+      if (this.radio ==1 ) {
+            let params = {
+            sessionId:localStorage.getItem('sessionId'),
+            pageNumber:'',
+            pageSize:'',
+            departmentId:this.departmentId,
+            keyword:this.keyword,
+            EventTypes:'',
+            dateType:'',
+            date:this.month,
+            begin:'',
+            end:''
+          }            
+          scorePageScore( this.$qs.stringify(params) ).then(res=>{
+            // console.log(res,'查询',params.departmentId);
+            if (res.code === 1 ){
+              this.tableData = res.data.data.list
+              // console.log(this.tableData,'ssssssshshsh');
+              this.tableData2= res.data.label
+              this.length = res.data.data.totalRow       
+              // this.departmentId =this.selectedOptions2[0]             
+              // res.data.list[9].head = 'https://img-blog.csdn.net/20180723162104907'
+            }
+          })
+      } else if (this.radio ==2) {
+        console.log('查询自定义');
+        
+        let params = {
+            sessionId:localStorage.getItem('sessionId'),
+            pageNumber:'',
+            pageSize:'',
+            departmentId:this.departmentId,
+            keyword:this.keyword,
+            EventTypes:'',
+            dateType:'',
+            date:this.month,
+            begin:'',
+            end:'',
+            groupId:this.groupId,
+            reportId:this.reportId
+          } 
+        pageCustomizeScore( this.$qs.stringify(params) ).then(res=>{
+          console.log(res,'查询自定义');
+          if (res.code === 1 ){
+              this.tableData = res.data.data.list
+              // console.log(this.tableData,'ssssssshshsh');
+              this.tableData2= res.data.label
+              this.length = res.data.data.totalRow       
+              // this.departmentId =this.selectedOptions2[0]             
+              // res.data.list[9].head = 'https://img-blog.csdn.net/20180723162104907'
+            }
+        })
+      }
+    },
+    
+  },
+  mounted () {
+    this.init()
+    this.check()
+
+  },
+  // watch: {
+  //     'this.tableData':function(value,oldvalue) {
+  //       for(let item of this.tableData) {
+  //         item:function(obj,oldobj) {
+
+  //         }
+  //       }
+  //     }
+  //     // na:function (value ,oldvalue) {
+        
+  //     //   if (value!=oldvalue) {
+  //     //     console.log('有变化');
+          
+  //     //   }
+  //     // }
+  //   }
+}
+</script>
+
+<style scoped>
+
+  .divOne{
+    background-color:#F2F9FF;
+    min-height: 750px;
+    width: 100%;
+  }
+  .table{
+    margin-top:10px;
+    overflow-y:scroll;
+    min-height: 300px;
+  }
+  .table_title{
+    text-align: center;
+    color: blue
+  }
+  .numTwo_1{
+    margin-left: 60px;
+  }
+  /* .el-table__body{
+    table-layout:auto !important;
+
+} */
+a{
+  text-decoration: none;
+  color: #262D39;
+}
+a:visited {
+color:#262D39;
+text-decoration:none;
+}
+a:active {
+color:#0083FF;
+text-decoration:none;
+}
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.spppp {
+  
+}
+</style>
+<style>
+/* 表格内容样式  自定义组件样式*/
+  .cell{
+    text-align: center !important;
+    /* color: red; */
+    vertical-align: middle !important;
+  }
+</style>

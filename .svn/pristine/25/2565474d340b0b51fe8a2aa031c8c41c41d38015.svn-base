@@ -1,0 +1,18 @@
+<template>
+  <div class="DetailsOfTheEvent"></div>
+</template>
+
+<script>
+export default {
+  name: 'DetailsOfTheEvent',
+  data () {
+    return {
+
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+</style>

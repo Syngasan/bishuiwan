@@ -1,0 +1,357 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+
+Vue.use(Router)
+
+const router = new Router({
+  // mode: 'history',
+  routes: [
+    {
+      path: '/',
+      redirect: '/login'
+    },
+    {
+      path: '/login',
+      name: 'login',
+      meta: {
+        requireAuth: true
+      },
+      component: resolve => require(['@/components/comm/login'], resolve)
+    },
+    {
+      path: '/forget',
+      name: 'forget',
+      meta: {
+        requireAuth: true
+      },
+      component: resolve => require(['@/components/comm/forget'], resolve)
+    },
+    {
+      path: '/index',
+      meta: {
+        requireAuth: true
+      },
+      component: resolve => require(['@/components/index'], resolve),
+      children: [
+        {
+          path: '/',
+          redirect: '/home'
+        },
+        // 首页
+        {
+          path: '/home',
+          name: 'home',
+          component: resolve => require(['@/components/home/home'], resolve)
+        },
+        // 公告列表
+        {
+          path: '/BulletinList',
+          name: 'BulletinList',
+          component: resolve => require(['@/components/home/BulletinList'], resolve)
+        },
+        // 公告详情
+        {
+          path: '/BulletinListDetails',
+          name: 'BulletinListDetails',
+          component: resolve => require(['@/components/home/BulletinListDetails'], resolve)
+        },
+        // 积分管理
+        {
+          path: '/Administration',
+          component: resolve => require(['@/components/Administration/Administration'], resolve),
+          children: [
+            {
+              path: '/',
+              redirect: '/WebEntry'
+            },
+            {
+              path: '/WebEntry',
+              name: 'WebEntry',
+              component: resolve => require(['@/components/Administration/WebEntry'], resolve)
+            },
+            {
+              path: '/EventLibrary',
+              name: 'EventLibrary',
+              component: resolve => require(['@/components/Administration/EventLibrary'], resolve)
+            },
+            {
+              path: '/tableEntry',
+              name: 'tableEntry',
+              component: resolve => require(['@/components/Administration/tableEntry'], resolve)
+            },
+            {
+              path: '/Submission',
+              name: 'Submission',
+              component: resolve => require(['@/components/Administration/Submission'], resolve)
+            },
+            {
+              path: '/drafts',
+              name: 'drafts',
+              component: resolve => require(['@/components/Administration/drafts'], resolve)
+            },
+            // 积分审核
+            {
+              path: '/IntegralAudit',
+              name: 'IntegralAudit',
+              component: resolve => require(['@/components/Administration/IntegralAudit'], resolve)
+            },
+            // 事件详情 =========
+            {
+              path: '/DetailsOfTheEvent',
+              name: 'DetailsOfTheEvent',
+              component: resolve => require(['@/components/Administration/DetailsOfTheEvent'], resolve)
+            },
+            {
+              path: '/Audited',
+              name: 'Audited',
+              component: resolve => require(['@/components/Administration/Audited'], resolve)
+            },
+            // 任务详情 ==========
+            {
+              path: '/DetailsOfTheTask',
+              name: 'DetailsOfTheTask',
+              component: resolve => require(['@/components/Administration/DetailsOfTheTask'], resolve)
+            },
+            // 积分查询
+            {
+              path: '/integralSelect',
+              name: 'integralSelect',
+              component: resolve => require(['@/components/Administration/integralSelect'], resolve)
+            },
+            {
+              path: '/Prizes',
+              name: 'Prizes',
+              component: resolve => require(['@/components/Administration/Prizes'], resolve)
+            },
+            {
+              path: '/BuckleExecution',
+              name: 'BuckleExecution',
+              component: resolve => require(['@/components/Administration/BuckleExecution'], resolve)
+            },
+            // 奖扣任务
+            {
+              path: '/BuckleTask',
+              name: 'BuckleTask',
+              component: resolve => require(['@/components/Administration/BuckleTask'], resolve)
+            },
+            // 固定积分
+            {
+              path: '/FixedIntegral',
+              name: 'FixedIntegral',
+              component: resolve => require(['@/components/Administration/FixedIntegral'], resolve)
+            },
+            // 结算日志
+            {
+              path: '/SettlementLog',
+              name: 'SettlementLog',
+              component: resolve => require(['@/components/Administration/SettlementLog'], resolve)
+            }
+          ]
+        },
+        // 积分报表
+        {
+          path: '/ReportForm',
+          name: 'ReportForm',
+          component: resolve => require(['@/components/ReportForm/ReportForm'], resolve),
+          children: [
+            {
+              path: '/integralReport',
+              name: 'integralReport',
+              component: resolve => require(['@/components/integralReport/integralReport'], resolve)
+            },
+            {
+              path: '/phased',
+              name: 'phased',
+              component: resolve => require(['@/components/integralReport/phased'], resolve)
+            },
+            {
+              path: '/accumulate',
+              name: 'accumulate',
+              component: resolve => require(['@/components/integralReport/accumulate'], resolve)
+            },
+            {
+              path: '/customGrouping',
+              name: 'customGrouping',
+              component: resolve => require(['@/components/customGrouping/customGrouping'], resolve)
+            },
+            {
+              path: '/customReport',
+              name: 'customReport',
+              component: resolve => require(['@/components/customReport/customReport'], resolve)
+            },
+            // echarts
+            {
+              path: '/echarts',
+              name: 'echarts',
+              component: resolve => require(['@/components/echarts/echarts'], resolve)
+            },
+            // groupDetail小组详情
+            { path: '/groupDetail',
+              name: 'groupDetail',
+              component: resolve => require(['@/components/customGrouping/groupDetail'], resolve)
+            },
+            // 报表详情
+            { path: '/ReportDetail',
+              name: 'ReportDetail',
+              component: resolve => require(['@/components/customReport/ReportDetail'], resolve)
+            }
+          ]
+        },
+        // 任务大厅
+        {
+          path: '/hall',
+          name: 'hall',
+          component: resolve => require(['@/components/hall/hall'], resolve),
+          children: [
+            { path: '/toTask',
+              name: 'toTask',
+              component: resolve => require(['@/components/toTask/toTask'], resolve)
+            },
+            { path: '/myTask',
+              name: 'myTask',
+              component: resolve => require(['@/components/myTask/myTask'], resolve)
+            },
+            { path: '/myTaskDid',
+              name: 'myTaskDid',
+              component: resolve => require(['@/components/myTask/myTaskDid'], resolve)
+            },
+            { path: '/taskCommit',
+              name: 'taskCommit',
+              component: resolve => require(['@/components/myTask/taskCommit'], resolve)
+            },
+            { path: '/releaseTask',
+              name: 'releaseTask',
+              component: resolve => require(['@/components/releaseTask/releaseTask'], resolve)
+            },
+            { path: '/published',
+              name: 'published',
+              component: resolve => require(['@/components/published/published'], resolve)
+            },
+            { path: '/taskDetail',
+              name: 'taskDetail',
+              component: resolve => require(['@/components/taskDetail/taskDetail'], resolve)
+            },
+            { path: '/releaseTaskDetail',
+              name: 'releaseTaskDetail',
+              component: resolve => require(['@/components/releaseTask/releaseTaskDetail'], resolve)
+            },
+            { path: '/releaseTaskDetailEdit',
+              name: 'releaseTaskDetailEdit',
+              component: resolve => require(['@/components/releaseTask/releaseTaskDetailEdit'], resolve)
+            },
+            {
+              path: '/taskDid',
+              name: 'taskDid',
+              component: resolve => require(['@/components/hall/taskDid'], resolve)
+            },
+            {
+              path: '/taskDoing',
+              name: 'taskDoing',
+              component: resolve => require(['@/components/hall/taskDoing'], resolve)
+            },
+            // 全员任务详情
+            { path: '/allTaskDetail',
+              name: 'allTaskDetail',
+              component: resolve => require(['@/components/myTask/allTaskDetail'], resolve)
+            },
+            // demo
+            { path: '/allTaskDetailDoing',
+              name: 'allTaskDetailDoing',
+              component: resolve => require(['@/components/myTask/allTaskDetailDoing'], resolve)
+            },
+            // 推送任务详情
+            { path: '/titleTaskDetail',
+              name: 'titleTaskDetail',
+              component: resolve => require(['@/components/myTask/titleTaskDetail'], resolve)
+            }
+          ]
+        },
+        // 社区
+        {
+          path: '/Community',
+          name: 'Community',
+          component: resolve => require(['@/components/Community/Community'], resolve)
+        },
+        // 个人中心
+        {
+          path: '/personal',
+          component: resolve => require(['@/components/personal/personal'], resolve),
+          children: [
+            {
+              path: '/',
+              redirect: '/MyPoints'
+            },
+            // 月积分
+            {
+              path: '/MyPoints',
+              name: 'MyPoints',
+              component: resolve => require(['@/components/personal/MyPoints'], resolve)
+            },
+            // 累计积分
+            {
+              path: '/AccumulativeIntegral',
+              name: 'AccumulativeIntegral',
+              component: resolve => require(['@/components/personal/AccumulativeIntegral'], resolve)
+            },
+            // 积分趋势
+            {
+              path: '/IntegralTrend',
+              name: 'IntegralTrend',
+              component: resolve => require(['@/components/personal/IntegralTrend'], resolve)
+            },
+            // 排名趋势
+            {
+              path: '/RankingTrend',
+              name: 'RankingTrend',
+              component: resolve => require(['@/components/personal/RankingTrend'], resolve)
+            },
+            // 奖扣任务
+            {
+              path: '/PersonalAwardDeductionTask',
+              name: 'PersonalAwardDeductionTask',
+              component: resolve => require(['@/components/personal/PersonalAwardDeductionTask'], resolve)
+            },
+            // 奖扣明细
+            {
+              path: '/PersonalAwardDeductionDetails',
+              name: 'PersonalAwardDeductionDetails',
+              component: resolve => require(['@/components/personal/PersonalAwardDeductionDetails'], resolve)
+            },
+            // 我的资料
+            {
+              path: '/MyInformation',
+              name: 'MyInformation',
+              component: resolve => require(['@/components/personal/MyInformation'], resolve)
+            }
+          ]
+        },
+        // 通知
+        {
+          path: '/message',
+          name: 'message',
+          component: resolve => require(['@/components/message/message'], resolve)
+        }
+      ]
+    }
+  ]
+})
+
+// router.beforeEach((to, from, next) => {
+//   if (to.matched.length === 0) { // 如果未匹配到路由
+//     from.name ? next({name: from.name}) : next('/404') // 如果上级也未匹配到路由则跳转登录页面，如果上级能匹配到则转上级路由
+//   } else {
+//     // 如果匹配到正确跳转
+//     next()
+//   }
+// })
+// router.beforeEach((to, from, next) => {
+//   console.log(localStorage.ryToken, '0000')
+//   if (localStorage.ryToken === undefined) {
+//     console.log('未登录')
+
+//     router.push({name: 'login'})
+//   } else {
+//     next()
+//   }
+// })
+export default router

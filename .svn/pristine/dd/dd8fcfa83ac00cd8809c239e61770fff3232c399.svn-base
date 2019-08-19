@@ -1,0 +1,229 @@
+<template>
+  <div class="task">
+    <div class="bigBox">
+      <ul>
+        <li>
+          <div class="liDiv" @click="toDetail()">
+            <div class="left_div" >
+              <img src="../../images/nav_sun.png" class="left_div_img">
+              <div>王小明</div>
+              <div>部门</div>
+            </div>
+            <div class="right_div">
+              <div class="right_div_title">
+                <div class="jifen">+10/-10</div>
+                <div style="text-align:left" class="mt">ddd任务内容任务内容任务内容任务内容任务内容任务内容务内容
+任务内容任务内容任务内....ddd</div>
+              </div>
+              <div class="right_div_content">
+                任务内容
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="liDiv" @click="toDetail()">
+            <div class="left_div" >
+              <img src="../../images/nav_sun.png" class="left_div_img">
+              <div>王小明</div>
+              <div>部门</div>
+            </div>
+            <div class="right_div">
+              <div class="right_div_title">
+                <div class="jifen">+10/-10</div>
+                <div style="text-align:left" class="mt">ddd任务内容任务内容任务内容任务内容任务内容任务内容务内容
+任务内容任务内容任务内....ddd</div>
+              </div>
+              <div class="right_div_content">
+                任务内容
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="liDiv" @click="toDetail()">
+            <div class="left_div" >
+              <img src="../../images/nav_sun.png" class="left_div_img">
+              <div>王小明</div>
+              <div>部门</div>
+            </div>
+            <div class="right_div">
+              <div class="right_div_title">
+                <div class="jifen">+10/-10</div>
+                <div style="text-align:left" class="mt">ddd任务内容任务内容任务内容任务内容任务内容任务内容务内容
+任务内容任务内容任务内....ddd</div>
+              </div>
+              <div class="right_div_content">
+                任务内容
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="liDiv" @click="toDetail()">
+            <div class="left_div" >
+              <img src="../../images/nav_sun.png" class="left_div_img">
+              <div>王小明</div>
+              <div>部门</div>
+            </div>
+            <div class="right_div">
+              <div class="right_div_title">
+                <div class="jifen">+10/-10</div>
+                <div style="text-align:left" class="mt">ddd任务内容任务内容任务内容任务内容任务内容任务内容务内容
+任务内容任务内容任务内....ddd</div>
+              </div>
+              <div class="right_div_content">
+                任务内容
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="liDiv" @click="toDetail()">
+            <div class="left_div" >
+              <img src="../../images/nav_sun.png" class="left_div_img">
+              <div>王小明</div>
+              <div>部门</div>
+            </div>
+            <div class="right_div">
+              <div class="right_div_title">
+                <div class="jifen">+10/-10</div>
+                <div style="text-align:left" class="mt">ddd任务内容任务内容任务内容任务内容任务内容任务内容务内容
+任务内容任务内容任务内....ddd</div>
+              </div>
+              <div class="right_div_content">
+                任务内容
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="liDiv" @click="toDetail()">
+            <div class="left_div" >
+              <img src="../../images/nav_sun.png" class="left_div_img">
+              <div>王小明</div>
+              <div>部门</div>
+            </div>
+            <div class="right_div">
+              <div class="right_div_title">
+                <div class="jifen">+10/-10</div>
+                <div style="text-align:left" class="mt">ddd任务内容任务内容任务内容任务内容任务内容任务内容务内容
+任务内容任务内容任务内....ddd</div>
+              </div>
+              <div class="right_div_content">
+                任务内容
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="liDiv">
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  data () {
+    return {
+      index: ''
+    }
+  },
+  methods: {
+    toDetail () {
+      this.$router.push('/taskDetail')
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.task {
+  padding-bottom: 50px;
+   min-height: 750px;
+}
+.bigBox {
+  background-color: #F2F9FF;
+  width: 100%;
+  height: 100%;
+  padding: 10px
+}
+li{
+  list-style: none
+}
+.liDiv {
+  width: 95%;
+  height: 136px;
+  background:rgba(255,255,255,1);
+  margin: 0 auto;
+  margin-top: 10px;
+  text-align: left;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  box-shadow:0px 5px 18px 0px rgba(10,143,246,0.14);
+}
+.left_div{
+  width: 20%;
+  height: 100%;
+  display: flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items: center;
+  box-sizing: border-box;
+}
+.left_div_img{
+  width:51px;
+  height:51px;
+  border-radius:26px;
+}
+.right_div {
+  width: 80%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  box-sizing: border-box;
+  border-left: 1px solid rgba(233,238,242,1);
+
+}
+.jifen {
+  width:87px;
+height:25px;
+font-size:26px;
+font-family:PingFang-SC-Bold;
+font-weight:bold;
+color:rgba(10,143,246,1);
+line-height:36px;
+}
+.right_div_title {
+  width:432px;
+height:41px;
+font-size:16px;
+font-family:MicrosoftYaHei;
+font-weight:400;
+color:rgba(130,135,142,1);
+line-height:26px;
+}
+.right_div_title span {
+  width:139px;
+height:13px;
+font-size:13px;
+font-family:MicrosoftYaHei;
+font-weight:400;
+color:rgba(185,185,185,1);
+}
+.mt {
+  margin-top: 15px
+}
+.right_div_content {
+  width:139px;
+  height:13px;
+  font-size:13px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(185,185,185,1);
+}
+</style>

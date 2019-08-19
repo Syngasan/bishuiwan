@@ -1,0 +1,135 @@
+<template>
+  <div class="PersonalAwardDeductionTask">
+    <el-row class="IntegralAuditBox">
+      <el-col :span="12">
+        完成状态：
+        <el-select v-model="select1" class="EventTheme" placeholder="请选择完成状态">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="12">
+        结算状态：
+        <el-select v-model="select1" class="EventTheme" placeholder="请选择结算状态">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="12">
+        任务名称：
+        <el-input class="EventTheme" placeholder="请输入任务名称" v-model="name"></el-input>
+      </el-col>
+      <el-col :span="12" class="textR">
+        <el-button type="primary">查询</el-button>
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="date" label="序号"></el-table-column>
+      <el-table-column prop="date" label="任务周期"></el-table-column>
+      <el-table-column prop="date" label="任务名称"></el-table-column>
+      <el-table-column prop="date" label="任务指标"></el-table-column>
+      <el-table-column prop="date" label="完成值"></el-table-column>
+      <el-table-column prop="date" label="完成状态"></el-table-column>
+      <el-table-column prop="date" label="积分扣罚"></el-table-column>
+      <el-table-column prop="date" label="结算状态"></el-table-column>
+    </el-table>
+    <el-row>
+      <!-- <el-col :span="4">
+        <el-button plain type="primary">导出excel</el-button>
+      </el-col> -->
+      <el-col :span="24">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="100" layout="total, sizes, prev, pager, next,  jumper" :total="100">
+        </el-pagination>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+export default {
+  name: 'PersonalAwardDeductionTask',
+  data () {
+    return {
+      radio: '1',
+      name: '',
+      select1: '',
+      date1: '',
+      select2: '',
+      date2: '',
+      tableData: [
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'},
+      ],
+      currentPage4: 1
+    }
+  },
+  created() {
+    this.getList()
+  },
+  methods: {
+    getList () {
+      this.$axios({
+        url: 'reward/listMyRewardTask',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        console.log(res)
+        if (res.data.code === 1) {}
+      })
+    },
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    }
+  }
+}
+</script>
+
+<style scoped>
+.EventTheme {
+  width: 318px;
+  height: 46px;
+}
+.EventThemeDate1 {
+  width: 250px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 150px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 83px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+  padding-right: 90px;
+}
+</style>

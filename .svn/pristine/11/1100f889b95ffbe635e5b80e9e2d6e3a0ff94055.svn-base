@@ -1,0 +1,232 @@
+<template>
+  <div class="BuckleLogt">
+    <el-row class="IntegralAuditBox">
+      <el-col :span="24" class="textR"><el-button plain type="primary" @click="routerBack">返回</el-button></el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="businessName" label="公司名称" align="center"></el-table-column>
+      <el-table-column prop="createTime" label="结算月份" align="center"></el-table-column>
+      <el-table-column prop="rewardTaskId" label="结算状态" align="center">
+        <template  slot-scope="scope">
+          <span v-if="scope.row.rewardTaskId == 0">未结算</span>
+          <span v-else-if="scope.row.rewardTaskId == 1">已结算</span>
+          <span v-else>结算成功</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="updateUser" label="更新人" align="center"></el-table-column>
+      <el-table-column prop="updateTime" label="更新日期" align="center"></el-table-column>
+      <el-table-column prop="date" label="操作" align="center" width="300px">
+        <template slot-scope="scope">
+            <el-button size="mini" type="primary" class="tableBtn" @click="ifSettlement(scope.row.createTime)">重新结算</el-button>
+            <el-button size="mini" type="primary" class="tableBtn" @click="exportExcel(scope.row.createTime)">导出报表</el-button>
+          </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNumber" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next,  jumper" :total="total">
+    </el-pagination>
+    <!-- </el-dialog> -->
+    <!-- <el-dialog :visible.sync="dialogVisible" width="20%" :center='true'>
+      选 择 月 份：<el-date-picker class="EventTheme" type="month" format="yyyy-MM" value-format="yyyy-MM" placeholder="选择月份" v-model="dateMonth"></el-date-picker>
+      <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="dialogVisible=false">取 消</el-button>
+          <el-button type="primary" @click="pushN">确 定</el-button>
+      </span>
+    </el-dialog> -->
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+import {ifSettlement,settlement,exportRewardTask} from '@/utils/axios/axios'
+export default {
+  name: 'BuckleLogt',
+  data () {
+    return {
+      tableData: [],
+      dateMonth: '',
+      dialogVisible: false,
+      pageNumber: 1,
+      pageSize: 10,
+      total: 0,
+      createTimes:'',
+      updateTimes:''
+    }
+  },
+   created () {
+    this.getList()
+  },
+  methods: {
+    exportExcel (value) {
+      console.log(333);
+      
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        date:value
+      }
+      exportRewardTask(this.$qs.stringify(params)).then(res=>{
+        if (res.code === 0) {
+          this.$message.error('错误');  
+        } else {
+          let str = 'http://112.74.105.6:8080/bishuiwan/api/reward/exportRewardTask?sessionId='+localStorage.getItem('sessionId')+"&date="+value
+          console.log( str,'跳转链接');
+          window.location.href = str
+        }
+      })
+    },
+    pushN () {
+      this.$axios({
+        url: 'reward/settlement',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          dateMonth: this.dateMonth + '-01'
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+        }
+      })
+    },
+    // 重新结算
+    ifSettlement (value) {
+      // value = value.split(' ')
+  // console.log(value,'日期格式');
+      this.dateMonth = value
+  
+              // ifSettlement(this.$qs.stringify(params)).then(res=>{
+              //   if (res.code ===1 ) {
+              //     this.settlement()
+              //   } else {
+                  
+              //   }
+              // })  
+              this.dialogVisible = false
+                  this.$confirm('已结算过, 是否重新结算?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                  }).then(() => {
+                    this.settlements()
+                  }).catch(() => {
+                    this.$message({
+                      type: 'info',
+                      message: '已取消结算'
+                    });          
+
+                  });
+    },
+        // 结算
+    settlements() {
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        date: this.dateMonth 
+      }
+      settlement(this.$qs.stringify(params)).then(res=>{
+        if (res.code === 1 ) {
+           this.$message({
+              message: res.desc,
+              type: 'success'
+            });
+            this.getList()
+            this.dialogVisible = false
+        } 
+      })
+    },
+    getList () {
+      this.$axios({
+        url: 'reward/pageSettlementLog',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize,
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        console.log(res)
+        if (res.data.code === 1) {
+          this.total = res.data.data.totalRow
+          this.tableData = res.data.data.list
+          // console.log(this.tableData,'少时诵诗书所');
+          
+          for (let item of this.tableData) {
+            item.createTime = item.createTime.split(' ')[0]
+            item.updateTime = item.updateTime.split(' ')[0]
+          }
+        }
+      })
+    },
+    routerBack () {
+      this.$router.back(-1)
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.getList()
+    },
+    handleCurrentChange(val) {
+      this.pageNumber = val
+      this.getList()
+    },
+    settlement() {
+      this.dialogVisible = true
+    }
+    // Resettlement() {
+    //   this.$alert('XX月的奖扣任务分已结算过，确认重新结算2018年XX月的奖扣任务分吗？', {
+    //       confirmButtonText: '确定',
+    //       center: true,
+    //       callback: action => {
+    //         this.$message({
+    //           type: 'info',
+    //           message: `action: ${ action }`
+    //         });
+    //       }
+    //     });
+    // }
+  }
+}
+</script>
+
+<style scoped>
+.bounced{
+
+}
+.tableBtn {
+  width: 90px;
+  display: inline-block;
+  text-align: center;
+}
+.tableBtn a{
+  color:rgba(10,143,246,1)!important;
+  text-decoration:none;
+}
+.EventTheme {
+  width: 195px;
+  height: 46px;
+}
+.EventThemeDate1 {
+  width: 250px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 150px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 83px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+}
+</style>

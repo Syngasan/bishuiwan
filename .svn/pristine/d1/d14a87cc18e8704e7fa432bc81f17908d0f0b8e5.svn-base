@@ -1,0 +1,42 @@
+<template>
+  <div class="hall">
+      <el-col :span="4">
+    <el-menu default-active="/toTask" class="el-menu-vertical-demo" :router="true" style="text-align:left">
+      <el-menu-item index="/toTask"><i class="el-icon-time"></i>抢任务</el-menu-item>
+      <el-menu-item index="/myTask"><i class="el-icon-tickets"></i>我的任务</el-menu-item>
+      <el-menu-item index="/releaseTaskDetail"><i class="el-icon-edit-outline"></i>发布任务</el-menu-item>
+      <el-menu-item index="/published"><i class="el-icon-printer"></i>已发布</el-menu-item>
+    </el-menu>
+  </el-col>
+        <el-col :span="20">
+          <el-main>
+          <router-view></router-view>
+        </el-main>
+        </el-col>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'hall',
+  data () {
+    return {
+
+    }
+  },
+  // mounted () {
+  //   console.log(77777777777777)
+
+  //   this.$router.push('/toTask')
+  // }
+  created () {
+    this.$router.push('/toTask')
+  }
+}
+</script>
+<style lang="scss" scoped>
+.task {
+  padding-bottom: 50px;
+   min-height: 750px;
+}
+</style>

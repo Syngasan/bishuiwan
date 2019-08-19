@@ -1,0 +1,266 @@
+<template>
+  <div class="PersonalAwardDeductionDetails">
+    <el-row class="IntegralAuditBox">
+      <el-col :span="8">
+        事件类型：
+        <el-select v-model="eventTypeId" class="EventTheme" placeholder="请选择事件类型">
+          <el-option :key="item.name" :label="item.name" :value="item.id" v-for="(item,index) in eventType"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="8">
+        初审人：
+        <el-input class="EventTheme" placeholder="请输入初审人" v-model="firstExamineName"></el-input>
+      </el-col>
+      <el-col :span="8">
+        终审人：
+        <el-input class="EventTheme" placeholder="请输入终审人" v-model="secondExamineName"></el-input>
+      </el-col>
+      <el-col :span="12">
+        奖扣日期：
+        <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="happenTimeBegin"></el-date-picker>
+        至 
+        <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="happenTimeEnd"></el-date-picker>
+      </el-col>
+      <el-col :span="12">
+        录入日期：
+        <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="createTimeBegin"></el-date-picker>
+        至 
+        <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="createTimeEnd"></el-date-picker>
+      </el-col>
+
+      <el-col :span="8">
+        事件主题：
+        <el-input class="EventTheme" placeholder="请输入事件主题" v-model="keyword"></el-input>
+      </el-col>
+      <el-col :span="8">
+        事件内容：
+        <el-input class="EventTheme" placeholder="请输入事件内容" v-model="content"></el-input>
+      </el-col>
+      <el-col :span="8">
+        分值：
+        <el-input class="EventThemeNum" v-model="valueBegin"></el-input>
+        到
+        <el-input class="EventThemeNum" v-model="valueEnd"></el-input>
+        <el-button type="primary" @click="getList">查询</el-button>
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column align="center" min-width="50px" prop="businessId" label="序号"></el-table-column>
+      <el-table-column align="center" min-width="100px" prop="eventTypeName" label="事件类型"></el-table-column>
+      <el-table-column align="center" min-width="100px" prop="title" label="事件主题"></el-table-column>
+      <el-table-column align="center" min-width="100px" prop="content" label="事件内容"></el-table-column>
+      <el-table-column align="center" min-width="85px" prop="value" label="分值" :render-header="renderHeader1" v-if="hiddenHeader1"></el-table-column>
+      <el-table-column align="center" min-width="100px" prop="firstExamineName" label="初审人" :render-header="renderHeader2" v-if="hiddenHeader2"></el-table-column>
+      <el-table-column align="center" min-width="100px" prop="secondExamineName" label="终审人" :render-header="renderHeader3" v-if="hiddenHeader3"></el-table-column>
+      <el-table-column align="center" min-width="100px" prop="recordName" label="记录人" :render-header="renderHeader4" v-if="hiddenHeader4"></el-table-column>
+      <el-table-column align="center" min-width="120px" prop="happenTime" label="奖扣日期" :render-header="renderHeader5" v-if="hiddenHeader5"></el-table-column>
+      <el-table-column align="center" min-width="120px" prop="createTime" label="录入日期" :render-header="renderHeader6" v-if="hiddenHeader6"></el-table-column>
+    </el-table>
+    <el-row>
+      <!-- <el-col :span="4">
+        <el-button type="primary">导出excel</el-button>
+      </el-col> -->
+      <el-col :span="24">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNumber" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next,  jumper" :total="total">
+        </el-pagination>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+export default {
+  name: 'PersonalAwardDeductionDetails',
+  data () {
+    return {
+      hiddenHeader1: true,
+      hiddenHeader2: true,
+      hiddenHeader3: true,
+      hiddenHeader4: true,
+      hiddenHeader5: true,
+      hiddenHeader6: true,
+      eventType: [],
+      eventTypeId: '',
+      keyword: '',
+      content: '',
+      firstExamineName: '',
+      secondExamineName: '',
+      happenTimeBegin: '',
+      happenTimeEnd: '',
+      createTimeBegin: '',
+      createTimeEnd: '',
+      eventTypeId: '',
+      keyword: '',
+      valueBegin: '',
+      valueEnd: '',
+      tableData: [],
+      pageNumber: 1,
+      pageSize: 10,
+      total: 0
+    }
+  },
+  created() {
+    this.getEventType()
+    this.getList()
+  },
+  mounted () {
+    this.$nextTick(() => {
+      var _this = this
+      document.getElementById('hiden1').onclick = function () {
+        _this.hiddenHeader1 = false
+      }
+      document.getElementById('hiden2').onclick = function () {
+        _this.hiddenHeader2 = false
+      }
+      document.getElementById('hiden3').onclick = function () {
+        _this.hiddenHeader3 = false
+      }
+      document.getElementById('hiden4').onclick = function () {
+        _this.hiddenHeader4 = false
+      }
+      document.getElementById('hiden5').onclick = function () {
+        _this.hiddenHeader5 = false
+      }
+      document.getElementById('hiden6').onclick = function () {
+        _this.hiddenHeader6 = false
+      }
+    })
+  },
+  methods: {
+    getEventType () {
+      this.$axios({
+        url: 'eventtype/getEventTypeName',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.eventType = res.data.data
+        }
+      })
+    },
+    getList () {
+      this.$axios({
+        url: 'score/myIntegralDeTailPC',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId'),
+          eventTypeId: this.eventTypeId,
+          firstExamineName: this.firstExamineName,
+          secondExamineName: this.secondExamineName,
+          happenTimeBegin: this.happenTimeBegin,
+          happenTimeEnd: this.happenTimeEnd,
+          createTimeBegin: this.createTimeBegin,
+          createTimeEnd: this.createTimeEnd,
+          eventTypeId: this.eventTypeId,
+          keyword: this.keyword,
+          content: this.content,
+          valueBegin: this.valueBegin,
+          valueEnd: this.valueEnd,
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        console.log(res)
+        if (res.data.code === 1) {
+          this.total = res.data.data.totalRow
+          this.tableData = res.data.data.list
+        }
+      })
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.getList()
+    },
+    handleCurrentChange(val) {
+      this.pageNumber = val
+      this.getList()
+    },
+    renderHeader1() {
+      return (
+        <div>
+          <span>分值</span>
+          <i class="iconfont icon-xianshi" id="hiden1"></i>
+        </div>
+      )
+    },
+    renderHeader2() {
+      return (
+        <div>
+          <span>初审人</span>
+          <i class="iconfont icon-xianshi" id="hiden2"></i>
+        </div>
+      )
+    },
+    renderHeader3() {
+      return (
+        <div>
+          <span>终审人</span>
+          <i class="iconfont icon-xianshi" id="hiden3"></i>
+        </div>
+      )
+    },
+    renderHeader4() {
+      return (
+        <div>
+          <span>记录人</span>
+          <i class="iconfont icon-xianshi" id="hiden4"></i>
+        </div>
+      )
+    },
+    renderHeader5() {
+      return (
+        <div>
+          <span>奖扣日期</span>
+          <i class="iconfont icon-xianshi" id="hiden5"></i>
+        </div>
+      )
+    },
+    renderHeader6() {
+      return (
+        <div>
+          <span>录入日期</span>
+          <i class="iconfont icon-xianshi" id="hiden6"></i>
+        </div>
+      )
+    }
+  }
+}
+</script>
+
+<style scoped>
+.icon-xianshi {
+  cursor: pointer;
+}
+.EventTheme {
+  width: 200px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 170px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 83px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+  padding-right: 90px;
+}
+</style>

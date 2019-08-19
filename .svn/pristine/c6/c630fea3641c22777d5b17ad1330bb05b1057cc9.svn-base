@@ -1,0 +1,124 @@
+<template>
+  <div class="MyInformation">
+    <div class="divBox">
+      <img class="HeadPortrait" src="">
+      <div class="Grade">V 20</div>
+      <div class="GradeImg"><img src=""><img src=""><img src=""><img src=""></div>
+      <div class="progressBox">
+        <span class="Grade">V 20</span>
+        <el-progress :text-inside="true" :stroke-width="18" :percentage="80" color="rgba(220,179,119, 0.7)"></el-progress>
+        <span class="Grade">V 21</span>
+      </div>
+      <div class="forUp">距升级V21还剩32日 </div>
+      <div class="listBox">
+        <div class="title">基本信息</div>
+        <div class="desc"><span class="descL">姓名：</span><span>王小明</span></div>
+        <div class="desc"><span class="descL">性别：</span><span>男</span></div>
+        <div class="desc"><span class="descL">部门：</span><span>昌文酒店-房务部</span></div>
+        <div class="desc"><span class="descL">职务：</span><span>经理</span></div>
+        <div class="desc"><span class="descL">工号：</span><span>0000001</span></div>
+        <div class="borderBottom"></div>
+        <div class="title">联系方式</div>
+        <div class="desc"><span class="descL">邮箱：</span><span>654852692@qq.com</span><span class="change">修改邮箱</span></div>
+        <div class="desc"><span class="descL">电话：</span><span>13545685238</span><span class="change">修改电话</span></div>
+        <div class="borderBottom"></div>
+        <div class="desc"><span class="descL">账号：</span><span>001</span></div>
+        <div class="desc"><span class="descL">密码：</span><span>********</span><span class="change">修改密码</span></div>
+        <div class="desc"><span class="descL">手机号码：</span><span>135****4567</span><span class="change">修改手机号码</span></div>
+        <div class="borderBottom"></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'MyInformation',
+  data () {
+    return {
+
+    }
+  }
+}
+</script>
+
+<style scoped>
+.divBox {
+  padding: 20px 18px 28px 19px;
+  text-align: center;
+}
+.HeadPortrait {
+  width: 92px;
+  height: 92px;
+}
+.Grade {
+  font-size:18px;
+  font-family:PingFang-SC-Bold;
+  font-weight:bold;
+  color:rgba(255,255,255,1);
+  width: 50px;
+  height: 26px;
+  margin: 0 auto;
+  background-color: rgb(220,179,119);
+  border-radius: 5px;
+  margin-top: 22px;
+  padding: 5px;
+}
+.GradeImg {
+  margin-top: 22px;
+}
+.GradeImg img{
+  width: 25px;
+  height: 20px;
+  margin: 0 1px;
+  border-radius: 50%;
+}
+.progressBox {
+  margin-top: 19px;
+}
+.el-progress {
+  width: 375px;
+  display: inline-block;
+}
+.forUp {
+  font-size:15px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(43,43,43,1);
+  margin-top: 8px;
+  padding-bottom: 38px;
+  border-bottom: 1px solid rgba(233,237,246,1);
+}
+.listBox {
+  text-align: left;
+}
+.title {
+  font-size:20px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  margin-top: 27px;
+  color:rgba(31,31,31,1);
+}
+.desc {
+  margin-top: 24px;
+  font-size:16px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(23,23,23,1);
+}
+.descL {
+  color:rgba(151,151,151,1);
+}
+.borderBottom {
+  margin-top: 25px;
+  border: 1px solid rgba(233,237,246,1);
+}
+.change {
+  float: right;
+  font-size:18px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(10,143,246,1);
+  cursor: pointer;
+}
+</style>

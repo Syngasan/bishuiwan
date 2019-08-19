@@ -1,0 +1,139 @@
+<template>
+  <div class="integralSelect">
+    <ul class="navTitle">
+      <li class="active"><router-link to="/integralSelect">积分构成</router-link></li>
+      <li><router-link to="/Prizes">奖扣明细</router-link></li>
+      <li><router-link to="/BuckleExecution">奖扣执行</router-link></li>
+    </ul>
+    <el-row class="IntegralAuditBox">
+      <el-col :span="12">姓名或工号：<el-input class="EventTheme" placeholder="请输入姓名或工号" v-model="name"></el-input></el-col>
+      <el-col :span="12">
+        选 择 部 门：
+        <el-select v-model="select1" class="EventTheme" placeholder="请选择活动区域">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="12">
+        选 择 月 份：<el-date-picker class="dateInput EventTheme" type="date" placeholder="选择日期" v-model="date1"></el-date-picker>
+      </el-col>
+      <el-col :span="12">
+        排 序 依 据：
+        <el-select v-model="select2" class="EventTheme" placeholder="请选择活动区域">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select>
+        <el-button type="primary">查询</el-button>
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="date" label="姓名"></el-table-column>
+      <el-table-column prop="date" label="部门"></el-table-column>
+      <el-table-column prop="date" label="工号"></el-table-column>
+      <el-table-column prop="date" label="日常奖扣分"></el-table-column>
+      <el-table-column prop="date" label="奖扣任务分"></el-table-column>
+      <el-table-column prop="date" label="固定积分"></el-table-column>
+      <el-table-column prop="date" label="总积分"></el-table-column>
+    </el-table>
+    <el-row>
+      <el-col :span="4">
+        <el-button type="primary">导出excel</el-button>
+      </el-col>
+      <el-col :span="20">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="100" layout="total, sizes, prev, pager, next,  jumper" :total="100">
+        </el-pagination>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'integralSelect',
+  data () {
+    return {
+      name: '',
+      select1: '',
+      date1: '',
+      select2: '',
+      tableData: [
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'},
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}],
+      currentPage4: 1
+    }
+  },
+  methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    }
+  }
+}
+</script>
+
+<style scoped>
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle a{
+  text-decoration:none;
+  color:rgba(21,21,21,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.EventTheme {
+  width: 290px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+</style>

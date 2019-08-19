@@ -1,0 +1,141 @@
+<template>
+  <div class="forget">
+    <div class="logo"><img src="../../images/logo_w@2x.png"><span>员工积分管理系统</span></div>
+    <div class="loginCon">
+      <div class="loginTitle">Password</div>
+      <div class="welcome">找回密码</div>
+      <el-input class="ForInputPadding" placeholder="请输入手机号码"><i slot="prefix" class="el-input__icon iconfont icon-phone iconStyle"></i></el-input>
+      <el-row>
+        <el-col :span="16"><el-input class="ForInputPaddings ForInput" placeholder="请输入验证码"><i slot="prefix" class="el-input__icon iconfont icon-anquanbaozhang1 iconStyle"></i></el-input></el-col>
+        <el-col :span="8"><el-button class="sureBtn" type="primary">获取验证码</el-button></el-col>
+      </el-row>
+      <el-input class="ForInputPadding ForInput" placeholder="请输入新密码"><i slot="prefix" class="el-input__icon iconfont icon-suo iconStyle"></i></el-input>
+      <el-input class="ForInputPadding ForInput" placeholder="请再次输入密码"><i slot="prefix" class="el-input__icon iconfont icon-suo iconStyle"></i></el-input>
+      <el-row>
+        <el-col :span="24"><el-button class="sureBtne" type="primary">重置</el-button></el-col>
+      </el-row>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'forget',
+  data () {
+    return {
+    }
+  }
+}
+</script>
+
+<style scoped>
+.forget {
+  background-image: url(../../images/bg@2x.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.logo {
+  text-align: left;
+}
+.logo span{
+  font-size:27px;
+  font-family:MicrosoftYaHei;
+  font-weight:bold;
+  color:rgba(10,143,246,1);
+  line-height:39px;
+  margin-left:30px;
+  position: absolute;
+  top: 58px;
+}
+.logo img {
+  width: 105px;
+  height: 54px;
+  margin-left: 43px;
+  margin-top: 38px;
+}
+.loginCon {
+  width: 386px;
+  height: 561px;
+  background-image: url(../../images/Login_bg@2x.png);
+  margin:200px auto;
+  padding: 0px 41px 37px 42px;
+}
+.loginTitle {
+  width:121px;
+  height:23px;
+  font-family:PingFang-SC-Medium;
+  font-size:30px;
+  font-weight:500;
+  color:rgba(55,61,65,1);
+  line-height:0px;
+  margin: 0 auto;
+  padding-top: 42px;
+}
+.ForInputPadding {
+  width:385px;
+  height: 49px;
+}
+.ForInputPaddings {
+  width:267px;
+  /*height: 49px;*/
+}
+.welcome{
+  font-size:18px;
+  font-weight:500;
+  color:rgba(115,119,122,1);
+  line-height:0px;
+  margin-top: 36px;
+  text-align: left;
+  height:28px;
+}
+.ForInput{
+  margin-top: 23px;
+}
+.iconStyle{
+ font-size:18px;
+ margin-left:4px;
+}
+.rememberCon {
+  text-align: left;
+}
+.remember {
+  font-size:15px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(90,90,90,1);
+}
+.forGet {
+  text-align: right;
+  font-size:15px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(10,143,246,1);
+}
+.sureBtn {
+  width: 100%;
+  width:118px;
+  height:40px;
+  margin-top: 23px;
+  margin-left: 8px
+
+}
+.sureBtne {
+  font-size:19px;
+  width: 100%;
+  width:385px;
+  height:47px;
+  margin-top: 68px
+}
+.downPhone {
+  font-size:17px;
+  font-weight:400;
+  color:rgba(63,63,63,1);
+  line-height:0px;
+  margin-top: 30px;
+  height:17px;
+}
+.downPhoneImg img{
+  width: 182px;
+  height: 57px;
+}
+</style>

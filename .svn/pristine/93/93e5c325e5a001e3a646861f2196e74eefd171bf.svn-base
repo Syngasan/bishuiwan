@@ -1,0 +1,166 @@
+<template>
+  <div class="IntegralLog">
+    <el-row class="IntegralAuditBox">
+      <el-col :span="24" class="textR"><el-button plain type="primary" @click="routerBack">返回</el-button></el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="businessName" label="公司名称" align="center"></el-table-column>
+      <el-table-column prop="createTime" label="结算月份" align="center"></el-table-column>
+      <el-table-column prop="rewardTaskId" label="结算状态" align="center">
+        <template  slot-scope="scope">
+          <span v-if="scope.row.rewardTaskId == 0">未结算</span>
+          <span v-else-if="scope.row.rewardTaskId == 1">已结算</span>
+          <span v-else>未知</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="updateUser" label="更新人" align="center"></el-table-column>
+      <el-table-column prop="updateTime" label="更新日期" align="center"></el-table-column>
+      <el-table-column prop="createTime" label="操作" align="center" width="300px">
+        <template slot-scope="scope">
+          <div><span class="tableBtn" @click="dialogVisible=true">重新结算</span><router-link :to="'/IntegralDetail?month='+scope.row.createTime"><span class="tableBtn">查看明细</span></router-link></div>
+          <div><router-link :to="'/ExclusionStaff?month='+scope.row.createTime"><span class="tableBtn">查看排除人员</span></router-link><span class="tableBtn" @click="exportExcel">导出报表</span></div>
+        </template>
+        <!-- <template slot-scope="scope">
+            <el-button size="mini" type="primary" class="tableBtn" @click="Resettlement">重新结算</el-button>
+            <el-button size="mini" type="primary" class="tableBtn">导出报表</el-button>
+          </template> -->
+      </el-table-column>
+    </el-table>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNumber" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next,  jumper" :total="total">
+    </el-pagination>
+    <el-dialog :visible.sync="dialogVisible" width="20%" :center='true'>
+      选 择 月 份：<el-date-picker class="EventTheme" type="month" format="yyyy-MM" value-format="yyyy-MM" placeholder="选择月份" v-model="dateMonth"></el-date-picker>
+      <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="dialogVisible=false">取 消</el-button>
+          <el-button type="primary" @click="pushN">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+export default {
+  name: 'IntegralLog',
+  data () {
+    return {
+      dateMonth: '',
+      dialogVisible: false,
+      radio: '1',
+      name: '',
+      select1: '',
+      date1: '',
+      select2: '',
+      date2: '',
+      tableData: [],
+      currentPage4: 1,
+      total: 0,
+      pageNumber: 1,
+      pageSize: 10,
+    }
+  },
+  created () {
+    this.getList()
+  },
+  methods: {
+    pushN() {
+      if (this.dateMonth == '' || this.dateMonth == null) {
+        Message.error({
+    message: '請選擇月份',
+    customClass: 'messageClass',
+    center: true
+  })
+        return false
+      }
+      this.$axios({
+        url: 'steady/settlement',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId'),
+          date: this.month + '-01'
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
+    routerBack () {
+      this.$router.back(-1)
+    },
+    exportExcel () {
+      window.location.href = "http://10.0.0.110:8080/bishuiwan/api/steady/exportExcludeUserModelExcel?sessionId="+this.$cookie.get('sessionId')
+    },
+    getList () {
+      this.$axios({
+        url: 'steady/pageSettlementLog',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId'),
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize,
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        console.log(res)
+        if (res.data.code === 1) {
+          this.total = res.data.data.totalRow
+          this.tableData = res.data.data.list
+        }
+      })
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.getList()
+    },
+    handleCurrentChange(val) {
+      this.pageNumber = val
+      this.getList()
+    }
+  }
+}
+</script>
+
+<style scoped>
+.tableBtn {
+  width: 90px;
+  display: inline-block;
+  text-align: center;
+}
+.tableBtn a{
+  color:rgba(10,143,246,1)!important;
+  text-decoration:none;
+}
+.EventTheme {
+  width: 195px;
+  height: 46px;
+}
+.EventThemeDate1 {
+  width: 250px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 150px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 83px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+}
+</style>

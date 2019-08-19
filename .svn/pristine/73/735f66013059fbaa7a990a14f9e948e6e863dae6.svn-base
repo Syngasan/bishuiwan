@@ -1,0 +1,51 @@
+<template>
+  <div class="ExclusionStaff">
+  	<el-row class="IntegralAuditBox">
+  	  <el-col :span="14" class="textl">XX月排除人员</el-col>
+      <el-col :span="10" class="textR"><el-button plain type="primary" @click="routerBack">返回</el-button></el-col>
+      <el-col :span="24">
+      	<el-button type="primary">主要按钮</el-button>
+      	<el-button type="primary">主要按钮</el-button>
+      	<el-button type="primary">主要按钮</el-button>
+      	<el-button type="primary">主要按钮</el-button>
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="date" label="公司名称" align="center"></el-table-column>
+      <el-table-column prop="date" label="结算月份" align="center"></el-table-column>
+      <el-table-column prop="date" label="结算状态" align="center"></el-table-column>
+      <el-table-column prop="date" label="更新人" align="center"></el-table-column>
+      <el-table-column prop="date" label="更新日期" align="center"></el-table-column>
+      <el-table-column prop="date" label="操作" align="center" width="200px">
+        <template slot-scope="scope">
+        	<el-button type="primary">主要按钮</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="100" layout="total, sizes, prev, pager, next,  jumper" :total="100">
+    </el-pagination>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'ExclusionStaff',
+  data () {
+    return {
+    	tableData: [
+    		{date: 123}
+    	]
+    }
+  }
+}
+</script>
+
+<style scoped>
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.textR {
+  text-align: right;
+}
+</style>

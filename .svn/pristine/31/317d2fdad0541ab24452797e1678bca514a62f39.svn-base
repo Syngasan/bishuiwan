@@ -1,0 +1,111 @@
+<template>
+  <div class="tableEntry">
+    <ul class="navTitle">
+      <li><router-link to="/WebEntry">网页录入</router-link></li>
+      <li class="active"><router-link to="/tableEntry">excel录入</router-link></li>
+      <li><router-link to="/Submission">已提交</router-link></li>
+      <li><router-link to="/drafts">草稿箱</router-link></li>
+    </ul>
+    <div>
+      <div class="tableEntryBox">
+        <el-button type="primary">验证</el-button>
+        <el-button plain>提交</el-button>
+      </div>
+      <el-table :data="tableData" stripe>
+        <el-table-column prop="address" label="事件主题" align="center"></el-table-column>
+        <el-table-column prop="address" label="初审人" align="center"></el-table-column>
+        <el-table-column prop="address" label="终审人" align="center"></el-table-column>
+        <el-table-column prop="address" label="奖扣日期" align="center"></el-table-column>
+        <el-table-column prop="address" label="事件类型" align="center"></el-table-column>
+        <el-table-column prop="address" label="事件内容" align="center"></el-table-column>
+        <el-table-column prop="address" label="分值" align="center"></el-table-column>
+        <el-table-column prop="address" label="奖扣对象" align="center"></el-table-column>
+      </el-table>
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="100" layout="total, sizes, prev, pager, next, jumper" :total="100">
+    </el-pagination>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'tableEntry',
+  data () {
+    return {
+      tableData: [
+       { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'},
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}
+      ],
+      currentPage4: 1
+    }
+  },
+  methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    }
+  }
+}
+</script>
+
+<style scoped>
+ul, li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.navTitle {
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+  padding-top: 12px;
+}
+.navTitle li{
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle a{
+  text-decoration:none;
+  color:rgba(21,21,21,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.tableEntryBox {
+  padding: 10px 15px 10px 0;
+  text-align: right;
+}
+.el-pagination {
+  margin-top: 43px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+</style>

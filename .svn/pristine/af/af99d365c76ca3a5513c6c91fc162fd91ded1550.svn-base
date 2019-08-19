@@ -1,0 +1,271 @@
+<template>
+  <div class="BuckleExecution">
+    <ul class="navTitle">
+      <li><router-link to="/integralSelect">积分构成</router-link></li>
+      <li><router-link to="/Prizes">奖扣明细</router-link></li>
+      <li class="active"><router-link to="/BuckleExecution">奖扣执行</router-link></li>
+    </ul>
+    <el-row class="IntegralAuditBox">
+      <el-col :span="12">
+        <el-radio v-model="radio1" label="1">
+          按月查询：
+          <el-date-picker class="EventTheme" v-model="month" format="yyyy-MM" value-format="yyyy-MM" type="month" placeholder="选择月"></el-date-picker>
+        </el-radio>
+      </el-col>
+      <el-col :span="12">
+        <el-radio v-model="radio1" label="2">
+          录入日期：
+          <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="beginTime"></el-date-picker>
+          至 
+          <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="endTime"></el-date-picker>
+        </el-radio>
+      </el-col>
+      <el-col :span="8">
+        姓 名：
+        <el-input class="EventTheme" placeholder="请输入员工姓名" v-model="name"></el-input>
+      </el-col>
+      <el-col :span="8">
+        选择部门：
+        <!-- <el-select v-model="AllConcatTypeId" class="EventTheme" placeholder="请选择部门">
+          <el-option :key="index" :label="item.concatName" :value="item.id" v-for="(item,index) in AllConcatType"></el-option>
+        </el-select> -->
+                <el-cascader
+                      placeholder="碧水湾" size='small' 
+                      expand-trigger="hover"
+                      :options="option"
+                      :props="prop"
+                      change-on-select
+                      v-model="selectedOptions2"
+                      @change="handleChange">
+                    </el-cascader>
+      </el-col>
+      <el-col :span="8">
+        排序依据：
+        <el-select v-model="sort" class="EventTheme" placeholder="请选择排序依据">
+          <el-option label="用户" value="0"></el-option>
+          <el-option label="总奖分" value="1"></el-option>
+          <el-option label="奖分数量" value="2"></el-option>
+          <el-option label="平均扣分" value="3"></el-option>
+          <el-option label="总减分" value="4"></el-option>
+          <el-option label="扣分数" value="5"></el-option>
+          <el-option label="平均扣分" value="6"></el-option>
+          <!-- <el-option :key="item.name" :label="item.name" :value="item.id" v-for="(item,index) in sort"></el-option> -->
+        </el-select>
+        <el-button type="primary" @click="getList">查询</el-button>
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column align="center" prop="userId" label="序号"></el-table-column>
+      <el-table-column align="center" prop="realName" label="姓名"></el-table-column>
+      <el-table-column align="center" prop="department" label="部门"></el-table-column>
+      <el-table-column align="center" prop="rewardNumber" label="总奖分"></el-table-column>
+      <el-table-column align="center" prop="rewardCount" label="奖分人次"></el-table-column>
+      <el-table-column align="center" prop="rewardAverage" label="平均奖分"></el-table-column>
+      <el-table-column align="center" prop="reduceNumber" label="总扣分"></el-table-column>
+      <el-table-column align="center" prop="reduceCount" label="扣分人次"></el-table-column>
+      <el-table-column align="center" prop="reduceAverage" label="平均扣分"></el-table-column>
+    </el-table>
+    <el-row>
+      <el-col :span="4">
+        <el-button type="primary" @click="exportExcel">导出excel</el-button>
+      </el-col>
+      <el-col :span="20">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNumber" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next,  jumper" :total="total">
+        </el-pagination>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+// import { curentYearMonth } from '@/utils/date/getDate'
+import {ifSettlement,settlement,getAllDepartment} from '@/utils/axios/axios'
+export default {
+  name: 'BuckleExecution',
+  data () {
+    return {
+      radio1: '1',
+      name: '',
+      sort: '0',
+      // date1: '',
+      month: '',
+      beginTime: '',
+      endTime: '',
+      pageNumber: 1,
+      pageSize: 10,
+      total: 0,
+      tableData: [],
+      AllConcatType:[],
+      AllConcatTypeId: '',
+      selectedOptions2:[],
+      prop: {
+        value: 'id',
+        children: 'children',
+        label: 'name'
+      },
+      option: [],
+      departmentId:''
+    }
+  },
+  created () {
+    // this.date1 = curentYearMonth()
+    this.getList()
+    this.getAllConcatType()
+    this.getAugrment()
+  },
+  methods: {
+    handleChange (value) {
+      console.log(this.selectedOptions2[this.selectedOptions2.length-1],'选中部门',value)
+      this.departmentId = this.selectedOptions2[this.selectedOptions2.length-1]
+      this.queryType = 2
+    },
+    exportExcel() {
+      window.location.href = 'http://112.74.105.6:8080/bishuiwan/api/score/ExportIntegralExecutionPCExcel?name='+this.name+'&month='+this.month+'&sort='+this.sort+'&departmentId='+this.departmentId+'&beginTime='+this.beginTime+'&endTime='+this.endTime+'&pageNumber='+this.pageNumber+'&pageSize='+this.pageSize+'&sessionId='+this.$cookie.get('sessionId')
+    },
+     getAllConcatType () {
+      this.$axios({
+        url: 'department/getAllConcatName',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.AllConcatType = res.data.data
+        }
+      })
+    },
+    getList () {
+      // this.month = this.date1.split('-')[1]
+      this.$axios({
+        url: 'score/integralExecutionPC',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          // date: this.date1 + '-01',
+          name: this.name,
+          month: this.month,
+          sort: this.sort,
+          departmentId: this.departmentId,
+          beginTime: this.beginTime,
+          endTime: this.endTime,
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize,
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.total = res.data.data.totalRow
+          // for (var i = 0; i < res.data.data.list.length; i++) {
+          //   res.data.data.list[i].splitTime = res.data.data.list[i].createTime.split('-')[0]+'-'+res.data.data.list[i].createTime.split('-')[1]
+          // }
+          this.tableData = res.data.data.list
+        }
+      })
+    },
+        getAugrment () {
+        // this.$axios({
+        //   url: 'department/getAllJsonDepartment',
+        //   method: 'POST',
+        //   data: {
+        //     sessionId: localStorage.getItem('sessionId'),
+        //     departmentId:this.departmentId
+        //   },
+        //   transformRequest: transformRequestFn
+        // }).then((res) => {
+        //   if (res.data.code === 1) {
+        //     this.option = res.data
+        //   }
+        // })
+        let sessionId = localStorage.getItem('sessionId')
+        let departmentId = this.departmentId
+        let params = {
+          sessionId:sessionId,
+          departmentId:departmentId
+        }      
+        getAllDepartment ( this.$qs.stringify(params) ).then(res => {
+          if ( res.code === 1){
+            // for (let item of this.option) {
+            //       item = res.data
+            //       console.log(item,'没');
+                  
+            //   }
+            // this.option.push(res.data)
+            this.option = res.data          
+          }        
+        })
+      },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.getList()
+    },
+    handleCurrentChange(val) {
+      this.pageNumber = val
+      this.getList()
+    }
+  }
+}
+</script>
+
+<style scoped>
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle a{
+  text-decoration:none;
+  color:rgba(21,21,21,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.EventTheme {
+  width: 155px;
+  height: 46px;
+}
+.EventThemeDate1 {
+  width: 250px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 150px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 83px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+  padding-right: 90px;
+}
+</style>

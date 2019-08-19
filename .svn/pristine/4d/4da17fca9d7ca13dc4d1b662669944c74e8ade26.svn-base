@@ -1,0 +1,248 @@
+<template>
+  <div class="inheader">
+    <div class="bigBox">
+        <el-row class="logo">
+        <el-col :span="12"><img src="../../images/logo_w@2x.png" class="logoHeader"><span>员工积分管理系统</span></el-col>
+        <el-col :span="12">
+          <el-row>
+            <el-col :span="15"><img src=""></el-col>
+            <el-col :span="9">
+              <!-- <div>糖糖</div> -->
+              <div class="presonL" style="    display: flex;
+              justify-content: center;
+              align-items: center;" >
+                <img :src="head" class="logoContent" @click="toPerson()">
+                <div class="personMsg">
+                  <div class="personName" @click="toPerson()">{{  realName  }}</div>
+                  <div class="personScore">
+                    <img src="../../images/nav_moon@2x.png" alt="">
+                    <img src="../../images/nav_moon@2x.png" alt="">
+                    <img src="../../images/nav_moon@2x.png" alt="">
+                  </div>
+                </div>
+                <div class="utils">
+                  <img src="../../images/nav_new@2x.png" alt="消息" @click="toMessage()">
+                  <div class="messageNumber" v-if="messageNumber">
+                  </div>
+                  <img src="../../images/nav_back@2x.png" alt="" style="margin-left:10px" @click="out()">
+                </div>
+              </div>
+            </el-col>
+            <el-col :span="5"><img src="" class="logoFooter"></el-col>
+            <el-col :span="5"><img src="" class="logoFooter"></el-col>
+          </el-row>
+        </el-col>
+      </el-row>
+      <!-- <el-row style="margin-top:30px">
+        <el-col :span="4" @click.native="routerGo('home',indexs)"><a :class="'home' === indexs ? 'currentRouter' : ''">首页</a></el-col>
+        <el-col :span="4" @click.native="routerGo('Administration',indexs)"><a :class="'Administration' === indexs ? 'currentRouter' : ''">积分管理</a></el-col>
+        <el-col :span="4" @click.native="routerGo('ReportForm',indexs)"> <a :class="'ReportForm' === indexs ? 'currentRouter' : ''">积分报表</a></el-col>
+        <el-col :span="4" @click.native="routerGo('hall',indexs)"><a :class="'hall' === indexs ? 'currentRouter' : ''">任务大厅</a></el-col>
+        <el-col :span="4" @click.native="routerGo('Community',indexs)"><a :class="'Community' === indexs ? 'currentRouter' : ''">社区</a></el-col>
+        <el-col :span="4" @click.native="routerGo('personal',indexs)"><a :class="'personal' === indexs ? 'currentRouter' : ''">个人中心</a></el-col>
+      </el-row> -->
+      <el-menu :default-active="currentPath" class="el-menu-demo menuflex" mode="horizontal" @select="handleSelect" :router="true">
+        <el-menu-item index="/home">首页</el-menu-item>
+        <el-menu-item index="/WebEntry">积分管理</el-menu-item>
+        <el-menu-item index="/integralReport">积分报表</el-menu-item>
+        <el-menu-item index="/toTask">任务大厅
+        <div class="qipao" v-if="taskNumber>0">
+          {{taskNumber}}
+        </div>
+          <!-- <i class="qipao">1</i> -->
+          <el-tooltip class="item" effect="dark" content="Right Top 提示文字" placement="right-start" v-model="value">
+          </el-tooltip>
+        </el-menu-item>
+        <!-- <el-menu-item index="/Community">社区</el-menu-item> -->
+        <el-menu-item index="/MyPoints">个人中心</el-menu-item>
+      </el-menu>
+    </div>
+  </div>
+</template>
+
+<script>
+import {outLogin,getRecordNew} from '@/utils/axios/axios'
+export default {
+  name: 'inheader',
+  data () {
+    return {
+      currentPath: '',
+      realName:'',
+      head:'',
+      value:true,
+      messageNumber:0,
+      taskNumber:0
+    }
+  },
+//  computed: {
+//       messageNumbers: function(){
+//           if (this.messageNumber ==0) {
+//             return false
+//           } else {
+//             return true 
+//           }
+//       },
+//   },
+  watch: {
+    messageNumber:function name(val,oldval) {
+      console.log(val,oldval);
+      this.messageNumber = val
+    }
+  },
+  methods: {
+    routerGo (path) {
+      this.$router.push('/' + path)
+      console.log(path)
+      this.indexs = path
+    },
+    handleSelect (key, keyPath) {
+      console.log(key, keyPath)
+    },
+    toMessage () {
+      this.$router.push('/message')
+      this.messageNumber = 0
+    },
+    toPerson () {
+      this.$router.push('/MyPoints')
+    },
+    // 退出登录
+    out () {
+      console.log(2);
+      
+      // this.$router.push('/login')
+      let sessionId = localStorage.getItem('sessionId')
+      // console.log(sessionId)
+      let out = {sessionId:sessionId}
+      console.log(out);
+      
+      outLogin( this.$qs.stringify(out) ).then(res=>{
+        console.log(res,'退出登录');
+        if (res.code ===1 ) {
+          this.$router.push('/login')
+          localStorage.setItem('sessionId','')
+        }
+      })
+    },
+    // 气泡消息
+    qipao() {
+      let params = {
+         sessionId : localStorage.getItem('sessionId')
+      }
+      getRecordNew( this.$qs.stringify(params) ).then(res=>{
+        if (res.code ===1 ) {
+          console.log(res,'气泡消息');
+          // localStorage.setItem('examineNumber',res.data.examineNumber)
+          this.messageNumber = res.data.messageNumber
+          this.taskNumber = res.data.taskNumber
+        }
+      })
+    }
+  },
+  mounted () {
+    this.realName = localStorage.getItem('realName')
+    this.head = localStorage.getItem('head')
+    console.log(this.$route, '当前路由')
+    this.currentPath = this.$route.path
+    console.log(this.currentPath)
+    this.qipao()
+    // this.$router.push(currentPath)
+  }
+  
+}
+</script>
+
+<style scoped>
+.inheader {
+  width:100%;
+  min-width: 1200px;
+  height:135px;
+  background:rgba(255,255,255,1);
+  border-bottom: 1px solid #e6e6e6;
+  /* box-shadow:0px 2px 6px 0px rgba(80,91,99,0.19); */
+/*  margin: 0 auto;*/
+}
+.bigBox {
+  height:135px;
+  width: 1219px;
+  margin: 0 auto;
+}
+.logo{
+  text-align: left;
+}
+.logoContent {
+  width:42px;
+  height:41px;
+  border-radius:50%;
+  margin-top: 15px;
+}
+.logoHeader {
+  margin-top: 10px;
+  margin-left:20px
+}
+.inheader span {
+  width:224px;
+  height:28px;
+  font-size:27px;
+  font-family:MicrosoftYaHei;
+  font-weight:bold;
+  color:rgba(10,143,246,1);
+  line-height:39px;
+  margin-top: 29px;
+  margin-left:30px;
+  position: absolute;
+}
+.menuflex {
+  display: flex;
+  justify-content: space-around
+}
+.personName {
+  cursor: pointer;
+}
+.personMsg {
+  margin-top: 15px;
+  margin-left: 10px;
+}
+/* .currentRouter{
+
+background:rgba(10,143,246,1);
+} */
+.utils {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+  margin-left: 10px;
+  position: relative;
+}
+.utils img {
+  width:14px;
+  height:15px;
+}
+.qipao {
+  color: black;
+  position: relative;
+  bottom: 50px;
+  left: 50px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  font-size: 2px;
+  font-family : 微软雅黑;
+  background-color:red;
+  border-radius: 50%;
+}
+.messageNumber {
+  background-color: red;
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  top: 0px;
+  left: 10px;
+  border-radius: 50%
+}
+</style>
+<style>
+  .el-menu.el-menu--horizontal {
+    border:0px;
+  }
+</style>

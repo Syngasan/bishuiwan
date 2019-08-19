@@ -1,0 +1,103 @@
+<template>
+  <div class="IntegralAudit">
+    <ul class="navTitle">
+      <li class="active"><router-link to="/IntegralAudit">待审核</router-link></li>
+      <li><router-link to="/Audited">已审核</router-link></li>
+    </ul>
+    <el-row class="IntegralAuditBox">
+      <el-col :span="12">事件主题：<el-input class="EventTheme" placeholder="请输入事件主题" v-model="EventTheme"></el-input></el-col>
+      <el-col :span="12">初审人：<el-input class="EventTheme" placeholder="请输入初审人姓名" v-model="FirstInstance"></el-input></el-col>
+      <el-col :span="12">
+        奖扣日期：<el-date-picker class="dateInput" type="date" placeholder="选择日期" v-model="date1"></el-date-picker>
+        至 <el-date-picker class="dateInput" type="date" placeholder="选择日期" v-model="date2"></el-date-picker>
+      </el-col>
+      <el-col :span="12">
+        录入日期：<el-date-picker class="dateInput" type="date" placeholder="选择日期" v-model="date1"></el-date-picker>
+        至 <el-date-picker class="dateInput" type="date" placeholder="选择日期" v-model="date2"></el-date-picker>
+        <el-button type="primary">查询</el-button>
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="date" label="序号"></el-table-column>
+      <el-table-column prop="date" label="事件主题"></el-table-column>
+      <el-table-column prop="date" label="奖扣日期"></el-table-column>
+      <el-table-column prop="date" label="奖/扣分值"></el-table-column>
+      <el-table-column prop="date" label="初审人"></el-table-column>
+      <el-table-column prop="date" label="终审人"></el-table-column>
+      <el-table-column prop="date" label="记录人"></el-table-column>
+      <el-table-column prop="date" label="录入日期"></el-table-column>
+      <el-table-column prop="date" label="状态"></el-table-column>
+    </el-table>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="100" layout="total, sizes, prev, pager, next,  jumper" :total="100">
+    </el-pagination>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'IntegralAudit',
+  data () {
+    return {
+      EventTheme: '',
+      FirstInstance: '',
+      date1: '',
+      date2: '',
+      tableData: [],
+      currentPage4: 1
+    }
+  },
+  methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    }
+  }
+}
+</script>
+
+<style scoped>
+ul, li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.navTitle {
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+  padding-top: 12px;
+}
+.navTitle li{
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.EventTheme {
+  width: 290px;
+  height: 46px;
+}
+.dateInput {
+  width: 132px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+</style>

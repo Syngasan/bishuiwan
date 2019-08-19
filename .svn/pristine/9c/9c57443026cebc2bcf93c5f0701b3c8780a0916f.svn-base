@@ -1,0 +1,294 @@
+<template>
+  <div class="tableEntry">
+    <ul class="navTitle">
+      <li>
+        <router-link to="/WebEntry">网页录入</router-link>
+      </li>
+      <li class="active">
+        <router-link to="/tableEntry">表格录入</router-link>
+      </li>
+      <li>
+        <router-link to="/Submission">已提交</router-link>
+      </li>
+      <li>
+        <router-link to="/drafts">草稿箱</router-link>
+      </li>
+    </ul>
+    <div>
+      <div class="tableEntryBox">
+        <el-button type="primary" @click="exportExclude">下载模版</el-button>
+        <el-upload style="margin-left:10px" class="upload-demo" ref="upload" :limit=1 action='http://112.74.105.6:8080/bishuiwan/api/event/getImportExcelEvent' multiple method:="post" accept=".xls,.xlsx" :http-request="uploadSectionFile" :file-list="fileList" :auto-upload="true">
+          <el-button slot="trigger" type="primary">导入Excel</el-button>
+          <!-- <el-button style="margin-left: 10px;" size="small" type="success" @click="submitDone">确认提交</el-button> -->
+        </el-upload>
+        <el-button style="margin-left:10px" type="primary" @click="examineImportEvent">验证</el-button>
+        <el-button style="margin-left:10px" plain @click="importEvent">提交</el-button>
+        <el-button style="margin-left:10px" plain @click="importSuccessEvent">提交完成</el-button>
+      </div>
+      <el-table :data="tableData" stripe>
+        <el-table-column prop="title" label="事件主题" align="center"></el-table-column>
+        <el-table-column prop="firstExamineName" label="初审人" align="center"></el-table-column>
+        <el-table-column prop="secondExamineName" label="终审人" align="center"></el-table-column>
+        <el-table-column prop="happenTime" label="奖扣日期" align="center"></el-table-column>
+        <el-table-column prop="eventTypeName" label="事件类型" align="center"></el-table-column>
+        <el-table-column prop="content" label="事件内容" align="center"></el-table-column>
+        <el-table-column prop="value" label="分值" align="center"></el-table-column>
+        <el-table-column prop="userName" label="奖扣对象" align="center"></el-table-column>
+      </el-table>
+      <!-- <el-form-item type='flex' style="margin-top:10px;text-align:left">
+        <el-button type="primary"  size="small" @click="exportReport()">导出报表</el-button>
+      </el-form-item> -->
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNumber" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+      </el-pagination>
+    </div>
+  </div>
+</template>
+
+<script>
+import { Message } from "element-ui";
+import { transformRequestFn } from "@/utils/transformRequestFn/transformRequestFn";
+import {
+  exportEventExcel,
+  importEvent,
+  getImportExcelEvent,
+  examineImportEvent,
+  importSuccessEvent
+} from "@/utils/axios/axios";
+export default {
+  name: "tableEntry",
+  data() {
+    return {
+      tableData: [],
+      pageNumber: 1,
+      pageSize: 10,
+      total: 0,
+      fileList: [],
+      form: ""
+    };
+  },
+  created() {
+    // this.getList()
+  },
+  methods: {
+    importSuccessEvent() {
+      // this.$axios({
+      //   url: "event/importSuccessEvent",
+      //   method: "POST",
+      //   data: {
+      //     sessionId: localStorage.getItem("sessionId"),
+      //     jsonData: this.tableData
+      //   },
+      //   transformRequest: transformRequestFn
+      // }).then(res => {
+      //   if (res.data.code === 1) {
+      //     Message.success({
+      //       message: res.desc,
+      //       customClass: "messageClass",
+      //       center: true
+      //     });
+      //   }
+      // });
+      importSuccessEvent(this.form).then(res => {
+        if (res.code === 1) {
+          this.$message({
+            type: "success",
+            message: res.desc
+          });
+        }
+      });
+    },
+    // 完成
+    importEvent() {
+      importEvent(this.form).then(res => {
+        if (res.code === 1) {
+          this.$message({
+            type: "success",
+            message: res.desc
+          });
+        }
+      });
+    },
+    //   importEvent(){
+    //     this.$axios({
+    //       url: 'event/importEvent',
+    //       method: 'POST',
+    //       data: {
+    //         sessionId: localStorage.getItem('sessionId'),
+    //         jsonData: this.tableData
+    //       },
+    //       transformRequest: transformRequestFn
+    //     }).then((res) => {
+    //       if (res.data.code === 1) {
+    //         Message.success({
+    //   message: res.desc,
+    //   customClass: 'messageClass',
+    //   center: true
+    // })
+    //       }
+    //     })
+    //   },
+    examineImportEvent() {
+      //     this.$axios({
+      //       url: 'event/examineImportEvent',
+      //       method: 'POST',
+      //       data: {
+      //         sessionId: localStorage.getItem('sessionId'),
+      //         jsonData: this.tableData
+      //       },
+      //       transformRequest: transformRequestFn
+      //     }).then((res) => {
+      //       if (res.data.code === 1) {
+      //         Message.success({
+      //   message: res.desc,
+      //   customClass: 'messageClass',
+      //   center: true
+      // })
+      //       }
+      //     })
+      // console.log(this.form,'999');
+
+      examineImportEvent(this.form).then(res => {
+        if (res.code === 1) {
+          this.$message({
+            type: "success",
+            message: res.desc
+          });
+        }
+      });
+    },
+    exportExclude() {
+      // window.location.href =
+      //   "http://10.0.0.110:8080/bishuiwan/api/event/exportEventExcel?sessionId=" +
+      //   localStorage.getItem("sessionId");
+      let params = {
+        sessionId: localStorage.getItem("sessionId")
+      };
+      exportEventExcel(this.$qs.stringify(params)).then(res => {
+        console.log(res, "下载模板");
+        if (res.code === 0) {
+          this.$message.error("错误");
+        } else {
+          let str =
+            "http://112.74.105.6:8080/bishuiwan/api/event/exportEventExcel?sessionId=" +
+            localStorage.getItem("sessionId");
+          console.log(str, "跳转链接");
+          window.location.href = str;
+        }
+      });
+    },
+    // 成功导入
+    // submitUpload() {
+    //     let list = document.getElementsByClassName('el-upload-list__item is-ready')
+    //     if(list.length == 0){
+    //       this.$message({
+    //         type:'warning',
+    //         message:"请选择需要导入的模板！"
+    //       })
+    //       return;
+    //     }
+    //     this.$refs.upload.submit();
+    //   },
+    uploadSectionFile(param) {
+      var fileObj = param.file;
+      // FormData 对象
+      var form = new FormData();
+      // 文件对象
+      form.append("sessionId", localStorage.getItem("sessionId"));
+      form.append("eventExcel", fileObj);
+      form.append('pageNumber',this.pageNumber);
+      form.append('pageSize',this.pageSize)
+      console.log(form.get("sessionId"), "文件参数");
+      console.log("文件", fileObj);
+      this.form = form;
+      getImportExcelEvent(form).then(res => {
+        if (res.code == 1) {
+          this.$message({
+            type: "success",
+            message: res.desc
+          });
+          this.fileList = [];
+          this.tableData = res.data.list;
+          this.total = res.data.totalRow
+        } else {
+          this.$message({
+            type: "error",
+            message: res.desc
+          });
+          this.fileList = [];
+        }
+      });
+    },
+
+    getList() {
+      // this.$axios({
+      //   url: 'event/importEvent',
+      //   method: 'POST',
+      //   data: {
+      //     sessionId: localStorage.getItem('sessionId'),
+      //     pageNumber: this.pageNumber,
+      //     pageSize: this.pageSize,
+      //   },
+      //   transformRequest: transformRequestFn
+      // }).then((res) => {
+      //   if (res.data.code === 1) {
+      //     this.total = res.data.data.totalRow
+      //     this.tableData = res.data.data.list
+      //   }
+      // })
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getList();
+    },
+    handleCurrentChange(val) {
+      this.pageNumber = val;
+      this.getList();
+    }
+  }
+};
+</script>
+
+<style scoped>
+ul,
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.navTitle {
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+  padding-top: 12px;
+}
+.navTitle li {
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ababab;
+  font-size: 18px;
+  font-family: MicrosoftYaHei;
+  font-weight: 400;
+  color: rgba(38, 45, 57, 1);
+}
+.navTitle a {
+  text-decoration: none;
+  color: rgba(21, 21, 21, 1);
+}
+.navTitle .active a {
+  color: rgba(0, 131, 255, 1) !important;
+}
+.tableEntryBox {
+  padding: 10px 15px 10px 0;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  height: 60px;
+  box-sizing: border-box
+}
+.el-pagination {
+  margin-top: 43px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+</style>

@@ -1,0 +1,486 @@
+<template>
+  <!-- 发布任务 -->
+  <div class="task">
+    <div class="caogao" style="margin-left:26px">
+      <el-button type="primary" size="small" @click="caogao()">草稿箱</el-button>
+    </div>
+    <!-- <div class="header_title mt">
+      <div class="header_title_left">编辑任务</div>
+      <div class="header_title_right">
+        <el-button type="primary" plain size="small">返回</el-button>
+      </div>
+    </div> -->
+    <div class="contentDetail mt">
+      <el-form :inline="true">
+        <div class="content_header" style="margin-left:20px">
+          <i class="el-icon-edit-outline"></i>
+          填写发布任务
+        </div>
+         <el-row class="mt">
+           <el-col :span="8">
+             <el-form-item label="事件主题">
+              <el-input placeholder="请输入事件主题" size="small" style="width:200px" v-model="title"></el-input>
+            </el-form-item>
+           </el-col>
+           <el-col :span="8">
+             <el-form-item label="事件类型">
+              <el-select v-model="eventTypeId" placeholder="请选择" size='small' style="width:200px">
+                <el-option
+                  v-for="item in option"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+           </el-col>
+         </el-row>
+         <el-row class="mt" >
+           <el-col :span="8">
+             <el-form-item label="终  审 人">
+              <el-select v-model="secondExamineUserId" placeholder="请输入 \ 选择" size='small' style="width:200px" filterable @change="getinput(secondExamineUserId)">
+                <el-option
+                  v-for="item in options"
+                  :key="item.id"
+                  :label="item.nick"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+           </el-col>
+           <el-col :span="5">
+             <el-form-item label="完成奖分">
+              <el-input placeholder="" size="small" style="width:40px" v-model="reward"></el-input>&nbsp;分
+            </el-form-item>
+           </el-col>
+           <el-col :span="5">
+             <el-form-item label="未完成扣分" >
+              <el-input  size="small" style="width:40px" v-model="deduction"></el-input> &nbsp;分
+            </el-form-item>
+           </el-col>
+         </el-row>
+         <el-row class="mt">
+           <el-col :span="8">
+             <el-form-item label="备      注">
+              <el-input placeholder="请输入备注内容" size="small" style="width:200px" v-model="remark"></el-input>
+            </el-form-item>
+           </el-col>
+         </el-row>
+         <el-row  class="mt">
+           <el-col :span="8">
+             <el-form-item label="任务内容">
+             <el-input
+            type="textarea"
+            :rows="2"
+            placeholder="请输入事件内容" v-model="content">
+          </el-input>
+           </el-form-item>
+           </el-col>
+         </el-row>
+         <el-row class="mt">
+           <el-col :span="8">
+             <el-form-item label=" 推送范围">
+              <el-select v-model="example0" placeholder="请选择推送范围" size='small' style="width:200px" @change="tuisong(example0)">
+                <el-option
+                  v-for="item in optionsa"
+                  :key="item.id"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+           </el-col>
+           <el-col :span="8">
+             <el-form-item label="数量上限">
+              <el-input placeholder="请输入数量上限" size="small" style="width:200px" v-model="number"></el-input>
+            </el-form-item>
+           </el-col>
+         </el-row>
+         <!-- 设置推送范围 -->
+         <el-row > 
+           <el-col :span="4">
+             <el-form-item id="canSee" style="display:none">
+              <el-radio v-model="radio" label="1" class="font" >设置可见范围</el-radio>
+            </el-form-item>
+           </el-col>
+         </el-row>
+
+         <el-row >
+           <div class="can" id="canSee1" style="display:none">
+             <el-col :span="8" >
+             <el-form-item > 
+               <div class="checkBox" >
+                 <div class="checkBox_left">房务部</div>
+                 <div class="checkBox_right">
+                  X
+                 </div>
+             </div>
+             </el-form-item>
+           </el-col>
+           <el-col :span="8">
+             <el-form-item>
+               <div class="checkBox">
+                 <div class="checkBox_left">房务部</div>
+                 <div class="checkBox_right">
+                  X
+                 </div>
+             </div>
+             </el-form-item>
+           </el-col>
+           </div>
+         </el-row>
+
+         <el-row>
+           <el-col :span="8">
+              <el-form-item label="完成期限"  style="margin-left:10px;">
+              <el-date-picker type="date" placeholder="请选择完成期限"  size="small" style="width:200px"></el-date-picker>
+            </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="截止日期"  style="margin-left:10px;">
+              <el-date-picker type="date" placeholder="请选择完成期限"  size="small" style="width:200px"></el-date-picker>
+            </el-form-item>
+            </el-col>
+         </el-row>
+      </el-form>
+      <el-button type="primary" size="small" @click="commit()">发布</el-button>
+      <el-button  size="small">保存</el-button>
+    </div>
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisible"
+      width="30%"
+      >
+      <!-- <el-transfer
+        v-model="value"
+        filterable
+        :left-default-checked="[2, 3]"
+        :right-default-checked="[1]"
+        :render-content="renderFunc"
+        :titles="['Source', 'Target']"
+        :button-texts="['到左边', '到右边']"
+        :format="{
+          noChecked: '${total}',
+          hasChecked: '${checked}/${total}'
+        }"
+        @change="handleChange"
+        :data="data">
+        <el-button class="transfer-footer" slot="left-footer" size="small">操作</el-button>
+        <el-button class="transfer-footer" slot="right-footer" size="small">操作</el-button>
+      </el-transfer> -->
+      <!-- <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" >确 定</el-button>
+      </span> -->
+    </el-dialog>
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisible1"
+      >
+      <!-- <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" >确 定</el-button>
+      </span> -->
+      <el-transfer
+      style="text-align: left; display: inline-block"
+      v-model="value4"
+      filterable
+      :left-default-checked="[]"
+      :right-default-checked="[]"
+      :titles="['Source', 'Target']"
+      :button-texts="['到左边', '到右边']"
+      :format="{
+        noChecked: '${total}',
+        hasChecked: '${checked}/${total}'
+      }"
+      @change="handleChange"
+      :data="data">
+      <span slot-scope="{ option }">{{ option.key }} - {{ option.label }}</span>
+      <!-- <el-button class="transfer-footer" slot="left-footer" size="small">操作</el-button>
+      <el-button class="transfer-footer" slot="right-footer" size="small">操作</el-button> -->
+      <div  class="transfer-footer" slot="left-footer">
+        <el-cascader
+                      placeholder="默认报表" size='small'
+                      expand-trigger="hover"
+                      :options="optionPeople"
+                      :props="www"
+                      v-model="selectedOptions2"
+                      @change="handleChange">
+                    </el-cascader>
+      </div>
+      <!-- <div  class="transfer-footer" slot="right-footer"></div> -->
+    </el-transfer>
+    </el-dialog>
+  </div>
+</template>
+<script>
+import {publishTask ,getExamineUserByBusiness,getEventTypeName,getDepartment} from '@/utils/axios/axios'
+export default {
+  data () {
+    const generateData = _ => {
+      const data = []
+      const old = []
+      for (let i = 0; i <= old.length; i++) {
+        data.push({
+          key: i,
+          label: old[i]
+          // label: `备选项 ${i}`
+          // disabled: i % 4 === 0
+        })
+      }
+      return data
+    }
+    return {
+      data: generateData(),
+      value3: [1],
+      value4: [1],
+      renderFunc (h, option) {
+        return <span>{ option.key } - { option.label }</span>
+      },
+      option:[],
+      options: [],
+      optionsa: [{
+        value: 1,
+        label: '部分可见'
+      }, {
+        value: 2,
+        label: '定向推送'
+      }
+      , {
+        value: 0,
+        label: '全员'
+      }],
+      title: '',
+      valuetuisong: 10,
+      radio: true,
+      dialogVisible: false,
+      dialogVisible1: false,
+      example0: '',
+      eventTypeId:this.eventTypeId,
+      secondExamineUserId:'',
+      secondExamineUserName:'',
+      reward:'',
+      deduction:'',
+      content:'',
+      remark:'',
+      ranges:"",
+      number:"",
+      endTime:'',
+      happenTime:'',
+      groupId:'',
+      optionPeople:[],
+      value:[],
+      www: {
+        value: 'id',
+        children: 'children',
+        label: 'name'
+      },
+      selectedOptions2:[]
+    }
+  },
+  methods: {
+    caogao () {
+      console.log(1)
+
+      this.$router.push('/releaseTask')
+    },
+    // handleChange (value, direction, movedKeys) {
+    //   console.log(value, direction, movedKeys)
+    // },
+    handleChange (value) {
+      console.log(this.selectedOptions2,'选中部门',value)
+      for( let item of this.optionPeople ) {
+        for (let item2 of this.data) {
+          item2.label = item. name
+        }
+      }
+    },
+    commit () {
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        title:this.title,
+        eventTypeId:this.eventTypeId,
+        secondExamineUserId:this.secondExamineUserId,
+        secondExamineUserName:this.secondExamineUserName,
+        reward:this.reward,
+        deduction:this.deduction,
+        content:this.content,
+        remark:this.remark,
+        ranges:this.example0,
+        number:this.number,
+        endTime:this.endTime,
+        happenTime:this.happenTime,
+        groupId:this.groupId
+      }
+      // publishTask( this.$qs.stringify(params) ).then(res=>{
+      //   console.log(res,'发布任务');
+        
+      // })
+      console.log(params,'发布');
+      
+    },
+    init() {
+      let params = {
+        sessionId:localStorage.getItem('sessionId')
+      }
+      getExamineUserByBusiness( this.$qs.stringify(params) ).then(res=>{
+        if(res.code === 1) {
+          this.options = res.data
+          // console.log(this.options,'dd');
+        }
+      })
+      getEventTypeName( this.$qs.stringify(params) ).then(res=>{
+        if(res.code === 1) {
+          this.option = res.data
+          console.log(this.option,'dd');
+        }
+      })
+    },
+    // 同时获取value和label
+    getinput(val) {
+     let obj = {};
+      obj = this.options.find((item)=>{//这里的userList就是上面遍历的数据源
+          return item.id === val;//筛选出匹配数据
+      });
+      console.log(obj.nick,val);//我这边的name就是对应label的
+      this.secondExamineUserName=obj.nick
+    },
+    getDepartmentPeople () {
+      let sessionId = localStorage.getItem('sessionId')
+      // let departmentId = this.departmentId
+      let params = {
+        sessionId:sessionId,
+        // departmentId:departmentId
+      }      
+      getDepartment( this.$qs.stringify(params) ).then(res => {
+        if ( res.code === 1){
+          // for (let item of this.option) {
+          //       item = res.data
+          //       console.log(item,'没');
+                
+          //   }
+          // this.option.push(res.data)
+          this.optionPeople = res.data
+          console.log(res,'集团');
+                    
+        }        
+      })
+    },
+    tuisong(val) {
+      console.log(this.optionPeople,'推送',this.data);
+      // switch (val) {
+      //   case val===1:
+      //     this.dialogVisible = true
+      //     break;
+      // case val===2:
+      //     this.dialogVisible1 = true
+      //     break;
+      //   default:
+      //     break;
+      // }
+      if ( val ===1) {
+          this.dialogVisible = true
+        
+      } else if (val ===2) {
+        // 定向
+        this.dialogVisible1 = true
+        this.getDepartmentPeople()
+      }   
+    }
+  },
+  mounted () {
+    this.init()
+  },
+  watch: {
+    // example0 (curVal, oldVal) {
+    //   console.log(curVal, oldVal)
+    //   if (curVal === 1) {
+    //     this.dialogVisible = true
+    //     // console.log(this.$refs.canSee,'可见');
+    //     console.log(document.getElementById('canSee'));
+    //     document.getElementById('canSee').style.display='block'
+    //     document.getElementById('canSee1').style.display='block'
+    //   } else if (curVal === 2) {
+    //     this.dialogVisible1 = true
+    //     document.getElementById('canSee').style.display='none'
+    //     document.getElementById('canSee1').style.display='none'
+    //   }
+    // }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+  li {
+    list-style: none;
+  }
+  .task {
+    background-color: #F2F9FF;
+    padding: 15px;
+    width: 100%;
+    min-height: 750px
+  }
+  .caogao {
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 10px;
+  }
+  .header_title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+  .header_title_left {
+    // width:60px;
+    height:20px;
+    font-size:20px;
+    font-family:PingFang-SC-Regular;
+    font-weight:bold;
+    color:rgba(0,0,0,1);
+    line-height:0px;
+  }
+  .content_header {
+    width:160px;
+    height:20px;
+    font-size:20px;
+    font-family:MicrosoftYaHei;
+    font-weight:400;
+    color:rgba(21,21,21,1);
+  }
+  .mt {
+    margin-top: 15px;
+  }
+  .font {
+    width:107px;
+  height:18px;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(6,147,255,1);
+  line-height:0px;
+  }
+  .checkBox {
+    width:217px;
+    height:38px;
+    // background:rgba(97,97,97,1);
+    // background-color: red;
+    border: 1px solid black;
+    border-radius:5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing:  border-box;
+    padding: 0 10px;
+  }
+  .checkBox_right {
+    width:27px;
+    height:27px;
+    line-height: 27px;
+    font-size: 20px;
+    vertical-align: middle;
+    color: #979797;
+    border-radius:50%;
+    border: 1px solid black;
+  }
+</style>

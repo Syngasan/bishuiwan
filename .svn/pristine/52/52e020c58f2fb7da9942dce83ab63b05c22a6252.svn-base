@@ -1,0 +1,243 @@
+<template>
+  <div class="task">
+    <!-- <el-tabs type="border-card"> -->
+  <!-- <el-tab-pane label="当前任务"> -->
+    <ul class="navTitle">
+      <li class="active"><router-link to="/myTask">当前任务</router-link></li>
+      <li><router-link to="/myTaskDid">未完成</router-link></li>
+       <li><router-link to="/taskCommit">已提交</router-link></li>
+
+    </ul>
+    <div class="bigBox">
+            <ul>
+        <li>
+          <div class="liDiv" @click="toDetail()">
+            <div class="left_div" >
+              <img src="../../images/rwxq_pic01@2x.png" class="left_div_img">
+              <div>王小明</div>
+              <div>部门</div>
+            </div>
+            <div class="right_div">
+              <div class="right_div_title">
+                <div class="jifen">+10/-10</div>
+                <div style="text-align:left" class="mt">全员任务内容任务内容任务内容任务内容任务内容任务内容务内容
+任务内容任务内容任务内....ddd</div>
+              </div>
+              <div class="right_div_content">
+                <div class="right_div_content_word">2018-07-22  12:35发布</div>
+                <el-button type="primary" size="small" class="btn" @click.stop="commit($event)">提交任务</el-button>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="liDiv" @click="totitleDetail()">
+            <div class="left_div" >
+              <img src="../../images/rwxq_pic01@2x.png" class="left_div_img">
+              <div>王小明</div>
+              <div>部门</div>
+            </div>
+            <div class="right_div">
+              <div class="right_div_title">
+                <div class="jifen">+10/-10</div>
+                <div style="text-align:left" class="mt">推送任务内容任务内容任务内容任务内容任务内容任务内容务内容
+任务内容任务内容任务内....ddd</div>
+              </div>
+              <div class="right_div_content">
+                <div class="right_div_content_word">2018-07-22  12:35发布</div>
+                <el-button type="primary" size="small" class="btn" v-on:click="commit($event)">提交任务</el-button>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  <!-- </el-tab-pane>
+  <el-tab-pane label="未完成"></el-tab-pane>
+  <el-tab-pane label="已提交"></el-tab-pane>
+
+</el-tabs> -->
+  </div>
+</template>
+<script>
+export default {
+  data () {
+    return {
+      index: ''
+    }
+  },
+  methods: {
+    commit (event) {
+      console.log(event)
+
+      event.stopPropagation()
+
+      this.$confirm('确认提交任务?, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: '提交成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消提交'
+        })
+      })
+    },
+    toDetail () {
+      this.$router.push('/allTaskDetail')
+    },
+    totitleDetail () {
+      this.$router.push('/titleTaskDetail')
+    }
+  }
+}
+</script>
+<style scoped >
+a{
+  text-decoration: none;
+  color: #262D39;
+}
+a:visited {
+color:#262D39;
+text-decoration:none;
+}
+a:active {
+color:#0083FF;
+text-decoration:none;
+}
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+font-family:MicrosoftYaHei;
+font-weight:400;
+color:rgba(38,45,57,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.divBox {
+  padding: 20px 18px 28px 19px;
+  background-color: #F2F9FF;
+}
+
+</style>
+<style lang="scss" scoped>
+.task {
+  padding-bottom: 50px;
+  min-height: 750px;
+}
+.bigBox {
+  background-color: #F2F9FF;
+  width: 100%;
+  height: 100%;
+  padding: 10px
+}
+li{
+  list-style: none
+}
+.liDiv {
+  width: 95%;
+  height: 136px;
+  background:rgba(255,255,255,1);
+  margin: 0 auto;
+  margin-top: 10px;
+  text-align: left;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  box-shadow:0px 5px 18px 0px rgba(10,143,246,0.14);
+}
+.left_div{
+  width: 20%;
+  height: 100%;
+  display: flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items: center;
+  box-sizing: border-box;
+}
+.left_div_img{
+  width:51px;
+height:51px;
+border-radius:26px;
+}
+.right_div {
+  width: 80%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  box-sizing: border-box;
+  border-left: 1px solid rgba(233,238,242,1);
+}
+.jifen {
+  width:87px;
+height:25px;
+font-size:26px;
+font-family:PingFang-SC-Bold;
+font-weight:bold;
+color:rgba(10,143,246,1);
+line-height:36px;
+}
+.right_div_title {
+  width:432px;
+height:41px;
+font-size:16px;
+font-family:MicrosoftYaHei;
+font-weight:400;
+color:rgba(130,135,142,1);
+line-height:26px;
+}
+.right_div_title span {
+  width:139px;
+height:13px;
+font-size:13px;
+font-family:MicrosoftYaHei;
+font-weight:400;
+color:rgba(185,185,185,1);
+}
+.mt {
+  margin-top: 15px;
+}
+.right_div_content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.right_div_content_word {
+  width:139px;
+  height:13px;
+  font-size:13px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(185,185,185,1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.btn {
+  margin-top: 30px;
+  width: 109px;
+  height: 35px;
+}
+</style>

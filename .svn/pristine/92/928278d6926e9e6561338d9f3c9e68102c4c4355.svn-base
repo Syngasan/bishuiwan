@@ -1,0 +1,321 @@
+<template>
+  <div class="AccumulativeIntegral">
+    <ul class="navTitle">
+      <li><router-link to="/MyPoints">月积分</router-link></li>
+      <li class="active"><router-link to="/AccumulativeIntegral">累计积分</router-link></li>
+      <li><router-link to="/IntegralTrend">积分趋势</router-link></li>
+      <li><router-link to="/RankingTrend">排名趋势</router-link></li>
+      <li style="float: right !important;cursor: pointer;" @click="getRange"><img src="./img/my_icon_sz@2x.png"></li>
+    </ul>
+    <div class="divBox">
+      <el-row>
+        <el-col :span="16">
+          选择月份：
+          <!-- <el-date-picker class="EventTheme" type="date" format="yyyy-MM" value-format="yyyy-MM" placeholder="选择日期" v-model="date1" @change="setTime"></el-date-picker> -->
+          <el-date-picker
+                    class="dateInput"
+                    type="date"
+                    placeholder="选择日期"
+                    v-model="date1"
+                    @change="setTime"
+                    format="yyyy-MM-dd"
+                    value-format="yyyy-MM-dd"></el-date-picker>
+          至
+          <el-date-picker class="EventTheme" type="month" format="yyyy-MM" value-format="yyyy-MM" placeholder="选择日期" v-model="date2"></el-date-picker>
+        </el-col>
+        <el-col :span="8"><el-button type="primary" @click="getList">查询</el-button></el-col>
+      </el-row>
+      <div class="divBoxS">
+        <div class="title">累计积分：{{list.account}}分</div>
+        <!--创建一个echarts的容器-->
+        <div id="echartContainer" style="width:500px; height:500px"></div>
+        <div class="TotalIntegral">总积分：{{list.total}}分</div>
+        <div class="daily">日常奖扣分：{{list.totalDaily}}分</div>
+        <div class="Buckle">奖扣任务分：{{list.totalReward}}分</div>
+        <div class="fixedS">固定积分：{{list.totalSteady}}分</div>
+      </div>
+    </div>
+    <el-dialog title="设置默认排名范围" :visible.sync="dialogVisible"  :center='true'>
+        <!-- <template>
+          <el-radio v-model="radio" :label="item.id" :key="index" v-for="(item,index) in rangeList">{{item.name}}</el-radio>
+        </template> -->
+        <div>
+                <div v-for="items in rangeList" :key="items.id">
+                  <input type="radio" :label="items.name" :value="items.name" name='radio'  :checked="items.checked"  @change="radioChange(items.id,items.type)">
+                  {{items.name}}
+                </div>
+
+          </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="setSortType">确 定</el-button>
+        </span>
+    </el-dialog>
+    <!-- <el-dialog title="设置默认排名范围" :visible.sync="dialogVisible1" width="20%" :center='true'>
+        <el-row>
+          <el-col :span="12"><el-radio v-model="radio1" :label="0">按小组名排</el-radio></el-col>
+          <el-col :span="12"><el-radio v-model="radio1" :label="1">按部门排</el-radio></el-col>
+          <el-col :span="12"><el-radio v-model="radio1" :label="2">按子公司排</el-radio></el-col>
+          <el-col :span="12"><el-radio v-model="radio1" :label="3">按公司排</el-radio></el-col>
+        </el-row>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogVisible1 = false">取 消</el-button>
+          <el-button type="primary" @click="setRange">确 定</el-button>
+        </span>
+    </el-dialog> -->
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+import { curentYearMonth } from '@/utils/date/getDate'
+export default {
+  name: 'AccumulativeIntegral',
+  data () {
+    return {
+      radio: '1',
+      radio1: '',
+      dialogVisible: false,
+      dialogVisible1: false,
+      date1: '',
+      date2: '',
+      month: '',
+      list: [],
+      chartData: [],
+      chartList: [],
+      rangeList: [],
+      type:'',
+      typeId:'',
+      secondBeginTime: ''
+    }
+  },
+  methods: {
+    setTime(e) {
+      console.log(e);
+    },
+    getList () {
+      this.chartData = []
+      this.chartList = []
+      this.$axios({
+        url: 'score/getMyCumulateScore',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          begin: this.date1 + '-01',
+          end: this.date2 + '-01'
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.list = res.data.data
+          for (var i = 0; i < res.data.data.list.length; i++) {
+            this.chartData.push(res.data.data.list[i].name)
+            this.chartList.push({name:res.data.data.list[i].name, value: res.data.data.list[i].ratio})
+          }
+          // 基于准备好的dom，初始化echarts实例
+          var myChart = this.$echarts.init(document.getElementById('echartContainer'))
+          // 绘制图表
+          myChart.setOption({
+              // title: { text: 'ECharts 入门示例' },
+              tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b} : {c} ({d}%)'
+              },
+              legend: {
+                orient: 'vertical',
+                right: 0,
+                bottom: 0,
+                data: this.chartData
+              },
+              // color: ['#ffa92a','#fb1f20','#64c21d','#2ea2f7'],
+              calculable : true,
+              series: [{
+                  name:'数据',
+                  type:'pie',
+                  radius : '60%',
+                  center: ['50%', '40%'],
+                  data: this.chartList
+              }]
+          })
+        }
+      })
+      // 基于准备好的dom，初始化echarts实例
+      var myChart = this.$echarts.init(document.getElementById('echartContainer'))
+      // 绘制图表
+      myChart.setOption({
+          // title: { text: 'ECharts 入门示例' },
+          tooltip: {
+             trigger: 'item',
+             formatter: '{a} <br/>{b} : {c} ({d}%)'
+          },
+          legend: {
+            orient: 'vertical',
+            right: 0,
+            bottom: 0,
+            data: ['工作分', '行为分', '营销分', '其他分']
+          },
+          color: ['#ffa92a','#fb1f20','#64c21d','#2ea2f7'],
+          calculable : true,
+          series: [{
+              name:'访问来源',
+              type:'pie',
+              radius : '70%',
+              center: ['50%', '60%'],
+              data: [
+                {value:335, name:'工作分'},
+                {value:310, name:'行为分'},
+                {value:234, name:'营销分'},
+                {value:135, name:'其他分'},
+              ]
+          }]
+      })
+    },
+     // radio值
+    radioChange(value ,types) {
+      console.log('radio值',value,types);
+      this.typeId = value
+      this.type = types
+    },
+    // 获取排名范围
+    getSortRange () {
+      this.$axios({
+        url: 'sort/getSortRange',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.rangeList.push(
+            {name: res.data.data.business.businessName, id: res.data.data.business.businessId, type: res.data.data.business.type,checked:false} ,
+            {name: res.data.data.company.companyName, id: res.data.data.company.companyId, type: res.data.data.company.type,checked:false},
+            {name: res.data.data.department.departmentName, id: res.data.data.department.departmentId, type: res.data.data.department.type,checked:false},
+            // {name: res.data.data.group.groupName, id: res.data.data.group.groupId}
+          )
+          for (let item of res.data.data.group) {
+            this.rangeList.push(
+              {name:item.groupName,id:item.groupId,type:item.type,checked:false}
+            )
+          }
+          for (let items of this.rangeList) {
+            if (items.id == res.data.data.selected.rangeId) {
+              items.checked =  true
+              this.typeId = items.id
+              this.type = items.type
+            }
+          }
+        }
+        console.log(res)
+      })
+    },
+    // 设置排名范围
+    setSortType () {
+      this.$axios({
+        url: 'sort/setSortType',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          id: this.typeId,
+          type: this.type
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.$message({
+            type: 'success',
+            message: res.data.desc
+          })
+          this.dialogVisible = false
+          this.getList()
+        }
+      })
+    },
+    getRange() {
+      this.dialogVisible = true
+    }
+  },
+  mounted () {
+    this.date1 = curentYearMonth()
+    this.date2 = this.date1
+    this.getList()
+    this.getSortRange()
+  }
+}
+</script>
+
+<style scoped>
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle a{
+  text-decoration:none;
+  color:rgba(21,21,21,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.divBox {
+  padding: 20px 18px 28px 19px;
+}
+.divBoxS {
+  margin-top: 35px;
+  padding: 43px 98px;
+  background-color: white;
+}
+.title {
+  font-size:26px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(1,1,1,1);
+  text-align: center;
+}
+#echartContainer {
+  margin: 0 auto;
+}
+.TotalIntegral {
+  font-size:27px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(13,13,13,1);
+}
+.daily {
+  margin-top: 24px;
+  font-size:20px;
+  font-family:PingFang-SC-Regular;
+  font-weight:400;
+  color:rgba(99,99,99,1);
+}
+.Buckle {
+  margin-top: 21px;
+  font-size:20px;
+  font-family:PingFang-SC-Regular;
+  font-weight:400;
+  color:rgba(99,99,99,1);
+}
+.fixedS {
+  margin-top: 22px;
+  font-size:20px;
+  font-family:PingFang-SC-Regular;
+  font-weight:400;
+  color:rgba(99,99,99,1);
+  padding-bottom: 48px;
+}
+</style>

@@ -1,0 +1,174 @@
+<template>
+  <div class="Bulletin">
+  <div class="BulletinList">
+    <div class="BulletinListNavigation">首页 -> <span class="colorB">公告列表</span></div>
+    <div class="BulletinListBox">
+      <el-row class="Box">
+        <el-col :span="6">
+            <img src="./img/u=3426437677,4051799481&fm=27&gp=0.jpg">
+        </el-col>
+        <el-col :span="18">
+          <div class="listBox">
+            <div class="title">到底什么时候该投简历？</div>
+            <div class="time">发布时间：2017-07-06</div>
+            <div class="contain">公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容<span class="list"><router-link to="/BulletinListDetails">详情</router-link></span></div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="BulletinListBox">
+      <el-row class="Box">
+        <el-col :span="6">
+            <img src="./img/u=3426437677,4051799481&fm=27&gp=0.jpg">
+        </el-col>
+        <el-col :span="18">
+          <div class="listBox">
+            <div class="title">到底什么时候该投简历？</div>
+            <div class="time">发布时间：2017-07-06</div>
+            <div class="contain">公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容<span class="list"><router-link to="/BulletinListDetails">详情</router-link></span></div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="BulletinListBox">
+      <el-row class="Box">
+        <el-col :span="6">
+            <img src="./img/u=3426437677,4051799481&fm=27&gp=0.jpg">
+        </el-col>
+        <el-col :span="18">
+          <div class="listBox">
+            <div class="title">到底什么时候该投简历？</div>
+            <div class="time">发布时间：2017-07-06</div>
+            <div class="contain">公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容<span class="list"><router-link to="/BulletinListDetails">详情</router-link></span></div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="BulletinListBox">
+      <el-row class="Box">
+        <el-col :span="6">
+            <img src="./img/u=3426437677,4051799481&fm=27&gp=0.jpg">
+        </el-col>
+        <el-col :span="18">
+          <div class="listBox">
+            <div class="title">到底什么时候该投简历？</div>
+            <div class="time">发布时间：2017-07-06</div>
+            <div class="contain">公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容<span class="list"><router-link to="/BulletinListDetails">详情</router-link></span></div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="BulletinListBox">
+      <el-row class="Box">
+        <el-col>
+          <div class="listBox">
+            <div class="title">到底什么时候该投简历？</div>
+            <div class="time">发布时间：2017-07-06</div>
+            <div class="contain">公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容。容公告内容公告内容公告内容公告内容公告内容<span class="list"><router-link to="/BulletinListDetails">详情</router-link></span></div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="paging">
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="10" layout="total, sizes, prev, pager, next,  jumper" :total="100">
+    </el-pagination>
+    </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'BulletinList',
+  data () {
+    return {
+      currentPage4: 1
+    }
+  },
+  methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    }
+  }
+}
+</script>
+
+<style scoped>
+.list {
+  color: rgb(121,185,248);
+}
+.list a {
+  color:rgba(10,143,246,1);
+  text-decoration: none;
+}
+.Bulletin {
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  background-color: #f8fbfe !important;
+}
+.BulletinList {
+  width: 1200px;
+  display: inline-block;
+  margin: 30px 0px 0px 0px;
+  background-color: #f8fbfe !important;
+}
+.BulletinListNavigation {
+  text-align: left;
+  font-size:13px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(28,28,28,1);
+  line-height:26px;
+}
+.colorB {
+  color: rgb(131,196,249);
+}
+.BulletinListBox {
+  margin-bottom: 13px;
+  padding: 34px 35px 37px 35px;
+  width: 1215px;
+  height: 180px;
+  background-color: #ffffff;
+}
+.BulletinListBox img{
+  width:252px;
+  height:169px;
+  margin-top: 10px;
+  margin-right: 50px ;
+}
+.listBox {
+  text-align: left;
+}
+.title {
+  font-size:20px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(30,30,30,1);
+  line-height:43px;
+}
+.time {
+  font-size:14px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(169,169,169,1);
+  line-height:22px;
+}
+.contain {
+  font-size:15px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(110,110,110,1);
+  line-height:26px;
+  margin-top: 24px;
+}
+.Box {
+  margin-bottom: 13px;
+}
+.paging{
+  margin-top: 41px;
+}
+</style>

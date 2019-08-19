@@ -1,0 +1,154 @@
+<template>
+  <div class="Bulletin">
+  <div class="BulletinList">
+    <div class="BulletinListNavigation">首页 -> <span class="colorB">公告列表</span></div>
+    <div class="BulletinListBox" v-for="(item,index) in list">
+      <el-row class="Box">
+        <el-col :span="6">
+            <img :src="item.image">
+        </el-col>
+        <el-col :span="18">
+          <div class="listBox">
+            <div class="title">{{item.title}}</div>
+            <div class="time">发布时间：{{item.createTime}}</div>
+            <div class="contain" v-html="item.content"></div>
+            <span class="list" @click="routerGoBulletinListDetails(item.id)">详情</span>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="paging">
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="pageSizes" :page-size.sync="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+    </el-pagination>
+    </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+export default {
+  name: 'BulletinList',
+  data () {
+    return {
+      pageSizes: [10, 20, 30, 40],
+      currentPage: 1,
+      pageSize: 10,
+      total: 10,
+      list: []
+    }
+  },
+  created () {
+    this.getList()
+  },
+  methods: {
+    routerGoBulletinListDetails (id) {
+      this.$router.push('/BulletinListDetails/' + id)
+    },
+    getList () {
+      this.$axios({
+        url: 'notice/page',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          pageSize: this.pageSize,
+          pageNumber: this.currentPage
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.total = res.data.data.totalRow
+          this.currentPage = res.data.data.pageNumber
+          this.list = res.data.data.list
+        }
+      })
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.getList()
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
+      this.getList()
+    }
+  }
+}
+</script>
+
+<style scoped>
+.list {
+  color: rgb(121,185,248);
+  cursor: pointer;
+}
+.list a {
+  color:rgba(10,143,246,1);
+  text-decoration: none;
+}
+.Bulletin {
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  background-color: #f8fbfe !important;
+}
+.BulletinList {
+  width: 1200px;
+  display: inline-block;
+  margin: 30px 0px 0px 0px;
+  background-color: #f8fbfe !important;
+}
+.BulletinListNavigation {
+  text-align: left;
+  font-size:13px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(28,28,28,1);
+  line-height:26px;
+}
+.colorB {
+  color: rgb(131,196,249);
+}
+.BulletinListBox {
+  margin-bottom: 13px;
+  padding: 34px 35px 37px 35px;
+  width: 1215px;
+  height: 180px;
+  background-color: #ffffff;
+}
+.BulletinListBox img{
+  width:252px;
+  height:169px;
+  margin-top: 10px;
+  margin-right: 50px ;
+}
+.listBox {
+  text-align: left;
+}
+.title {
+  font-size:20px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(30,30,30,1);
+  line-height:43px;
+}
+.time {
+  font-size:14px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(169,169,169,1);
+  line-height:22px;
+}
+.contain {
+  font-size:15px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(110,110,110,1);
+  line-height:26px;
+  margin-top: 24px;
+}
+.Box {
+  margin-bottom: 13px;
+}
+.paging{
+  margin-top: 41px;
+}
+</style>

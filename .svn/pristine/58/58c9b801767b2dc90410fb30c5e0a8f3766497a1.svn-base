@@ -1,0 +1,59 @@
+import axios from 'axios'
+import { Message } from 'element-ui'
+const URL = 'http://10.0.0.110:8080/bishuiwan/api/'
+
+axios.defaults.baseURL = URL
+// 超时时间
+axios.defaults.timeout = 300000
+
+// http请求拦截器
+axios.interceptors.request.use(config => {
+  return config
+}, error => {
+  Message.closeAll()
+  Message.error({
+    message: '加载超时',
+    customClass: 'messageClass',
+    center: true
+  })
+  return Promise.reject(error)
+})
+
+// http响应拦截器
+axios.interceptors.response.use(data => {
+  // 响应成功关闭loading
+  Message.closeAll()
+  if (data.data.code !== 1) {
+    Message.error({
+      message: data.data.desc,
+      customClass: 'messageClass',
+      center: true
+    })
+  }
+  return data
+}, error => {
+  Message.closeAll()
+  Message.error({
+    message: '加载失败',
+    customClass: 'messageClass',
+    center: true
+  })
+  return Promise.reject(error)
+})
+// 	登录页图片接口
+export const getLoginPic = obj => {
+  return axios.get('configure/get', {params: obj}).then(res => res.data)
+}
+// 登录
+export const checkLogin = params => axios.post('user/login', params).then(res => res.data)
+// 用户退出
+export const outLogin = params => axios.post('user/logout', params).then(res => res.data)
+// 6.1.11	按层级获取部门
+export const getDepartment = params => axios.post('department/getDepartment', params).then(res => res.data)
+// 7.1.2	(集团,子公司,部门)(月度,阶段性,累计)报表
+export const scorePageScore = params => axios.post('score/pageScore', params).then(res => res.data)
+// 7.1.7	获取所有自定义报表
+export const getAllReport = params => axios.post('report/getAllReport', params).then(res => res.data)
+// 7.2.1	所有小组 
+export const pageGroup = params => axios.post('group/pageGroup', params).then(res => res.data)
+export default axios

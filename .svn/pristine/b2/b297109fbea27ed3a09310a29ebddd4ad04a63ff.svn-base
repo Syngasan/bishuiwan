@@ -1,0 +1,231 @@
+<template>
+  <div class="MyPoints">
+    <ul class="navTitle">
+      <li class="active"><router-link to="/MyPoints">月积分</router-link></li>
+      <li><router-link to="/AccumulativeIntegral">累计积分</router-link></li>
+      <li><router-link to="/IntegralTrend">积分趋势</router-link></li>
+      <li><router-link to="/RankingTrend">排名趋势</router-link></li>
+      <li style="float: right !important;"><img src="./img/my_icon_sz@2x.png"></li>
+    </ul>
+    <div class="divBox">
+      <el-row>
+        <el-col :span="8">
+          选择月份：
+          <el-date-picker class="EventTheme" type="month" format="yyyy-MM" value-format="yyyy-MM" placeholder="选择月份" v-model="date1"></el-date-picker>
+        </el-col>
+        <el-col :span="8"><el-button type="primary" @click="getList">查询</el-button></el-col>
+        <div class="clear"></div>
+        <el-col :span="12" class="marginTopBox">
+          <div class="boxPadding">
+            <div class="title">房务部</div>
+            <div class="desc">{{month}}月排名</div>
+            <div class="descNum">{{list.currentSort}}</div>
+            <div class="descForList"><span>上月排名：{{list.previouslySort}}</span><span class="PointsDesc">排名变化：{{list.change}}</span></div>
+          </div>
+          <div class="forBox"></div>
+          <div class="boxPadding">
+            <div class="title">积分</div>
+            <div class="desc">{{month}}月积分</div>
+            <div class="descNum">{{list.thisMonth}}</div>
+            <div class="descForList"><span>上月积分：{{list.preMonth}}</span><span class="PointsDesc">累计积分：{{list.account}}</span></div>
+          </div>
+        </el-col>
+        <el-col :span="12" class="marginTopBox">
+          <div class="boxPadding">
+            <div class="desc">{{month}}月积分分析</div>
+            <!--创建一个echarts的容器-->
+            <div id="echartContainer" style="width:400px; height:400px"></div>
+            <div class="TotalIntegral">总积分：{{list.total}}分</div>
+            <div class="daily">日常奖扣分：{{list.totalDaily}}分</div>
+            <div class="Buckle">奖扣任务分：{{list.totalReward}}</div>
+            <div class="fixedS">固定积分：{{list.totalSteady}}分</div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+import { curentYearMonth } from '@/utils/date/getDate'
+export default {
+  name: 'MyPoints',
+  data () {
+    return {
+      date1: '',
+      month: '',
+      list: '',
+      chartData: [],
+      chartList: []
+    }
+  },
+  methods: {
+    getList () {
+      this.chartData = []
+      this.chartList = []
+      this.month = this.date1.split('-')[1]
+      this.$axios({
+        url: 'score/getMyScore',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId'),
+          date: this.date1 + '-01'
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.list = res.data.data
+          for (var i = 0; i < res.data.data.list.length; i++) {
+            this.chartData.push(res.data.data.list[i].name)
+            this.chartList.push({name:res.data.data.list[i].name, value: res.data.data.list[i].ratio})
+          }
+          // 基于准备好的dom，初始化echarts实例
+          var myChart = this.$echarts.init(document.getElementById('echartContainer'))
+          // 绘制图表
+          myChart.setOption({
+              // title: { text: 'ECharts 入门示例' },
+              tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b} : {c} ({d}%)'
+              },
+              legend: {
+                orient: 'vertical',
+                right: 0,
+                bottom: 0,
+                data: this.chartData
+              },
+              // color: ['#ffa92a','#fb1f20','#64c21d','#2ea2f7'],
+              calculable : true,
+              series: [{
+                  name:'数据',
+                  type:'pie',
+                  radius : '60%',
+                  center: ['50%', '40%'],
+                  data: this.chartList
+              }]
+          })
+        }
+      })
+    }
+  },
+  mounted () {
+    this.date1 = curentYearMonth()
+    this.getList()
+  }
+}
+</script>
+
+<style scoped>
+.MyPoints {
+  min-height: 1000px;
+}
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle a{
+  text-decoration:none;
+  color:rgba(21,21,21,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.divBox {
+  padding: 20px 18px 28px 19px;
+}
+.EventTheme {
+  width: 195px;
+  height: 46px;
+}
+.marginTopBox {
+  padding: 10px;
+}
+.boxPadding {
+  padding: 20px 21px;
+  border: 1px dotted #ccc;
+}
+.title {
+  font-size:19px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(10,143,246,1);
+  line-height:0px;
+}
+.desc {
+  margin-top: 41px;
+  text-align: center;
+  font-size:22px;
+  font-family:PingFang-SC-Medium;
+  font-weight:bold;
+  color:rgba(1,1,1,1);
+}
+.descNum {
+  font-size:70px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(29,161,243,1);
+  text-align: center;
+  margin-top: 57px;
+}
+.descForList {
+  font-size:19px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(37,37,37,1);
+  margin-top: 77px;
+}
+.PointsDesc {
+  margin-left: 65px;
+}
+.forBox {
+  height: 15px;
+}
+.echartContainer {
+  margin-top: 33px;
+}
+.TotalIntegral {
+  font-size:27px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(13,13,13,1);
+}
+.daily {
+  margin-top: 24px;
+  font-size:20px;
+  font-family:PingFang-SC-Regular;
+  font-weight:400;
+  color:rgba(99,99,99,1);
+}
+.Buckle {
+  margin-top: 21px;
+  font-size:20px;
+  font-family:PingFang-SC-Regular;
+  font-weight:400;
+  color:rgba(99,99,99,1);
+}
+.fixedS {
+  margin-top: 22px;
+  font-size:20px;
+  font-family:PingFang-SC-Regular;
+  font-weight:400;
+  color:rgba(99,99,99,1);
+  padding-bottom: 48px;
+}
+</style>

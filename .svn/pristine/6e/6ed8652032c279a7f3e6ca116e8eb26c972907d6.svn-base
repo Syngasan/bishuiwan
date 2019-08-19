@@ -1,0 +1,112 @@
+<template>
+  <div class="drafts">
+    <ul class="navTitle">
+      <li><router-link to="/WebEntry">网页录入</router-link></li>
+      <li><router-link to="/tableEntry">表格录入</router-link></li>
+      <li><router-link to="/Submission">已提交</router-link></li>
+      <li class="active"><router-link to="/drafts">草稿箱</router-link></li>
+    </ul>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="date" label="序号"></el-table-column>
+      <el-table-column prop="date" label="事件主题">
+          <template slot-scope="scope">
+          <router-link to="/DetailsOfTheEvent">{{scope.row.date}}</router-link>
+          </template>
+      </el-table-column>
+      <el-table-column prop="date" label="奖扣日期"></el-table-column>
+      <el-table-column prop="date" label="奖/扣分值"></el-table-column>
+      <el-table-column prop="date" label="初审人"></el-table-column>
+      <el-table-column prop="date" label="终审人"></el-table-column>
+      <el-table-column prop="date" label="记录人"></el-table-column>
+      <el-table-column prop="date" label="更新时间"></el-table-column>
+      <el-table-column prop="date" label="状态"></el-table-column>
+      <el-table-column prop="date" label="操作"></el-table-column>
+    </el-table>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="100" layout="total, sizes, prev, pager, next, jumper" :total="100">
+    </el-pagination>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'drafts',
+  data () {
+    return {
+      tableData: [
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'},
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}],
+      currentPage4: 1
+    }
+  },
+  methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    }
+  }
+}
+</script>
+
+<style scoped>
+ul, li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/*.JumpEvent {
+  text-decoration:none;
+}*/
+.navTitle {
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+  padding-top: 12px;
+}
+.navTitle li{
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle a{
+  text-decoration:none;
+  color:rgba(21,21,21,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  margin-top: 43px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+</style>

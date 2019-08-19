@@ -1,0 +1,892 @@
+<template>
+  <div class="ExclusionStaff">
+    <el-row class="IntegralAuditBox">
+      <el-col :span="14" class="textl">{{forMonth}}月排除人员</el-col>
+      <el-col :span="10" class="textR">
+        <el-button plain type="primary" @click="routerBack">返回</el-button>
+      </el-col>
+      <el-col :span="24">
+        <!-- <el-button type="primary" @click="dialogVisible1=true">添加</el-button> -->
+        <!-- <el-button type="primary" @click="addExcludeUser">提交</el-button> -->
+        <!-- <el-button type="primary" >导出excel</el-button> -->
+
+        <!-- <el-upload
+  :action="'http://10.0.0.110:8080/bishuiwan/api/steady/importExcludeUserUserExcel?sessionId=' + sessionId"
+  class="upload-demo"
+  ref="upload"
+  :auto-upload="false">
+  <el-button slot="trigger" size="small" type="primary">导入excel</el-button>
+  <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+</el-upload> -->
+        <div class="button_btn mTop">
+          <el-button type="primary" size="small" style="height:32px" @click="addUser()">添加</el-button>
+          <el-button type="primary" size="small" style="height:32px" @click="downExcal()">下载Excel模板</el-button>
+          <el-upload style="margin-left:10px" class="upload-demo" ref="upload" :limit=1 action='http://47.107.71.47/bishuiwan/api/steady/importExcludeUsersExcel' multiple method:="post" :on-preview="handlePreview" accept=".xls,.xlsx" :http-request="uploadSectionFile" :file-list="fileList" :auto-upload="true">
+            <el-button slot="trigger" size="small" type="primary">导入Excel</el-button>
+            <!-- <el-button style="margin-left: 10px;" size="small" type="success" @click="submitDone">确认提交</el-button> -->
+          </el-upload>
+          <el-button type="primary" style="margin-left:10px" size="small" @click="addExcludeUser()">提交</el-button>
+        </div>
+
+        <!-- <el-button type="primary" @click="exportExclude">下载excel模板</el-button> -->
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" stripe class="mTop">
+      <el-table-column prop="account" label="账号" align="center"></el-table-column>
+      <el-table-column prop="realName" label="姓名" align="center"></el-table-column>
+      <!-- <el-table-column prop="rewardTaskId" label="结算状态" align="center">
+        <template  slot-scope="scope">
+          <span v-if="scope.row.rewardTaskId == 0">未结算</span>
+          <span v-else-if="scope.row.rewardTaskId == 1">已结算</span>
+          <span v-else>未知</span>
+        </template>
+      </el-table-column> -->
+      <el-table-column prop="company" label="部门" align="center"></el-table-column>
+      <el-table-column prop="number" label="工号" align="center"></el-table-column>
+      <el-table-column label="操作" align="center" width="200px">
+        <template slot-scope="scope">
+          <el-button type="primary" @click="deleteTable(scope.row.userId)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div style="text-align:center" class="mTop">
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNumber" :page-sizes="[10, 100, 500, 1000]" :page-size="pageSize" layout="total, sizes, prev, pager, next,  jumper" :total="length">
+      </el-pagination>
+    </div>
+
+    <el-dialog title="选择成员" :visible.sync="dialogVisible1" width="40%">
+      <!-- <div class="treeBox">
+       <div class="leftTree">
+         <el-tree
+          :data="data4"
+          show-checkbox
+          node-key="id"
+          :props="prop9"
+          :expand-on-click-node="false"
+          @check-change="check_right_change"
+           ="[2, 1]"
+          ref="tree"
+          >
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span>{{ node.label }}</span>
+            <span>
+              <el-button
+                type="text"
+                size="mini"
+                @click="() => append(data)">
+                设为常选
+              </el-button>
+            </span>
+          </span>
+        </el-tree>
+
+
+        <div>
+            <span>常选人员</span>
+            <el-scrollbar style="height:500px;overflow-x: hidden;"> 
+              <el-tree
+                :data="data6"
+                show-checkbox
+                :props="prop11"
+                @check-change="check_right_change_Common"
+                ref="treechangxaun"
+                >
+                <span class="custom-tree-node" slot-scope="{ node, data }">
+                  <span>{{ node.label }}</span>
+                  <span>
+                    <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => noAppend(data)">
+                      取消常选
+                    </el-button>
+                  </span>
+                </span>
+              </el-tree>
+            </el-scrollbar>
+                  <el-button @click="add()" type="primary" size="small" style="text-align:right">确定</el-button>
+          </div>
+
+       </div>
+                         <div class="rightTree">
+                            <div >
+                              <ul v-for="(item,index) in checkList" :key="index">
+                                <li>
+                                  <el-button plain size="small" @click="delDepId(item.id)">{{item.name}}</el-button>
+                                </li>
+                              </ul>     
+                            </div>
+                            <div>
+                              <el-scrollbar style="height:100%;overflow-x: hidden;">
+                                  <ul v-for="(cols,colIndex) in checkListUser" :key="colIndex">
+                                    <li>
+                                      <el-button @click="delId(cols.id)" plain size="small">{{cols.realName}}</el-button>
+                                    </li>
+                                  </ul>
+                              </el-scrollbar>
+                            </div>
+                          </div>
+     </div> -->
+      <div class="treeBox">
+        <div class="leftTree">
+          <el-scrollbar style="height:250px;overflow-x: hidden;">
+            <el-input placeholder="输入关键字进行过滤" v-model="filterTexts">
+            </el-input>
+            <el-tree :data="data4" show-checkbox node-key="id" :props="prop9" :filter-node-method="filterNodes" :expand-on-click-node="false" @check-change="check_right_change" ref="tree">
+              <span class="custom-tree-node" slot-scope="{ node, data }">
+                <span>{{ node.label }}</span>
+                <span>
+                  <el-button type="text" class="fuckBtn" v-show="data.hasOwnProperty('account')" size="mini" @click="() => append(data)">
+                    设为常选
+                  </el-button>
+                </span>
+              </span>
+            </el-tree>
+          </el-scrollbar>
+          <div>
+            <span>常选人员</span>
+            <el-scrollbar style="height:250px;overflow-x: hidden;">
+              <el-tree :data="data6" show-checkbox :props="prop11" @check-change="check_right_change_Common" node-key="id" ref="treechangxaun">
+                <span class="custom-tree-node" slot-scope="{ node, data }">
+                  <span>{{ node.label }}</span>
+                  <span>
+                    <el-button type="text" class="fuckBtn" size="mini" @click="() => noAppend(data)">
+                      取消常选
+                    </el-button>
+                  </span>
+                </span>
+              </el-tree>
+            </el-scrollbar>
+
+          </div>
+        </div>
+
+        <div class="rightTree">
+          <div>
+            <ul>
+              <!-- 部门 -->
+              <li v-for="(item,index) in selectedTreeArr" :key="index" v-show="item.hasOwnProperty('series')" style="margin-top:10px">
+                <el-button plain size="small" type="success" @click="delDepId(item.id)">{{item.name}}</el-button>
+              </li>
+            </ul>
+          </div>
+          <el-scrollbar style="height:100%;overflow-x: hidden;">
+            <ul>
+              <!-- 人员 -->
+              <li v-for="(cols,colIndex) in selectedTreeArr" :key="colIndex" v-show="cols.hasOwnProperty('account')" style="margin-top:10px">
+                <el-button @click="delId(cols.id)" plain type="primary" size="small">{{cols.realName}}</el-button>
+              </li>
+            </ul>
+            <ul>
+              <li v-for="(colss,colIndexs) in selectedTreeArr2" :key="colIndexs" style="margin-top:10px">
+                <el-button @click="delIdCC(colss.id)" plain size="small">{{colss.realName}}</el-button>
+              </li>
+            </ul>
+          </el-scrollbar>
+        </div>
+        <el-button @click="add()" type="primary" size="small" style="text-align:right;position: absolute;
+    bottom: 0;
+    right: 0;">确定</el-button>
+
+      </div>
+    </el-dialog>
+
+  </div>
+</template>
+
+<script>
+import {
+  publishTask,
+  getExamineUserByBusiness,
+  getEventTypeName,
+  getDepartment,
+  getCommonUserList,
+  getAllDepartment,
+  setCommonUser,
+  cancelCommonUser
+} from "@/utils/axios/axios";
+import { transformRequestFn } from "@/utils/transformRequestFn/transformRequestFn";
+import {
+  pageExcludeUser,
+  deleteExcludeUser,
+  exportExcludeUserModelExcel,
+  importExcludeUsersExcel,
+  addExcludeUser,
+  steadyIfSettlement
+} from "@/utils/axios/axios";
+
+export default {
+  name: "ExclusionStaff",
+  data() {
+    const generateData = _ => {
+      const data = [];
+      const old = [];
+      // for (let i = 0; i <old.length; i++) {
+      //   data.push({
+      //     key: i,
+      //     label: old[i]
+      //     // label: `备选项 ${i}`
+      //     // disabled: i % 4 === 0
+      //   })
+      // }
+      // return data
+    };
+    const data4 = [];
+    const data5 = [];
+    const data6 = [];
+    return {
+      sessionId: "",
+      ccList: [],
+      seltedRights: [],
+      checkList: [],
+      checkListbufen: [],
+      checkListUser: [],
+      prop10: {
+        value: "id",
+        children: "children",
+        label: "name"
+      },
+      prop9: {
+        value: "id",
+        children: "children",
+        label: "name"
+      },
+      prop11: {
+        value: "userId",
+        label: "realName"
+      },
+      data4: JSON.parse(JSON.stringify(data4)),
+      data5: JSON.parse(JSON.stringify(data5)),
+      data6: JSON.parse(JSON.stringify(data6)),
+      data: generateData(),
+      departmentId: "",
+
+      dialogVisible1: false,
+      forMonth: "",
+      tableData: [],
+      total: 0,
+      pageNumber: 1,
+      pageSize: 10,
+      length: 0,
+      fileList: [],
+      userArrIds: "",
+      userArrId: [],
+      filterTexts: "",
+      selectedTreeArr: [], //选中的指定人员
+      selectedTreeArr2: [], //选中的常选人员
+      selectedTreeArr3: [] //选中的范围
+    };
+  },
+  watch: {
+    filterTexts(val) {
+      this.$refs.tree.filter(val);
+    }
+  },
+  mounted() {
+    this.sessionId = localStorage.getItem("sessionId");
+    this.forMonth = this.$route.query.date.split("-")[1];
+    this.forMonth = this.forMonth.split("");
+    console.log(this.forMonth);
+
+    if (this.forMonth[0] == 0) {
+      this.forMonth = this.forMonth[1];
+    } else {
+      this.forMonth = this.forMonth[0] + this.forMonth[1];
+    }
+    // this.forMonth = this.$route.params.month.split(' ')[0]
+    this.getList();
+    this.getDepartmentPeople();
+    this.getCommonUserListPeople();
+    this.pageExcludeUser();
+  },
+  methods: {
+    filterNodes(value, data) {
+      if (!value) return true;
+      return data.name.indexOf(value) !== -1;
+      console.log(data);
+    },
+    pageExcludeUser() {
+      let params = {
+        sessionId: localStorage.getItem("sessionId"),
+        pageNumber: this.pageNumber,
+        pageSize: this.pageSize,
+        date: this.$route.query.date
+      };
+      pageExcludeUser(this.$qs.stringify(params)).then(res => {
+        if (res.code === 1) {
+          console.log(res);
+          this.tableData = res.data.list;
+          this.length = res.data.totalRow;
+          // for(let item of this.tableData ) {
+          //   if(item.id == )
+          // }
+          // var result = [], hash = {};
+          // for (var i = 0, elem; (elem = this.tableData[i]) != null; i++) {
+          //   if (!hash[elem]) {
+          //     result.push(elem);
+          //     hash[elem] = true;
+          //   }
+          // }
+
+          // this.tableData = result
+          // this.tableData = this.tableData.reduce((preVal, curVal) => {
+          //   hash[curVal.id] ? '' : hash[curVal.id] = true && preVal.push(curVal);
+          //   return preVal
+          // }, [])
+          this.tableData = this.unique(this.tableData);
+          console.log(this.tableData);
+          let filerArr = [];
+          for (let item of this.tableData) {
+            filerArr.push(item.userId);
+          }
+          // let fileArr = this.tableData.filter((item, index, arr) => item.userId == 2);
+          this.userArrIds = filerArr.toString();
+          console.log(this.userArrIds);
+        }
+      });
+    },
+    // submitUpload() {
+    //   console.log(1)
+    //     this.$refs.upload.submit();
+    //   },
+    unique(arr) {
+      let unique = {};
+      arr.forEach(function(item) {
+        unique[JSON.stringify(item)] = item; //键名不会重复
+      });
+      arr = Object.keys(unique).map(function(u) {
+        //Object.keys()返回对象的所有键值组成的数组，map方法是一个遍历方法，返回遍历结果组成的数组.将unique对象的键名还原成对象数组
+        return JSON.parse(u);
+      });
+      return arr;
+    },
+
+    submitUpload() {
+      let list = document.getElementsByClassName(
+        "el-upload-list__item is-ready"
+      );
+      if (list.length == 0) {
+        this.$message({
+          type: "warning",
+          message: "请选择需要导入的模板！",
+          customClass: "messageClass1"
+        });
+        return;
+      }
+      this.$refs.upload.submit();
+    },
+    uploadSectionFile(param) {
+      var fileObj = param.file;
+      // FormData 对象
+      var form = new FormData();
+      // 文件对象
+      form.append("sessionId", localStorage.getItem("sessionId"));
+      form.append("excludeUsers", fileObj);
+      console.log(form.get("sessionId"), "文件参数");
+      console.log("文件", fileObj);
+
+      importExcludeUsersExcel(form).then(res => {
+        if (res.code == 1) {
+          this.$message({
+            type: "success",
+            message: res.desc,
+            customClass: "messageClass1"
+          });
+          for (let item of res.data) {
+            this.userArrId.push(item.userId);
+          }
+          this.userArrIds = this.userArrId.join(",");
+          console.log(this.userArrIds, "排除已对反腐败");
+
+          this.addExcludeUser();
+          this.pageExcludeUser();
+          // this.submitDone()
+          this.fileList = [];
+        } else {
+          this.$message({
+            type: "error",
+            message: res.desc,
+            customClass: "messageClass1"
+          });
+          this.fileList = [];
+        }
+      });
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    // exportExclude () {
+    //   window.location.href = 'http://10.0.0.110:8080/bishuiwan/api/steady/exportExcludeUserModelExcel?sessionId=' + localStorage.getItem('sessionId')
+    // },
+    // 下载excal模板
+    downExcal() {
+      let params = {
+        sessionId: localStorage.getItem("sessionId")
+      };
+      exportExcludeUserModelExcel(this.$qs.stringify(params)).then(res => {
+        console.log(res, "下载模板");
+        if (res.code === 0) {
+          this.$message.error("错误");
+        } else {
+          let str =
+            "http://47.107.71.47/bishuiwan/api/steady/exportExcludeUserModelExcel?sessionId=" +
+            localStorage.getItem("sessionId");
+          console.log(str, "跳转链接");
+          window.location.href = str;
+        }
+      });
+    },
+    // 添加排除人员
+    addUser() {
+      this.dialogVisible1 = true;
+    },
+    // 是否结算
+    isJiesuan() {
+      let params = {
+        sessionId: localStorage.getItem("sessionId"),
+        date: this.$route.query.date
+      };
+      steadyIfSettlement(this.$qs.stringify(params)).then(res => {
+        if (res.code === 0) {
+          this.$message({
+            message: "已重新结算",
+            type: "success",
+            customClass: "messageClass1"
+          });
+        }
+      });
+    },
+    addExcludeUser() {
+      // this.$axios({
+      //   url: 'steady/addExcludeUser',
+      //   method: 'POST',
+      //   data: {
+      //     sessionId: localStorage.getItem('sessionId'),
+      //     date: this.$route.query.date,
+      //     userIds: this.userArrIds
+      //   },
+      //   transformRequest: transformRequestFn
+      // }).then((res) => {
+      //   if (res.data.code === 1) {
+      //   }
+      // })
+      let params = {
+        sessionId: localStorage.getItem("sessionId"),
+        date: this.$route.query.date,
+        userIds: this.userArrIds
+      };
+      addExcludeUser(this.$qs.stringify(params)).then(res => {
+        if (res.code === 1) {
+          this.pageExcludeUser();
+          this.isJiesuan();
+
+          setTimeout(() => {
+            this.$router.push("/IntegralLog");
+          }, 2000);
+        }
+      });
+    },
+    getDepartmentPeople() {
+      let sessionId = localStorage.getItem("sessionId");
+      // let departmentId = this.departmentId
+      let params = {
+        sessionId: sessionId
+      };
+      getDepartment(this.$qs.stringify(params)).then(res => {
+        console.log(res);
+        if (res.code === 1) {
+          this.data4 = res.data;
+          console.log(this.data4, "集团");
+        }
+      });
+    },
+    getDepartmentPeoplebufen() {
+      let sessionId = localStorage.getItem("sessionId");
+      // let departmentId = this.departmentId
+      let params = {
+        sessionId: sessionId
+      };
+      getAllDepartment(this.$qs.stringify(params)).then(res => {
+        if (res.code === 1) {
+          this.data5 = res.data;
+          console.log(this.data5, "集团");
+        }
+      });
+    },
+    renderContent(h, { node, data, store }) {},
+    // 获取常选名单
+    getCommonUserListPeople() {
+      let params = {
+        sessionId: localStorage.getItem("sessionId")
+      };
+      getCommonUserList(this.$qs.stringify(params)).then(res => {
+        console.log(res, "常选");
+        if (res.code === 1) {
+          this.data6 = res.data;
+        }
+      });
+    },
+    // 推送
+    tuisong(val) {
+      if (val === 1) {
+        // 部分
+        this.dialogVisible = true;
+        this.ranges = val;
+        this.getDepartmentPeoplebufen();
+      } else if (val === 2) {
+        // 定向
+        this.dialogVisible1 = true;
+        this.ranges = val;
+        this.getDepartmentPeople();
+        this.getCommonUserListPeople();
+      } else if (val === 3) {
+        this.ranges = val;
+      }
+    },
+    // 确认选中的人 拼接
+    add() {
+      // let arr = [];
+      // let newArr = [];
+      // for (let item of this.checkListUser) {
+      //   arr.push(item.id);
+      // }
+      // for (let items of this.checkList) {
+      //   newArr.push(items.id);
+      // }
+      // arr = [...new Set(arr)];
+      // newArr = [...new Set(newArr)];
+      // if (this.userArrIds == "") {
+      //   this.userArrIds = arr.toString();
+      // } else {
+      //   this.userArrIds = this.userArrIds + "," + arr.toString();
+      // }
+      // this.departmentId = newArr.join(",");
+      // console.log(this.userArrIds, "结果数组", this.departmentId);
+      let arr = [];
+      let newArr = [];
+
+      this.selectedTreeArr = this.selectedTreeArr.concat(this.selectedTreeArr2);
+
+      for (let item in this.selectedTreeArr) {
+        if (this.selectedTreeArr[item].hasOwnProperty("series")) {
+          arr.push(this.selectedTreeArr[item].id);
+        } else if (this.selectedTreeArr[item].hasOwnProperty("account")) {
+          newArr.push(this.selectedTreeArr[item].id);
+        }
+      }
+      this.userArrIds = newArr.toString();
+      this.departmentId = arr.toString();
+      this.dialogVisible1 = false;
+      let params = {
+        sessionId: localStorage.getItem("sessionId"),
+        date: this.$route.query.date,
+        userIds: this.userArrIds
+      };
+      addExcludeUser(this.$qs.stringify(params)).then(res => {
+        if (res.code === 1) {
+          this.pageExcludeUser();
+          // this.isJiesuan();
+
+          // setTimeout(() => {
+          //   this.$router.push("/FixedIntegral");
+          // }, 2000);
+        }
+      });
+      // this.ccList = this.doUserId.split(',')
+      // this.addExcludeUser()
+      //       let params = {
+      //   sessionId:localStorage.getItem('sessionId'),
+      //       date: this.$route.query.date
+      // }
+      // steadyIfSettlement(this.$qs.stringify(params)).then(res=>{
+      //   if (res.code===0) {
+      //     this.$message({
+      //     message: '已重新结算',
+      //     type: 'success',
+      //     customClass: "messageClass1",
+      //   });
+      //   }
+      // })
+    },
+    // 选中标签
+    check_right_change() {
+      // var arr = this.$refs.tree.getCheckedNodes();
+      // console.log(arr, "数组");
+      // for (let item of arr) {
+      //   console.log(item, "区分");
+      //   if (item.series) {
+      //     this.checkList.push(item);
+      //     let newArr = [];
+      //     for (let itemNew of this.checkList) {
+      //       newArr.push(itemNew.id);
+      //       // this.checkList = newArr
+      //       this.checkList = [...new Set(this.checkList)];
+      //     }
+      //     this.departmentId = newArr.join(",");
+      //     console.log("部门", this.departmentId);
+      //   } else if (item.account) {
+      //     this.checkListUser.push(item);
+      //     let userArr = [];
+      //     this.checkListUser = [...new Set(this.checkListUser)];
+      //     for (let itemUser of this.checkListUser) {
+      //       userArr.push(itemUser.id);
+      //       userArr = [...new Set(userArr)];
+      //       this.checkListUser = [...new Set(this.checkListUser)];
+      //     }
+      //   }
+      // }
+      this.selectedTreeArr = this.$refs.tree.getCheckedNodes();
+    },
+    delIdCC(col) {
+      let setCheckNodes = [];
+      for (let i = 0; i < this.selectedTreeArr2.length; i++) {
+        if (this.selectedTreeArr2[i].id == col) {
+          this.selectedTreeArr2.splice(i, 1);
+        }
+      }
+      this.selectedTreeArr2.forEach(item => {
+        setCheckNodes.push({ id: item.id, label: item.name });
+      });
+      this.$refs.treechangxaun.setCheckedNodes(setCheckNodes);
+    },
+    // 获取常选名单
+    getCommonUserListPeople() {
+      let params = {
+        sessionId: localStorage.getItem("sessionId")
+      };
+      getCommonUserList(this.$qs.stringify(params)).then(res => {
+        console.log(res, "常选");
+        if (res.code === 1) {
+          this.data6 = res.data;
+        }
+      });
+    },
+    // 追加常选
+    append(data) {
+      // const newChild = { id: id++, label: 'testtest', children: [] };
+      // if (!data.children) {
+      //   this.$set(data, 'children', []);
+      // }
+      // data.children.push(newChild);
+      console.log(data, "追加常选");
+      // 设为常选人员
+      let params = {
+        sessionId: localStorage.getItem("sessionId"),
+        selectUserId: data.userId
+      };
+      setCommonUser(this.$qs.stringify(params)).then(res => {
+        if (res.code === 1) {
+          console.log(res.desc, "----------------------------------");
+          this.getCommonUserListPeople();
+        }
+      });
+    },
+    // 取消常选
+    noAppend(data) {
+      console.log("取消", data);
+      let params = {
+        sessionId: localStorage.getItem("sessionId"),
+        selectUserId: data.userId
+      };
+      cancelCommonUser(this.$qs.stringify(params)).then(res => {
+        if (res.code === 1) {
+          console.log(res.desc, "----------------------------------");
+          for (let item of this.data4) {
+            for (let item1 of item.children) {
+              for (let item2 of item1.children) {
+                if (data.id == item2.id) {
+                  console.log(item1, "哈哈哈哈哈");
+                  this.$set(item2, "account", 1);
+                }
+              }
+            }
+          }
+          this.getCommonUserListPeople();
+        }
+      });
+    },
+    // 指定常选人员
+    check_right_change_Common() {
+      this.selectedTreeArr2 = this.$refs.treechangxaun.getCheckedNodes();
+      console.log(this.selectedTreeArr2);
+      for (let item in this.selectedTreeArr2) {
+        this.selectedTreeArr2[item].account = "1";
+      }
+      // var arr = this.$refs.treechangxaun.getCheckedNodes();
+      // console.log(arr, "选中的常选", this.doUserId);
+      // let newArr = [];
+      // for (let item of arr) {
+      //   this.checkListUser.push(item);
+      //   this.checkListUser = [...new Set(this.checkListUser)];
+      //   // console.log(this.checkListUser);
+      //   // newArr.push(item.userId)
+      //   // newArr = [...new Set(newArr)]
+      //   // console.log(newArr,'常选');
+      // }
+      // this.ccList = [...new Set(newArr)];
+      // if (this.checkListUser.length != 0) {
+      //       this.checkListUser = this.checkListUser.concat(this.ccList)
+      //     }
+      // this.changxuan=newArr.join(',')
+
+      // this.doUserId = this.changxuan+','+this.doUserIds
+      // console.log(this.changxuan,'常选',this.doUserId);
+    },
+    delId(col) {
+      // for (let i = 0; i < this.checkListUser.length; i++) {
+      //   if (this.checkListUser[i].id == col) {
+      //     this.checkListUser.splice(i, 1);
+      //   }
+      // }
+      // console.log(this.checkListUser, "截取数组");
+      let setCheckNodes = [];
+      for (let i = 0; i < this.selectedTreeArr.length; i++) {
+        if (
+          this.selectedTreeArr[i].id == col &&
+          this.selectedTreeArr[i].hasOwnProperty("account")
+        ) {
+          this.selectedTreeArr.splice(i, 1);
+        }
+      }
+      this.selectedTreeArr.forEach(item => {
+        setCheckNodes.push({ id: item.id, label: item.name });
+      });
+      this.$refs.tree.setCheckedNodes(setCheckNodes);
+    },
+    // 删除部门id
+    delDepId(col) {
+      for (let i = 0; i < this.checkList.length; i++) {
+        if (this.checkList[i].id == col) {
+          this.checkList.splice(i, 1);
+        }
+      }
+    },
+    routerBack() {
+      this.$router.back(-1);
+    },
+    getList() {
+      // this.month = this.date1.split('-')[1]
+      // this.$axios({
+      //   url: 'steady/pageExcludeUser',
+      //   method: 'POST',
+      //   data: {
+      //     sessionId: localStorage.getItem('sessionId'),
+      //     date: this.forMonth,
+      //     pageNumber: this.pageNumber,
+      //     pageSize: this.pageSize,
+      //   },
+      //   transformRequest: transformRequestFn
+      // }).then((res) => {
+      //   if (res.data.code === 1) {
+      //     this.total = res.data.data.totalRow
+      //     this.tableData = res.data.data.list
+      //   }
+      // })
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.pageExcludeUser();
+    },
+    handleCurrentChange(val) {
+      this.pageNumber = val;
+      this.pageExcludeUser();
+    },
+    deleteTable(item) {
+      console.log(item);
+      let params = {
+        sessionId: localStorage.getItem("sessionId"),
+        userId: item,
+        date: this.$route.query.date
+      };
+      deleteExcludeUser(this.$qs.stringify(params)).then(res => {
+        if (res.code == 1) {
+          this.$message({
+            message: res.desc,
+            type: "success",
+            customClass: "messageClass1"
+          });
+          this.pageExcludeUser();
+        }
+      });
+      // this.$axios({
+      //   url: 'steady/deleteExcludeUser',
+      //   method: 'POST',
+      //   data: {
+      //     sessionId: localStorage.getItem('sessionId'),
+      //     userId: item.userId,
+      //     userId: this.forMonth
+      //   },
+      //   transformRequest: transformRequestFn
+      // }).then((res) => {
+      //   if (res.data.code === 1) {
+      //     this.total = res.data.data.totalRow
+      //     this.tableData = res.data.data.list
+      //   }
+      // })
+    }
+  }
+};
+</script>
+
+<style scoped>
+li {
+  list-style: none;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.textl {
+  font-size: 20px;
+  font-family: PingFang-SC-Regular;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 1);
+  line-height: 24px;
+}
+.textR {
+  text-align: right;
+}
+
+.treeBox {
+  position: relative;
+}
+.leftTree {
+  display: inline-block;
+  width: 50%;
+  border-right: 1px solid black;
+}
+.rightTree {
+  margin-left: 50%;
+  text-align: left;
+  height: 100%;
+  width: 200px;
+  overflow-y: auto;
+  top: 0;
+  position: absolute;
+}
+.button_btn {
+  display: flex;
+  justify-content: flex-start;
+  margin-left: 10px;
+}
+.mTop {
+  margin-top: 15px;
+}
+</style>
+<style>
+.el-select-dropdown .el-scrollbar .el-scrollbar__wrap {
+  overflow: scroll;
+}
+.fuckBtn span {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+}
+.el-tree-node__content {
+  padding-left: 36px;
+  position: relative;
+}
+</style>

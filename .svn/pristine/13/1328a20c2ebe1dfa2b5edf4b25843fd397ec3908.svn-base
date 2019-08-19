@@ -1,0 +1,402 @@
+<template>
+  <div class="hall">
+    <!-- <router-vew></router-vew> -->
+    <el-form ref="form" label-width="80px">
+    <!-- <el-tabs type="border-card"> -->
+  <!-- <el-tab-pane label="月度排名报表"> -->
+    <ul class="navTitle">
+      <li class="active"><router-link to="/integralReport">月度排名报表</router-link></li>
+      <li><router-link to="/phased">阶段性排名报表</router-link></li>
+       <li><router-link to="/accumulate">累积排名报表</router-link></li>
+
+    </ul>
+    <div class="divOne">
+       <el-form :inline="true">
+         <el-row label-width="80px" type="flex" >
+           <el-col :span="10">
+                  <el-form-item  >
+                  <el-radio v-model="radio1" label="1">默认报表</el-radio>
+                    <el-cascader
+                      placeholder="默认报表" size='small' style="width:200px;margin-left:13px"
+                      expand-trigger="hover"
+                      :options="option"
+                      :props="prop"
+                      v-model="selectedOptions2"
+                      @change="handleChange">
+                    </el-cascader>
+                </el-form-item>
+           </el-col>
+          <el-col :span="10">
+            <el-form-item>
+              <el-radio v-model="radio2" label="1">自定义报表</el-radio>
+            </el-form-item>
+            <el-form-item  >
+
+              <el-select v-model="value" placeholder="请选择自定义报表" size='small' style="width:200px;">
+                <el-option
+                  v-for="item in getAllReport"
+                  :key="item.id"
+                  :label="item.reportName"
+                  :value="item.description">
+                </el-option>
+              </el-select>
+         </el-form-item>
+          </el-col>
+       </el-row>
+
+       <el-row  type="flex" >
+            <el-col :span="10">
+              <el-form-item label="姓名或工号" style="margin-left:30px">
+               <el-input v-model="keyword" size="small" style="width:200px"></el-input>
+            </el-form-item>
+            </el-col>
+            <el-col :span="10">
+              <el-form-item label="选择月份"  style="margin-left:10px;">
+              <el-date-picker type="date" placeholder="选择日期" v-model="month" size="small" style="width:200px"></el-date-picker>
+            </el-form-item>
+            </el-col>
+             <!-- <el-button type="primary" size="small">主要按钮</el-button> -->
+             <el-col :span="2">
+               <el-form-item>
+               <el-button type="primary"  size="small" style="margin-left:10px" @click="check()">查询</el-button>
+             </el-form-item>
+             </el-col>
+       </el-row>
+       </el-form>
+       <el-row type="flex" >
+           <el-form-item>
+             <span style="height:40px ; line-height:40px; margin-left:-8px">积分类型:</span>
+           </el-form-item>
+                   <el-form-item style="margin-left:4px">
+                     <el-button type="primary" size="small" plain>工作类分</el-button>
+         <el-button type="primary" size="small" plain>行为类分</el-button>
+         <el-button type="primary" size="small" plain>营销类分</el-button>
+         <el-button type="primary" size="small" plain>其他类分</el-button>
+         <el-button type="primary" size="small" plain>奖扣任务分</el-button>
+         <el-button type="primary" size="small" plain>固定积分</el-button>
+         <el-button type="primary" size="small" plain>总积分</el-button>
+                   </el-form-item>
+       </el-row>
+        <el-table
+        :row-style="tableRowStyle"
+        :header-cell-style="{background:'rgba(66,172,254,1)',width:'980px',height:'55px','text-align':'center'}"
+      :data="tableData"
+      style="width: 100%;height:400px;overflow:auto;"
+      size='small'>
+      <el-table-column
+        type="index"
+        width="100"
+        label="序号"
+        >
+      </el-table-column>
+      <el-table-column
+      prop="date"
+        label="头像"
+        width="105"
+        >
+      </el-table-column>
+      <el-table-column
+      prop="name"
+        label="姓名" width="95"
+       >
+      </el-table-column>
+      <el-table-column
+      prop="address" width="95"
+        label="部门">
+      </el-table-column>
+      <el-table-column
+      prop="address" width="95"
+        label="工号">
+      </el-table-column>
+      <el-table-column
+      prop="address" width="95"
+        label="工作类分">
+      </el-table-column>
+      <el-table-column
+      prop="address" width="95"
+        label="行为类分">
+      </el-table-column>
+      <el-table-column
+      prop="address" width="95"
+        label="营销类分">
+      </el-table-column>
+      <el-table-column
+      prop="address" width="95"
+        label="其他类分">
+      </el-table-column>
+      <el-table-column
+      prop="address" width="95"
+        label="奖扣任务分">
+      </el-table-column>
+      <el-table-column
+      prop="address" width="100"
+        label="固定积分">
+      </el-table-column>
+      <el-table-column
+      prop="address" width="100"
+        label="总积分">
+      </el-table-column>
+      <el-table-column
+      prop="address" width="100"
+        label="排名">
+      </el-table-column>
+    </el-table>
+      <el-form-item type='flex' style="margin-top:10px;text-align:left">
+        <el-button type="primary"  size="small" @click="exportReport()">导出报表</el-button>
+    <el-button type="primary" size="small" @click="toEcharts()">积分分析</el-button>
+      </el-form-item>
+    <div class="block" style="margin-top:10px">
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage4"
+      :page-sizes="[100, 200, 300, 400]"
+      :page-size="100"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="400">
+    </el-pagination>
+    </div>
+
+  </div>
+<!-- </el-tabs> -->
+<!-- 导出小组弹窗 -->
+      <el-dialog
+        title="选择要导出的小组"
+        :visible.sync="centerDialogVisible"
+        width="30%"
+        center>
+        <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
+        <div style="margin: 15px 0;"></div>
+        <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+          <el-checkbox v-for="city in cities" :label="city" :key="city">{{city}}</el-checkbox>
+        </el-checkbox-group>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="centerDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="commitReport()">确 定</el-button>
+        </span>
+      </el-dialog>
+    </el-form>
+  </div>
+</template>
+
+<script>
+import {getDepartment,scorePageScore,getAllReport} from '@/utils/axios/axios'
+const cityOptions = ['上海', '北京', '广州', '深圳']
+export default {
+  name: 'integralReport',
+  data () {
+    return {
+      centerDialogVisible: false,
+      checkAll: false,
+      checkedCities: ['上海', '北京'],
+      cities: cityOptions,
+      isIndeterminate: true,
+      getAllReport: [],
+      value: '',
+      radio1: '1',
+      radio2: '0',
+      keyword: '',
+      month: '',
+      currentPage4: 4,
+      tableData: [{ date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'},
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}],
+      option: [],
+      selectedOptions2: [],
+      departmentId:'',
+      prop: {
+        value: 'id',
+        children: 'children',
+        label: 'name'
+      }
+    }
+  },
+  methods: {
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
+    },
+    handleCurrentChange (val) {
+      console.log(`当前页: ${val}`)
+    },
+    toEcharts () {
+      console.log(21)
+
+      this.$router.push('/echarts')
+    },
+    handleChange (value) {
+      console.log(this.selectedOptions2,'选中部门')
+    },
+    // 每一行的样式
+    tableRowStyle ({ row, rowIndex }) {
+      return 'text-align: center '
+    },
+    exportReport () {
+      console.log('导出报表')
+      this.centerDialogVisible = true
+    },
+    handleCheckAllChange (val) {
+      this.checkedCities = val ? cityOptions : []
+      this.isIndeterminate = false
+    },
+    handleCheckedCitiesChange (value) {
+      let checkedCount = value.length
+      this.checkAll = checkedCount === this.cities.length
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.cities.length
+    },
+    commitReport () {
+      console.log(this.checkedCities, '选中的项')
+
+      this.centerDialogVisible = false
+    },
+    // 6.1.11	按层级获取部门
+    init() {
+      let sessionId = localStorage.getItem('sessionId')
+      let departmentId = this.departmentId
+      let params = {
+        sessionId:sessionId,
+        departmentId:departmentId
+      }
+      console.log(params);
+      
+      getDepartment ( this.$qs.stringify(params) ).then(res => {
+        console.log(res,'部门');
+        if ( res.code === 1){
+          // for (let item of this.option) {
+          //       item = res.data
+          //       console.log(item,'没');
+                
+          //   }
+          // this.option.push(res.data)
+          this.option = res.data          
+        }
+        // 
+        console.log(this.option,'====');
+        
+      })
+      // 7.1.2	(集团,子公司,部门)(月度,阶段性,累计)报表
+      // scorePageScore (this.$qs.stringify()).then(res=>{
+      //   console.log(res);
+        
+      // })
+      let getAllReportParams = {
+        sessionId:sessionId,
+        reportId:''
+      }
+      getAllReport (this.$qs.stringify(getAllReportParams)).then(res=> {
+        console.log(res,'自定义报表');
+        this.getAllReport = res.data
+      })
+    },
+    // 7.1.2	(集团,子公司,部门)(月度,阶段性,累计)报表
+    check() {
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        pageNumber:'',
+        pageSize:'',
+        departmentId:this.selectedOptions2[0],
+        keyword:this.keyword,
+        EventTypes:'',
+        dateType:'',
+        date:'',
+        begin:'',
+        end:''
+      }
+      console.log(params,'sss');
+      
+      scorePageScore( this.$qs.stringify(params) ).then(res=>{
+        console.log(res,'查询');
+        
+      })
+    }
+
+  },
+  mounted () {
+    this.init()
+  }
+}
+</script>
+
+<style scoped>
+  .divOne{
+    background-color:#F2F9FF;
+    min-height: 750px;
+    width: 100%;
+  }
+  .table{
+    margin-top:10px;
+    overflow-y:scroll;
+    min-height: 300px;
+  }
+  .table_title{
+    text-align: center;
+    color: blue
+  }
+  .numTwo_1{
+    margin-left: 60px;
+  }
+  /* .el-table__body{
+    table-layout:auto !important;
+
+} */
+a{
+  text-decoration: none;
+  color: #262D39;
+}
+a:visited {
+color:#262D39;
+text-decoration:none;
+}
+a:active {
+color:#0083FF;
+text-decoration:none;
+}
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+</style>
+<style>
+/* 表格内容样式  自定义组件样式*/
+  .cell{
+    text-align: center !important;
+    /* color: red; */
+  }
+</style>

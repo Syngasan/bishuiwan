@@ -1,0 +1,131 @@
+<template>
+  <div class="SettlementLog">
+    <el-row class="IntegralAuditBox">
+      <el-col :span="24" class="textR"><el-button plain type="primary" @click="routerBack">返回</el-button></el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="date" label="公司名称" align="center"></el-table-column>
+      <el-table-column prop="date" label="结算月份" align="center"></el-table-column>
+      <el-table-column prop="date" label="结算状态" align="center"></el-table-column>
+      <el-table-column prop="date" label="更新人" align="center"></el-table-column>
+      <el-table-column prop="date" label="更新日期" align="center"></el-table-column>
+      <el-table-column prop="date" label="操作" align="center" width="300px">
+        <!-- <template slot-scope="scope">
+          <div><span class="tableBtn" @click="Resettlement">重新结算</span><router-link to="/IntegralDetail"><span class="tableBtn">查看明细</span></router-link></div>
+          <div><router-link to="/ExclusionStaff"><span class="tableBtn">查看排除人员</span></router-link><span class="tableBtn">导出报表</span></div>
+        </template> -->
+        <template slot-scope="scope">
+            <el-button size="mini" type="primary" class="tableBtn" @click="Resettlement">重新结算</el-button>
+            <el-button size="mini" type="primary" class="tableBtn">导出报表</el-button>
+          </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="100" layout="total, sizes, prev, pager, next,  jumper" :total="100">
+    </el-pagination>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'SettlementLog',
+  data () {
+    return {
+      radio: '1',
+      name: '',
+      select1: '',
+      date1: '',
+      select2: '',
+      date2: '',
+      tableData: [
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'},
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}],
+      currentPage4: 1
+    }
+  },
+  methods: {
+    routerBack () {
+      this.$router.back(-1)
+    },
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    },
+    Resettlement() {
+      this.$alert('这是一段内容', '标题名称', {
+          confirmButtonText: '确定',
+          center: true,
+          callback: action => {
+            this.$message({
+              type: 'info',
+              message: `action: ${ action }`
+            });
+          }
+        });
+    }
+  }
+}
+</script>
+
+<style scoped>
+.tableBtn {
+  width: 90px;
+  display: inline-block;
+  text-align: center;
+}
+.tableBtn a{
+  color:rgba(10,143,246,1)!important;
+  text-decoration:none;
+}
+.EventTheme {
+  width: 195px;
+  height: 46px;
+}
+.EventThemeDate1 {
+  width: 250px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 150px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 83px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+}
+</style>

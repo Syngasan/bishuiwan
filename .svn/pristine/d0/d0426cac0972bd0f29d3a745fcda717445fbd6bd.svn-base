@@ -1,0 +1,182 @@
+<template>
+  <div class="message">
+    <div class="title">
+      <img src="../../images/nav_new@2x.png">
+      <span class="span_t">消息通知</span>
+    </div>
+    <div class="libox mt">
+      <div class="left">
+        <img src="../../images/nav_new@2x.png" alt="">
+      </div>
+      <div class="center">
+         <div class="center_1">【积分审核】</div>
+        <div class="center_2">您有新的积分申请需要审核，快去看看吧！</div>
+      </div>
+      <div class="right">
+        2016.09.12
+      </div>
+    </div>
+        <div class="libox mt">
+      <div class="left">
+        <img src="../../images/nav_new@2x.png" alt="">
+      </div>
+      <div class="center">
+         <div class="center_1">【积分任务】</div>
+        <div class="center_2">您有新的积分任务通知</div>
+      </div>
+      <div class="right">
+        2016.09.12
+      </div>
+    </div>
+        <div class="libox mt">
+      <div class="left">
+        <img src="../../images/nav_new@2x.png" alt="">
+      </div>
+      <div class="center">
+         <div class="center_1">【审核通过】</div>
+        <div class="center_2">
+您有积分事件通过了审核，快去看看吧！</div>
+      </div>
+      <div class="right">
+        2016.09.12
+      </div>
+    </div>
+        <div class="libox mt">
+      <div class="left">
+        <img src="../../images/nav_new@2x.png" alt="">
+      </div>
+      <div class="center">
+         <div class="center_1">【审核退回】</div>
+        <div class="center_2">
+您有积分事件被退回，快去看看吧！</div>
+      </div>
+      <div class="right">
+        2016.09.12
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import {getInformationList} from '@/utils/axios/axios'
+export default {
+  data () {
+    return  {
+      pageNumber:1,
+      pageSize:10,
+    }
+  },
+  methods: {
+    init () {
+      let params ={
+        sessionId:localStorage.getItem('sessionId'),
+        pageNumber:this.pageNumber,
+        pageSize:this.pageSize
+      }
+      console.log(params,'参数');
+      
+      getInformationList( this.$qs.stringify(params) ).then(res=>{
+        if (res.code ===1) {
+          console.log(res);
+
+        }
+      })
+    }
+  },
+  mounted () {
+    this.init()
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.message {
+  padding: 15px;
+}
+.span_t {
+  width:122px;
+  height:30px;
+  font-size:30px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(0,0,0,1);
+  line-height:40px;
+}
+.title  {
+  position: relative;
+}
+.title img{
+  // margin-top: 10px
+  // vertical-align: middle;
+  position: absolute; top:50%; transform: translate(-120%, -50%)
+}
+.libox {
+  width:1251px;
+  height:114px;
+  background:rgba(255,255,255,1);
+  // background-color: red;
+  border-radius:10px;
+  box-shadow:0px 4px 9px 0px rgba(3,88,160,0.07);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+}
+.left {
+  display: inline-block;
+  background: url('../../images/area_icon_dorder@2x.png') no-repeat;
+  width: 72px;
+  height: 72px;
+  position: relative;
+  margin-left: 200px;
+}
+.left img {
+  position: absolute;
+  top:50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
+.center {
+  // display: inline-block;
+  // margin-left: 300px;
+  display: flex;
+  flex-direction: column;
+  // justify-content: space-;
+  text-align: left;
+}
+.center_1 {
+  width:119px;
+  height:25px;
+  font-size:16px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(16,16,16,1);
+  line-height:40px;
+}
+.center_2 {
+  width:330px;
+  height:18px;
+  font-size:14px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(98,98,98,1);
+  line-height:0px;
+  margin-top: 25px;
+  margin-left: 8px;
+}
+.right {
+  width:75px;
+height:12px;
+font-size:15px;
+font-family:PingFang-SC-Regular;
+font-weight:400;
+color:rgba(154,154,154,1);
+line-height:40px;
+position: absolute;
+right: 10px;
+top: 26px;
+}
+.mt {
+  margin-top: 15px;
+}
+
+</style>

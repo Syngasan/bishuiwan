@@ -1,0 +1,276 @@
+<template>
+  <div class="hall">
+    <router-view></router-view>
+    <div class="title_header title_header_font">
+      <span class="sp_t">所有小组</span>
+      <el-button  icon="el-icon-edit" class="newGroup" size="small" @click="newBuild()">新建小组</el-button>
+    </div>
+
+      <el-table
+        :data="tableData"
+        style="width:980px"
+        :row-style="tableRowStyle"
+        header-row-class-name="center"
+        :header-cell-style="{background:'rgba(66,172,254,1)',width:'980px',height:'55px','text-align':'center'}">
+        <el-table-column
+          label="小组名称"
+          width="180">
+          <template slot-scope="scope">
+            <span style="margin-left: 10px" class="pointer" @click="tableDetail(scope.row.id)">{{ scope.row.groupName }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="小组创建人"
+          width="180">
+          <template slot-scope="scope">
+            <!-- <el-popover  placement="top"> -->
+              <!-- <p>姓名: {{ scope.row.creator }}</p> -->
+              <!-- <p>住址: {{ scope.row.address }}</p> -->
+              <!-- <div slot="reference" class="name-wrapper"> -->
+                <el-tag size="medium">{{ scope.row.creator }}</el-tag>
+              <!-- </div> -->
+            <!-- </el-popover> -->
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            <el-button
+              size="mini"
+              type="primary"
+              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+       <div class="block mt" style="text-align:center">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="pageNumber"
+          :page-sizes="[1, 3, 5, 7]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="length">
+        </el-pagination>
+                      <!-- 新建小组 -->
+      <el-dialog title="" :visible.sync="dialogFormVisible">
+        <el-form :model="form">
+          <el-form-item label="填写小组名称" :label-width="formLabelWidth">
+            <el-input v-model="form.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="填写小组描述" :label-width="formLabelWidth">
+            <el-input v-model="form.content" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="commit()">确 定</el-button>
+        </div>
+      </el-dialog>
+      <!-- 修改小组信息 -->
+      <el-dialog title="" :visible.sync="dialogFormVisibleEdit">
+        <el-form :model="formEdit">
+          <el-form-item label="修改小组名称" :label-width="formLabelWidth">
+            <el-input v-model="formEdit.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="修改小组描述" :label-width="formLabelWidth">
+            <el-input v-model="formEdit.content" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisibleEdit = false">取 消</el-button>
+          <el-button type="primary" @click="commitEdit()">确 定</el-button>
+        </div>
+      </el-dialog>
+      </div>
+  </div>
+</template>
+
+<script>
+import {pageGroup,editGroup,deleteGroup,createGroup} from '@/utils/axios/axios'
+export default {
+  name: 'customGrouping',
+  data () {
+    return {
+      tableData: [],
+      pageNumber: 1,
+      pageSize:10,
+        dialogFormVisible:false,
+        dialogFormVisibleEdit:false,
+      form: {
+        name: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: '',
+        content: '',
+        groupId:''
+      },
+      formEdit: {
+        name: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: '',
+        content: ''
+      },
+      formLabelWidth: '120px',
+      length:0
+    }
+  },
+  methods: {
+    handleEdit (index, row) {
+      console.log(index, row)
+     this.formEdit.name = row.groupName
+      this.formEdit.content = row.description
+      this.formEdit.groupId = row.id
+      // this.$router.push('/groupDetail')
+      this.dialogFormVisibleEdit = true
+    },
+    handleDelete (index, row) {
+      console.log(index, row)
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        groupId:row.id
+      }
+      deleteGroup( this.$qs.stringify(params) ).then(res=> {
+        console.log(res,'删除小组');
+        
+      })
+
+    },
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
+      this.pageSize = val
+      this.init()
+    },
+    handleCurrentChange (val) {
+      // console.log(`当前页: ${val}`,val)
+      this.pageNumber = val     
+      this.init()       
+    },
+    tableRowStyle ({ row, rowIndex }) {
+      return 'background-color: #F2F9FF'
+    },
+    // 新建小组弹出
+     newBuild () {
+      this.dialogFormVisible = true
+      
+    },
+    commit () {
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        groupName:this.form.name,
+        description:this.form.content
+      }
+      createGroup( this.$qs.stringify(params) ).then(res=>{
+        // console.log(res,'新建小组');
+        if (res.code === 1 ) {
+          this.dialogFormVisible = false
+          this.init()
+        }
+      })
+    },
+    tableDetail (param) {
+      // console.log(param,'详情');
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        groupId:param
+      }
+      this.$router.push({path:'/groupDetail',query:params})
+    },
+    init () {
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        pageNumber:this.pageNumber,
+        pageSize:this.pageSize
+      }
+      pageGroup( this.$qs.stringify(params) ).then(res=>{
+        // console.log(res,'自定义小组',this.tableData);
+        this.tableData = res.data.list
+        this.length = res.data.totalRow        
+      })
+    },
+    commitEdit ( ){
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        groupId:this.formEdit.groupId,
+        groupName:this.formEdit.name,
+        description:this.formEdit.content
+      }
+      editGroup( this.$qs.stringify(params) ).then(res=>{
+        // console.log(res,'修改小组');
+        if (res.code === 1) {
+          this.dialogFormVisibleEdit = false
+          this.init()
+        }
+      })
+    } 
+  },
+  mounted () {
+    this.init()
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.pointer {
+  cursor: pointer;
+}
+.hall {
+  min-height: 750px;
+  margin-bottom: 50px;
+}
+  .title_header{
+    width:980px;
+    height:72px;
+    background:rgba(242,249,255,1);
+    border-radius:5px 5px 0px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left:  15px;
+    padding-right:  15px;
+    box-sizing: border-box
+  }
+  .sp_t{
+  width:81px;
+  height:20px;
+  font-size:20px;
+  font-family:PingFang-SC-Regular;
+  font-weight:bold;
+  color:rgba(0,0,0,1);
+  line-height:0px;
+}
+//   .title_header_font {
+//     width:81px;
+// height:20px;
+// font-size:20px;
+// font-family:PingFang-SC-Regular;
+// font-weight:bold;
+// color:rgba(0,0,0,1);
+// line-height:0px;
+//   }
+  .nav_header{
+    width:980px;
+    height:55px;
+    background:rgba(66,172,254,1);
+  }
+  .newGroup{
+    background-image: url('../../images/customGroup/fz_btn_add@3x.png'   ) no-repeat;
+    border-style:dashed;
+  }
+  .mt{
+    margin-top: 10px
+  }
+  .hall {
+    background-color: #F2F9FF;
+
+  }
+</style>

@@ -1,0 +1,758 @@
+<template>
+  <div class="WebEntry">
+    <ul class="navTitle">
+      <li class="active"><router-link to="/WebEntry">网页录入</router-link></li>
+      <li><router-link to="/tableEntry">表格录入</router-link></li>
+      <li><router-link to="/Submission">已提交</router-link></li>
+      <li><router-link to="/drafts">草稿箱</router-link></li>
+    </ul>
+    <div class="clear"></div>
+    <div class="Entry">
+      <div class="EntryTitle"><img src="./img/jflr_icon06@3x.png"><span>填写事项</span></div>
+      <el-row class="">
+        <el-col :span="12" class="marginBotton">
+          <span class="eventtypetheme">事件主题</span>
+          <el-input class="EventTheme" placeholder="事件主题" v-model="title"> </el-input>
+        </el-col>
+        <el-col :span="12" class="marginBotton">
+          <span class="eventtypetheme">初审人</span>
+          <!-- <el-select v-model="firstExamineUserId" class="EventTheme" placeholder="请输入 \ 选择"> -->
+            <el-cascader placeholder="请输入 \ 选择" @change="getFirstExamineUserName" v-model="firstExamineUserId" :options="options" filterable change-on-select class="EventTheme">
+          <!-- <el-option :key="item.id" :label="item.label" :value="item.id" v-for="(item,index) in options"></el-option> -->
+          </el-cascader>
+          <!-- </el-select> -->
+        </el-col>
+        <el-col :span="12" class="marginBotton">
+          <span class="eventtypetheme">奖扣日期</span>
+          <el-date-picker class="EventTheme" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="happenTime"></el-date-picker>
+        </el-col>
+        <el-col :span="12" class="marginBotton">
+        <span class="eventtypetheme">终审人</span>
+         <el-select v-model="secondExamineUserId" class="EventTheme" placeholder="请输入 \ 选择">
+          <el-option :key="item.userId" :label="item.nick" :value="item.userId" v-for="(item,index) in options1"></el-option>
+         </el-select>
+        </el-col>
+         
+      </el-row>
+      <div class="clear"></div>
+      <div class="EntryTitle"><img src="./img/jflr_icon07@3x.png"><span>填写事件</span></div>
+      <template v-for="(item,index) in event">
+        <div class="EntryEvent"><img src="./img/jflr_icon08@3x.png"><span>事件{{index+1}}</span><router-link to="/EventLibrary"><el-button type="primary">事件库</el-button></router-link></div>
+        <el-row class="">
+          <el-col :span="24" class="marginBotton">
+            <span class="eventtypetheme">事件类型</span>
+            <el-select v-model="form[index].eventTypeId" placeholder="请选择">
+                <el-option :key="this" :label="item.name" :value="item.id" v-for="(item,index) in eventList"></el-option>
+            </el-select>
+          </el-col>
+          <el-col :span="24" class="marginBotton">
+            <span class="eventtypetheme">备    注</span>
+            <el-input class="inputRemake"  placeholder="选填" v-model="form[index].remark"></el-input>
+          </el-col>
+          <el-col :span="24" class="marginBotton">
+            <span class="eventtypetheme">事件内容</span>
+            <el-input type="textarea" :rows="4" placeholder="请输入事件内容" v-model="form[index].content"></el-input>          
+          </el-col>
+        </el-row>
+        <div>奖扣对象</div>
+        <el-row>
+          <el-col :span="12" :key="this" class="objectList" v-for="(items,indexs) in form[index].userList">
+            <div class="objectListBox">
+              <img class="logo" src="./img/u=1752349347,1084259068&fm=27&gp=0.jpg">
+              <div class="objectListBoxName">
+                <div class="objectListBoxNameTop">{{items.name}}</div>
+                <div class="objectListBoxNameBottom">{{items.department}}</div>
+              </div>
+              <div class="objectListBoxNum"><el-input-number v-model="items.value" @change="handleChange" :min="0" :max="10" label="描述文字"></el-input-number>分</div>
+              <img class="close" src="./img/jkdx_close@3x.png" @click="removeEvent(form[index].userList,indexs)">
+            </div>
+          </el-col>
+        </el-row>
+        <div class="clear"></div>
+        <div class="addEntry" @click="showDialogVisible(index)"><img src="./img/jkdx_add@3x.png"><span>添加奖扣对象</span></div>
+      </template>
+      <div class="clear"></div>
+        <div class="addEntry backgroundB" @click="addEvent"><img src="./img/jkdx_add@3x.png"><span>添加事件</span></div>
+        <div class="forBtn">
+        <el-button type="primary" @click="saveEvent(0)">保存</el-button>
+        <el-button plain @click="saveEvent(1)">提交</el-button>
+        </div>
+      </div>  
+      <!-- <el-dialog title="添加成员" :visible.sync="dialogVisible" width="48%">
+      <el-transfer v-model="value1" :data="data"></el-transfer>
+       </el-dialog> -->
+
+       
+
+      <el-dialog
+      title="添加成员"
+      :visible.sync="dialogVisible"
+      >
+     <div class="treeBox">
+       <div class="leftTree">
+         <el-tree
+          :data="data4"
+          show-checkbox
+          node-key="id"
+          :props="prop9"
+          :expand-on-click-node="false"
+          @check-change="check_right_change"
+          :default-expanded-keys="[2, 1]"
+          ref="tree"
+          >
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span>{{ node.label }}</span>
+            <span>
+              <el-button
+                type="text"
+                size="mini"
+                @click="() => append(data)">
+                设为常选
+              </el-button>
+            </span>
+          </span>
+        </el-tree>
+        <div class="rightTree">
+          <div >
+            <ul v-for="(item,index) in checkList" :key="index">
+              <li>
+                <el-button plain size="small" @click="delDepId(item.id)">{{item.name}}</el-button>
+              </li>
+            </ul>     
+          </div>
+          <div>
+            <ul v-for="(cols,colIndex) in checkListUser" :key="colIndex">
+            <li>
+              <el-button @click="delId(cols.id)" plain size="small">{{cols.realName}}</el-button>
+            </li>
+          </ul>
+          </div>
+        </div>
+
+        <div>
+            <span>常选人员</span>
+              <el-tree
+                :data="data6"
+                show-checkbox
+                :props="prop11"
+                @check-change="check_right_change_Common"
+                ref="treechangxaun"
+                >
+                <span class="custom-tree-node" slot-scope="{ node, data }">
+                  <span>{{ node.label }}</span>
+                  <span>
+                    <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => noAppend(data)">
+                      取消常选
+                    </el-button>
+                  </span>
+                </span>
+              </el-tree>
+        <el-button @click="add()" type="primary" size="small" style="text-align:right">确定</el-button>
+          </div>
+       </div>
+     </div>
+    </el-dialog>
+      <!--  
+    <el-dialog title=" " :visible.sync="dialogMessageVisible" center width="30%">
+      <mt-cell title="提交失败">
+        <img slot="icon" src="./img/fail_icon@2x.png" style="margin-right: 10px;" width="24" height="24">
+      </mt-cell>
+      <div class="MessageCode">事件1与系统中已有事件存在重复项，请检查<p>修改后重新提交！</p></div>
+    </el-dialog> --> 
+  </div>
+</template>
+
+<script>
+  import { Message } from 'element-ui'
+  import {publishTask ,getExamineUserByBusiness,getEventTypeName,getDepartment ,getCommonUserList ,getAllDepartment,setCommonUser,cancelCommonUser} from '@/utils/axios/axios'
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+export default {
+  name: 'WebEntry',
+  data () {
+    const generateData = _ => {
+      const data = []
+      const old = []
+      for (let i = 0; i <old.length; i++) {
+        data.push({
+          key: i,
+          label: old[i]
+          // label: `备选项 ${i}`
+          // disabled: i % 4 === 0
+        })
+      }
+      return data
+    }
+    const data4 = [];
+    const data5 = [];
+    const data6 = [];
+    return {
+      prop10:{
+        value: 'id',
+        children: 'children',
+        label: 'name'
+      },
+      prop9: {
+        value: 'id',
+        children: 'children',
+        label: 'name'
+      },
+      prop11: {
+        value: 'userId',
+        label: 'realName'
+      },
+      data4: JSON.parse(JSON.stringify(data4)),
+      data5: JSON.parse(JSON.stringify(data5)),
+      data6: JSON.parse(JSON.stringify(data6)),
+      checkList:[],
+      checkListbufen:[],
+      checkListUser:[],
+      data: generateData(),
+      title: '',
+      happenTime:'',
+      firstExamineUserId: [],
+      secondExamineUserId: '',
+      event: 1,
+      radio2: 1,
+      dialogEventVisible: false,
+      dialogMessageVisible: false,
+      form: [
+        {
+          eventTypeId:'',
+          remark:'',
+          content:'',
+          userList:[]
+        }
+      ],
+      num1: 1,
+      num2: 1,
+      dialogVisible: false,
+      data: [
+        {key: 1,label: '昵称昵称'},
+        {key: 2,label: '昵称昵称'},
+        {key: 3,label: '昵称昵称'},
+        {key: 4,label: '昵称昵称'},
+        {key: 5,label: '昵称昵称'},
+        {key: 6,label: '昵称昵称'}
+      ],
+      value1: [1, 4],
+      options: [],
+      selectedOptions: [],
+      options1: [],
+      selectedOptions1: [],
+      eventList: [],
+      addIndex: 0,
+      vals:[],
+    }
+  },
+  created () {
+    this.getFirstUserByName()
+    this.getFirstUserByName1()
+    this.getFirstUserByName2()
+    this.getDepartmentPeople()
+    this.getCommonUserListPeople()
+  },
+  methods: {
+    getFirstExamineUserName(res,ress,resss) {
+      this.vals=this.getCascaderObj(this.firstExamineUserId, this.options);
+
+    },
+    getCascaderObj(val,opt) {
+            return val.map(function (value, index, array) {
+                for (var itm of opt) {
+                    if (itm.value == value) { opt = itm.children; return itm; }
+                }
+                return null;
+            });
+        },
+    getCascaderObj(val,opt) {
+            return val.map(function (value, index, array) {
+                for (var itm of opt) {
+                    if (itm.value == value) { opt = itm.children; return itm; }
+                }
+                return null;
+            });
+        },
+    removeEvent(items,indexs){
+      items.splice(indexs,1)
+    },
+    saveEvent(index) {
+      var firstExamineUserId = this.firstExamineUserId[this.firstExamineUserId.length-1]
+      var firstExamineUserName = this.vals[this.vals.length-1].realName
+// console.log(firstExamineUserName)
+      var secondExamineUserName = ''
+
+
+
+      // for (var i = 0; i < this.vals.length; i++) {
+      //   if (this.vals[i].departmentId == this.firstExamineUserId) {
+      //     firstExamineUserName =this.vals[i].label
+      //   }
+      // }
+      for (var i = 0; i < this.options1.length; i++) {
+        if (this.options1[i].userId == this.secondExamineUserId) {
+          secondExamineUserName = this.options1[i].nick
+        }
+      }
+// console.log(firstExamineUserName)
+// console.log(secondExamineUserName)
+// return
+      this.$axios({
+        url: 'event/saveEvent',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId'),
+          state:index,
+          title:this.title,
+          firstExamineUserId: firstExamineUserId,
+          firstExamineUserName: firstExamineUserName,
+          secondExamineUserId:this.secondExamineUserId,
+          secondExamineUserName:secondExamineUserName,
+          happenTime:this.happenTime,
+          jsonData: JSON.stringify(this.form)
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          Message.success({
+    message: res.data.desc,
+    customClass: 'messageClass',
+    center: true
+  })
+        }
+      })
+    },
+    showDialogVisible(index){
+      this.dialogVisible = true
+      this.addIndex = index
+    },
+    add() {
+      // let arr = []
+      // let newArr = []
+      // for (let item of this.checkListUser ) {
+      //   arr.push(item.id)
+        
+      // }
+      // for (let items of this.checkList ) {
+      //   newArr.push(items.id)
+        
+      // }
+      // this.doUserId = arr.join(',')
+      // this.departmentId = newArr.join(',')
+      // console.log(this.doUserId,'结果数组',this.departmentId);
+      var arrIn = this.$refs.tree.getCheckedNodes( )
+      console.log(arrIn)
+      for (var i = 0; i < arrIn.length; i++) {
+        this.form[this.addIndex].userList.push({userId: arrIn[i].userId,name: arrIn[i].name,department: arrIn[i].department,head:arrIn[i].head,value: 0})
+      }
+      console.log(this.$refs.tree.getCheckedNodes( ))
+      this.dialogVisible = false
+      // this.ccList = this.doUserId.split(',')
+    },
+    getFirstUserByName () {
+      this.$axios({
+        url: 'department/getJsonFirst',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        console.log(res)
+        if (res.data.code === 1) {
+          console.log(res)
+          this.options = res.data.data
+          // for (var i=0;i<res.data.data.length;i++) {
+            // this.options.push({value: res.data.data[i].businessId, label: res.data.data[i].name})
+          // }
+        }
+      })
+    },
+    getFirstUserByName1 () {
+      this.$axios({
+        url: 'user/getExamineUserByBusiness',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          console.log(res)
+          this.options1 = res.data.data
+          // for (var i=0;i<res.data.data.length;i++) {
+          //   this.options1.push({value: res.data.data[i].departmentId, label: res.data.data[i].nick})
+          // }
+        }
+      })
+    },
+    getFirstUserByName2 () {
+      this.$axios({
+        url: 'eventtype/getEventTypeName',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.eventList = res.data.data
+        }
+      })
+    },
+    handleChange(value) {
+      console.log(value)
+    },
+    addEvent() {
+      this.event += 1
+      this.form.push({eventTypeId:'',remark:'',content:'',userList:[]})
+    },
+    // 选中标签
+    check_right_change() {
+      var arr = this.$refs.tree.getCheckedNodes( )       
+      // console.log(arr,'数组' );
+        for ( let item of arr ) {
+          // console.log(item,'区分');
+          if(item.series) {
+            this.checkList.push(item)
+            let newArr = []
+            for( let itemNew of this.checkList) {
+              newArr.push(itemNew.id)
+              // this.checkList = newArr
+              this.checkList = [...new Set(this.checkList)] 
+            }
+            this.departmentId = newArr.join(',')
+            // console.log('部门',this.departmentId);
+          } else if (item.account) {
+            this.checkListUser.push(item)
+            let userArr = []
+            this.checkListUser = [...new Set(this.checkListUser)] 
+            for(let itemUser of this.checkListUser) {
+              userArr.push(itemUser.id)
+              userArr = [...new Set(userArr)] 
+              this.checkListUser = [...new Set(this.checkListUser)] 
+            }
+          }       
+        } 
+    },
+    getDepartmentPeoplebufen () {
+      // let departmentId = this.departmentId
+      let params = {
+        sessionId:this.$cookie.get('sessionId'),
+      }      
+      getAllDepartment( this.$qs.stringify(params) ).then(res => {
+        if ( res.code === 1){
+          this.data5= res.data
+          // console.log(this.data5,'集团');                    
+        }        
+      })
+    },
+    getDepartmentPeople () {
+      // let departmentId = this.departmentId
+      let params = {
+        sessionId:this.$cookie.get('sessionId'),
+      }      
+      getDepartment( this.$qs.stringify(params) ).then(res => {
+        if ( res.code === 1){
+          this.data4 = res.data
+          // console.log(this.data4,'集团');
+                   
+        }        
+      })
+    },
+    // 追加常选
+    append(data) {
+          // const newChild = { id: id++, label: 'testtest', children: [] };
+          // if (!data.children) {
+          //   this.$set(data, 'children', []);
+          // }
+          // data.children.push(newChild);
+          // console.log(data,'追加常选');
+          // 设为常选人员
+          let params = {
+              sessionId:this.$cookie.get('sessionId'),
+              selectUserId:data.userId
+            }
+            setCommonUser( this.$qs.stringify(params) ).then(res=>{
+              if (res.code ===1 ) {
+                // console.log(res.desc,'----------------------------------');
+                  this.getCommonUserListPeople()
+              }
+            })
+        },
+        // 取消常选
+        noAppend(data) {
+          // console.log('取消',data);
+          let params = {
+              sessionId:this.$cookie.get('sessionId'),
+              selectUserId:data.userId
+            }
+            cancelCommonUser( this.$qs.stringify(params) ).then(res=>{
+              if (res.code ===1 ) {
+                // console.log(res.desc,'----------------------------------');
+                  this.getCommonUserListPeople()
+              }
+            })
+        },
+    // 指定常选人员
+    check_right_change_Common() {
+      var arr = this.$refs.treechangxaun.getCheckedNodes( )
+      // console.log(arr,'选中的常选',this.doUserId);
+      let newArr = []
+      for(let item of arr ) {
+        this.checkListUser.push(item)
+        this.checkListUser = [...new Set(this.checkListUser)] 
+        // console.log(this.checkListUser);
+        // newArr.push(item.userId)
+        // newArr = [...new Set(newArr)]
+        // console.log(newArr,'常选');
+
+
+
+        
+      }
+      this.ccList = [...new Set(newArr)]
+        // if (this.checkListUser.length != 0) {
+        //       this.checkListUser = this.checkListUser.concat(this.ccList)
+        //     }
+        // this.changxuan=newArr.join(',')
+      
+        // this.doUserId = this.changxuan+','+this.doUserIds
+        // console.log(this.changxuan,'常选',this.doUserId);
+      
+    },
+    // 获取常选名单
+    getCommonUserListPeople() {
+      let params = {
+        sessionId: this.$cookie.get('sessionId')
+      }
+      getCommonUserList( this.$qs.stringify(params) ).then(res=>{
+        // console.log(res,'常选');    
+        if (res.code===1 ) {
+          this.data6 = res.data
+        }
+      })
+    },
+  }
+}
+</script>
+
+<style scoped>
+.marginBotton {
+  margin-bottom: 15px;
+}
+.inputRemake {
+  width: 600px;
+}
+.eventtypetheme {
+  width: 70px;
+  display: inline-block;
+}
+.EventTheme {
+  width: 250px;
+}
+.backgroundB {
+  background-color: #f1f5f8;
+  margin-right: -10px;
+  margin-left: -10px;
+  padding: 0 10px;
+  height: 60px;
+  line-height: 75px;
+}
+.WebEntry {
+  min-height: 1000px;
+}
+.el-radio {
+  width: 100%;
+  margin-left: 10px !important;
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+.mint-cell {
+  text-align: center;
+}
+.MessageTips {
+  font-size:20px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(1,1,1,1);
+  text-align: center;
+}
+.MessageTips img{
+  top: 10px
+}
+.MessageCode {
+  font-size: 8px;
+  text-align: center;
+  color:rgba(1,1,1,0.7);
+}
+ul, li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.navTitle {
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+  padding-top: 12px;
+}
+.navTitle li{
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle a{
+  text-decoration:none;
+  color:rgba(21,21,21,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+
+}
+.Entry {
+  padding: 16px;
+  background:rgba(248,249,250,1);
+}
+.EntryTitle {
+  position: relative;
+  margin-bottom: 19px;
+}
+.EntryTitle img{
+  width: 28px;
+  height: 23px;
+}
+.EntryTitle span {
+  font-size:20px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(21,21,21,1);
+  position: absolute;
+  top: -2px;
+  left: 36px;
+}
+.EntryEvent {
+  font-size:20px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(21,21,21,1);
+  position: relative;
+  margin-bottom: 19px;
+}
+.EntryEvent img {
+  width: 28px;
+  height: 23px;
+}
+.EntryEvent span {
+  margin-left: 5px;
+}
+.EntryEvent button {
+  margin-left: 25px;
+}
+.objectList {
+  margin-top: 13px;
+}
+.objectListBox {
+ /* width: 386px;
+  height: 50px;*/
+  width: 80%;
+  padding: 11px 13px;
+  background:rgba(237,242,246,1);
+  border-radius:5px;
+  position: relative;
+}
+.objectList .logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+.objectListBoxName {
+  position: absolute;
+  left: 70px;
+  top: 15px;
+}
+.objectListBoxNameTop {
+  font-size:16px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(0,0,0,1);
+}
+.objectListBoxNameBottom {
+  font-size:13px;
+  font-family:PingFang-SC-Regular;
+  font-weight:400;
+  color:rgba(97,97,97,1);
+}
+.objectList .close {
+  position: absolute;
+  right: 10px;
+  top: 24px;
+  width: 27px;
+  height: 27px;
+}
+.objectListBoxNum {
+  position: absolute;
+  right:47px;
+  top: 15px;
+  font-size:17px;
+}
+.objectListBoxNum .el-input-number {
+  width: 150px;
+}
+.addEntry {
+  margin-top: 30px;
+  font-size:24px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(12,130,221,1)!important;
+  position: relative;
+}
+.addEntry span {
+  position: absolute;
+  left: 50px;
+  top: -7px;
+  cursor: pointer;
+}
+.addEntry img{
+  width: 32px;
+  height: 32px;
+  margin-top: -20px;
+  margin-right: 10px;
+}
+.forBtn {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+.el-textarea {
+  width: 800px;
+}
+.treeBox {
+    position: relative;
+  }
+  .leftTree {
+    display: inline-block;
+    /*// border: 1px solid #000;*/
+    width: 50%;
+    /*// height: 200px;*/
+    border-right: 1px solid black;
+  }
+  .rightTree {
+    margin-left: 50%;
+    text-align: left;
+    /*// border: 1px solid #000;*/
+    /*// height: 500px;*/
+    width: 200px;
+    overflow-y:auto;
+    top: 0;
+    position: absolute;
+    /*// right: 0;*/
+  }
+</style>

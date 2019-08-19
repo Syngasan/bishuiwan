@@ -1,0 +1,76 @@
+<template>
+  <div class="RankingTrend">
+    <ul class="navTitle">
+      <li><router-link to="/MyPoints">月积分</router-link></li>
+      <li><router-link to="/AccumulativeIntegral">累计积分</router-link></li>
+      <li><router-link to="/IntegralTrend">积分趋势</router-link></li>
+      <li class="active"><router-link to="/RankingTrend">排名趋势</router-link></li>
+    </ul>
+    <div class="divBox">
+      <div id="echartContainer" style="width:932px; height:604px"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'RankingTrend',
+  data () {
+    return {
+
+    }
+  },
+  mounted () {
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = this.$echarts.init(document.getElementById('echartContainer'))
+    // 绘制图表
+    myChart.setOption({
+      title: { text: '当月排名：2' },
+      xAxis: {
+        type: 'category',
+        data: ['1月', '2月', '3月', '4月', '5月', '6月']
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [{
+        data: [820, 932, 901, 934, 1290, 1330],
+        type: 'line',
+        smooth: true
+      }]
+    })
+  }
+}
+</script>
+
+<style scoped>
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.divBox {
+  padding: 20px 18px 28px 19px;
+}
+#echartContainer {
+  margin: 0 auto;
+}
+</style>

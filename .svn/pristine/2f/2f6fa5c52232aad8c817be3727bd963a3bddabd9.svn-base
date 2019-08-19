@@ -1,0 +1,192 @@
+<template>
+  <div class="FixedIntegral">
+    <el-row class="IntegralAuditBox">
+      <!-- <el-col :span="22" class="banner">XX月固定积分明细</el-col>
+      <el-col :span="2"><el-button plain type="primary">返回</el-button></el-col> -->
+      <el-col :span="8">
+      	姓名或工号：
+      	<el-input class="EventTheme" placeholder="请输入姓名或工号" v-model="keyword"></el-input>
+      </el-col>
+      <el-col :span="8">
+        部门名称：
+        <el-select v-model="departmentId" class="EventTheme" placeholder="请选择部门">
+          <el-option :key="index" :label="item.concatName" :value="item.id" v-for="(item,index) in department"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="8">
+        <el-button type="primary" @click="getList">查询</el-button>
+        <el-button type="primary" @click="dialogVisible=true">结算</el-button>
+      </el-col>
+      <el-col :span="24" class="textR"><router-link to="/IntegralLog">查看结算日志</router-link></el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="userId" label="序号"></el-table-column>
+      <el-table-column prop="realName" label="姓名"></el-table-column>
+      <el-table-column prop="number" label="工号"></el-table-column>
+      <el-table-column prop="companyName" label="部门"></el-table-column>
+      <el-table-column prop="date" label="学历分"></el-table-column>
+      <el-table-column prop="date" label="证书分"></el-table-column>
+      <el-table-column prop="date" label="特长分"></el-table-column>
+      <el-table-column prop="date" label="工龄分"></el-table-column>
+                <!-- <template >
+                <el-table-column  :prop="col.type"  :label="col.name" v-for="(col ,index) in tableData" :key="index" >
+                </el-table-column>
+          </template> -->
+      <el-table-column prop="total" label="固定积分合计"></el-table-column>
+    </el-table>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNumber" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next,  jumper" :total="total">
+    </el-pagination>
+    <el-dialog :visible.sync="dialogVisible" width="20%" :center='true'>
+      选 择 月 份：<el-date-picker class="EventTheme" type="month" format="yyyy-MM" value-format="yyyy-MM" placeholder="选择月份" v-model="dateMonth"></el-date-picker>
+      <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="dialogVisible=false">取 消</el-button>
+          <el-button type="primary" @click="pushN">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+export default {
+  name: 'FixedIntegral',
+  data () {
+    return {
+      dateMonth: '',
+      dialogVisible: false,
+      department: [],
+      keyword: '',
+      departmentId: '',
+      tableData: [],
+      pageNumber: 1,
+      pageSize: 10,
+      total: 0,
+      steadyScore:[]
+    }
+  },
+   created () {
+    this.getAugrment()
+    this.getList()
+  },
+  methods: {
+    pushN() {
+      if (this.dateMonth == '' || this.dateMonth == null) {
+        Message.error({
+    message: '請選擇月份',
+    customClass: 'messageClass',
+    center: true
+  })
+        return false
+      }
+      this.$axios({
+        url: 'steady/settlement',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId'),
+          date: this.month + '-01'
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
+    getAugrment () {
+      this.$axios({
+        url: 'department/getAllConcatName',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.department = res.data.data
+        }
+      })
+    },
+    getList () {
+      this.$axios({
+        url: 'steady/pageSteady',
+        method: 'POST',
+        data: {
+          sessionId: this.$cookie.get('sessionId'),
+          keyword: this.keyword,
+          departmentId: this.departmentId,
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          console.log(res)
+          this.total = res.data.data.totalRow
+          this.tableData = res.data.data.page.list
+          // this.steadyScore = res.data.data.page.list
+          // console.log(this.steadyScore,'哈哈哈哈哈哈');
+          // for (let item of this.tableData) {
+          //   for ( let index of item.steadyScore) {
+
+          //   }
+          // }
+        }
+      })
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.getList()
+    },
+    handleCurrentChange(val) {
+      this.pageNumber = val
+      this.getList()
+    }
+  }
+}
+</script>
+
+<style scoped>
+/*.banner {
+  font-size:16px;
+font-family:PingFang-SC-Regular;
+font-weight:bold;
+color:rgba(0,0,0,1);
+}*/
+.EventTheme {
+  width: 195px;
+  height: 46px;
+}
+.EventThemeDate1 {
+  width: 250px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 150px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 83px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+  padding-right: 90px;
+  color: #FF0993FE !important;
+}
+.textR a{
+  color:rgba(10,143,246,1);
+  text-decoration:none;
+}
+</style>

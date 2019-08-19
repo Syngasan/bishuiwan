@@ -1,0 +1,173 @@
+<template>
+  <div class="BuckleExecution">
+    <ul class="navTitle">
+      <li><router-link to="/integralSelect">积分构成</router-link></li>
+      <li><router-link to="/Prizes">奖扣明细</router-link></li>
+      <li class="active"><router-link to="/BuckleExecution">奖扣执行</router-link></li>
+    </ul>
+    <el-row class="IntegralAuditBox">
+      <el-col :span="12">
+        <el-radio v-model="radio" label="1">
+          按月查询：
+          <el-date-picker class="EventThemeDate1" type="date" placeholder="选择日期" v-model="date1"></el-date-picker>
+        </el-radio>
+      </el-col>
+      <el-col :span="12">
+        <el-radio v-model="radio" label="2">
+          录入日期：
+          <el-date-picker class="EventThemeDate" type="date" placeholder="选择日期" v-model="date1"></el-date-picker>
+          至 
+          <el-date-picker class="EventThemeDate" type="date" placeholder="选择日期" v-model="date2"></el-date-picker>
+        </el-radio>
+      </el-col>
+      <el-col :span="8">
+        姓 名：
+        <el-input class="EventTheme" placeholder="请输入事件内容" v-model="name"></el-input>
+      </el-col>
+      <el-col :span="8">
+        选择部门：
+        <el-select v-model="select1" class="EventTheme" placeholder="请选择事件类型">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="8">
+        排序依据：
+        <el-select v-model="select1" class="EventTheme" placeholder="请选择排序依据">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select>
+        <el-button type="primary">查询</el-button>
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column prop="date" label="序号"></el-table-column>
+      <el-table-column prop="date" label="姓名"></el-table-column>
+      <el-table-column prop="date" label="部门"></el-table-column>
+      <el-table-column prop="date" label="总奖分"></el-table-column>
+      <el-table-column prop="date" label="奖分人次"></el-table-column>
+      <el-table-column prop="date" label="平均奖分"></el-table-column>
+      <el-table-column prop="date" label="总扣分"></el-table-column>
+      <el-table-column prop="date" label="扣分人次"></el-table-column>
+      <el-table-column prop="date" label="平均扣分"></el-table-column>
+    </el-table>
+    <el-row>
+      <el-col :span="4">
+        <el-button type="primary">导出excel</el-button>
+      </el-col>
+      <el-col :span="20">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="100" layout="total, sizes, prev, pager, next,  jumper" :total="100">
+        </el-pagination>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'BuckleExecution',
+  data () {
+    return {
+      radio: '1',
+      name: '',
+      select1: '',
+      date1: '',
+      select2: '',
+      date2: '',
+      tableData: [
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'},
+      { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}, { date: '2016-05-02',
+        name: '王小虎',
+        address: '1518'}],
+      currentPage4: 1
+    }
+  },
+  methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    }
+  }
+}
+</script>
+
+<style scoped>
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle a{
+  text-decoration:none;
+  color:rgba(21,21,21,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.EventTheme {
+  width: 155px;
+  height: 46px;
+}
+.EventThemeDate1 {
+  width: 250px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 150px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 83px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+  padding-right: 90px;
+}
+</style>

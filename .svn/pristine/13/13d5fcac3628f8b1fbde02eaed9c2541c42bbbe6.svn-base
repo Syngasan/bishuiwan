@@ -1,0 +1,259 @@
+<template>
+  <div class="home">
+    <div class="homeContainer">
+    	<el-row>
+    		<el-col :span="12" class="homeNotice">
+    			<div class="Notice"><img src="./img/con_icon_ggl@3x.png"><span>公告栏</span></div>
+    		</el-col>
+    		<el-col :span="12">
+    			<div class="more"><router-link to="/BulletinList">更多 ></router-link></div>
+    		</el-col>
+    	</el-row>
+    	<el-row class="marginForTop">
+    		<el-col :span="10">
+    			<img src="./img/u=3426437677,4051799481&fm=27&gp=0.jpg" class="titleImg">
+    		</el-col>
+    		<el-col :span="14">
+    			<div class="Titlecontain">
+    				<div class="titleName"><router-link to="/BulletinListDetails">公告标题公告标题公告标题</router-link></div>
+    				<div class="titleTime">发布：2017-07-06</div>
+    				<div class="titleDesc">广州小跑软件科技有限由均为5年研发经验的行业精英成立，是国内领先的移动互联企业应用软件的一站式服务提供商，专注于移动APP开发、微信开发、网站建设和企业管理系统开发等领域，为企业提供专业化、国际化、个性化、品牌化的互联网整合解决方案。由公司成立至今已完成超过500个开发项目，其中包括政府单位、国有企业以及世界500强大型企业；始终秉承着“一切以客户为中心，真心实意为客户服务”的服务理念，不断提升服务质量，以成为行业服务品质的标杆为目标。我们是传统企业转型移动互联网的助跑者，旨在打造安全、高效、靠谱的互联网军队，为各企业在互联网世界开疆辟<span class="list"><router-link to="/BulletinListDetails">详情</router-link></span></div>
+    			</div>
+    		</el-col>
+    	</el-row>
+    	<el-row class="marginForBottom">
+    		<el-col :span="8" class="tpggMagn">
+    			<div class="tpgg"><router-link to="/WebEntry"><img src="./img/tpgg_area_icon01@2x.png"></router-link></div>
+    			<div class="tpggArea">积分录入</div>
+    		</el-col>
+    		<el-col :span="8" class="tpggMagn">
+    			<div class="tpgg"><router-link to="/IntegralAudit"><img src="./img/tpgg_area_icon02@2x.png"></router-link><div class="paopao" v-if="list.examineNumber">{{list.examineNumber}}</div></div>
+    			<div class="tpggArea">积分审核</div>
+    		</el-col>
+    		<el-col :span="8" class="tpggMagn">
+    			<div class="tpgg"><router-link to="/integralReport"><img src="./img/tpgg_area_icon03@2x.png"></router-link></div>
+    			<div class="tpggArea">积分报表</div>
+    		</el-col>
+    		<el-col :span="8" class="tpggMagn">
+    			<div class="tpgg"><router-link to="/integralSelect"><img src="./img/tpgg_area_icon04@2x.png"></router-link></div>
+    			<div class="tpggArea">积分查询</div>
+    		</el-col>
+    		<el-col :span="8" class="tpggMagn">
+    			<div class="tpgg"><router-link to="/BuckleTask"><img src="./img/tpgg_area_icon05@2x.png"></router-link></div>
+    			<div class="tpggArea">奖扣任务</div>
+    		</el-col>
+    		<el-col :span="8" class="tpggMagn">
+    			<div class="tpgg"><router-link to="/MyPoints"><img src="./img/tpgg_area_icon06@2x.png"></router-link></div>
+    			<div class="tpggArea">个人中心</div>
+    		</el-col>
+    	</el-row>
+    	<div class="boxBottom"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+export default {
+  name: 'home',
+  data () {
+    return {
+      list: ''
+    }
+  },
+  created () {
+    this.getList()
+    this.getEvent()
+  },
+  methods: {
+    getList () {
+      this.$axios({
+        url: 'active/getMyLevel',
+        method: 'POST',
+        center: true,
+        data: {
+          sessionId: this.$cookie.get('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          if (res.data.data === -1) {
+            this.messageBox(res.data.desc,'warning','可恶')
+          } else if (res.data.data === 0) {
+            this.messageBox(res.data.desc,'info','咦')
+          } else if (res.data.data === 1) {
+            this.messageBox(res.data.desc,'success','恭喜')
+          }
+        }
+      })
+    },
+    getEvent () {
+      this.$axios({
+        url: 'user/getRecordNew',
+        method: 'POST',
+        data: {
+          sessionId: window.localStorage.getItem('ryToken')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.list = res.data.data
+        }
+      })
+    },
+    messageBox (desc,type,title) {
+      this.$alert(desc, title, {
+        confirmButtonText: '去看看',
+        type: type,
+          callback: action => {
+            if (action === 'confirm') {
+              this.$router.push('/MyPoints')
+            }
+          }
+      })
+    }
+  }
+}
+</script>
+
+<style scoped>
+.paopao {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 8px;
+}
+.home {
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  background-color: #f8fbfe !important;
+}
+.homeContainer {
+  width: 1200px;
+  display: inline-block;
+  margin: 60px auto 0 auto;
+  background-color: #f8fbfe !important;
+}
+.homeNotice {
+  text-align: left;
+}
+.Notice {
+  width: 127px;
+  height: 39px;
+  background-color: rgb(10,143,246);
+  text-align: left;
+  position: relative;
+  display: inline-block;
+}
+.Notice img {
+  width: 33px;
+  height: 27px;
+  margin-top: 5px;
+  margin-left: 12px;
+}
+.Notice span {
+  width:75px;
+  height:21px;
+  font-size:22px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(255,255,255,1);
+  position: absolute;
+  right: 0px;
+  top: 7px;
+}
+.more a{
+  text-decoration:none;
+  color:rgba(10,143,246,1);
+}
+.more {
+  font-size:14px;
+  font-family:PingFang-SC-Medium;
+  color:rgba(10,143,246,1);
+  line-height:0px;
+  text-align: right;
+  margin-top: 30px;
+}
+.marginForTop {
+  margin-top: 20px;
+  background-color: white;
+  height: 433px; 
+}
+.marginForTop img{
+  width:512px;
+  height:344px;
+  margin-top: 41px;
+  margin-left: 37px;
+}
+.titleImg {
+  width: 512px;
+  height: 344px;
+}
+.Titlecontain {
+  padding: 21px 43px 0 26px;
+  text-align: left;
+  margin-top: 52px;
+  margin-left: 45px;
+
+}
+.titleName {
+  font-size:28px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(0,0,0,1);
+  line-height:24px;
+}
+.titleName a {
+  color: rgba(0, 0, 0, 1);
+  text-decoration:none;
+}
+.titleTime {
+  font-size:13px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(169,169,169,1);
+  line-height:24px;
+  margin-top: 17px;
+}
+.titleDesc {
+  font-size:15px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(91,91,91,1);
+  line-height:24px;
+  margin-top: 23px;
+}
+.list a {
+  text-decoration:none;
+  color:rgba(10,143,246,1);
+}
+.marginForBottom {
+  margin-top: 20px;
+  background-color: white;
+  height: 433px; 
+}
+.tpgg,.tpgg img {
+  width: 120px;
+  height: 105px;
+  display: inline-block;
+  position: relative;
+}
+.tpggArea {
+  font-size:18px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(33,36,39,1);
+  line-height:0px;
+  position: relative;
+}
+.tpggMagn {
+  margin-top: 46px;
+}
+.boxBottom {
+  height: 46px;
+}
+</style>

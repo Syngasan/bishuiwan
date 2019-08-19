@@ -1,0 +1,1433 @@
+<template>
+  <div class="wrapper">
+    <div class="WebEntry">
+      <ul class="navTitle">
+        <li class="active">
+          <router-link to="/WebEntry">网页录入</router-link>
+        </li>
+        <li>
+          <router-link to="/tableEntry">表格录入</router-link>
+        </li>
+        <li>
+          <router-link to="/Submission">已提交</router-link>
+        </li>
+        <li>
+          <router-link to="/drafts">草稿箱</router-link>
+        </li>
+      </ul>
+      <div class="clear"></div>
+      <div class="Entry">
+        <div class="EntryTitle"><img src="./img/jflr_icon06@3x.png"><span>填写事项</span></div>
+        <el-row class="">
+          <el-col :span="12"
+                  class="marginBotton">
+            <span class="eventtypetheme">事件主题</span>
+            <el-input class="EventTheme"
+                      placeholder="事件主题"
+                      v-model="title"> </el-input>
+          </el-col>
+          <el-col :span="12"
+                  class="marginBotton">
+            <span class="eventtypetheme">初审人</span>
+            <!-- <el-select v-model="firstExamineUserId" class="EventTheme" placeholder="请输入 \ 选择"> -->
+            <el-cascader placeholder="请输入 \ 选择"
+                         @change="getFirstExamineUserName"
+                         v-model="firstExamineUserId"
+                         :props="prop9"
+                         :options="options"
+                         filterable
+                         change-on-select
+                         class="EventTheme">
+              <!-- <el-option :key="item.id" :label="item.label" :value="item.id" v-for="(item,index) in options"></el-option> -->
+            </el-cascader>
+            <!-- </el-select> -->
+          </el-col>
+          <el-col :span="12"
+                  class="marginBotton">
+            <span class="eventtypetheme">奖扣日期</span>
+            <el-date-picker class="EventTheme"
+                            type="date"
+                            format="yyyy-MM-dd"
+                            value-format="yyyy-MM-dd"
+                            placeholder="选择日期"
+                            v-model="happenTime"
+                            @change="setTime"></el-date-picker>
+          </el-col>
+          <el-col :span="12"
+                  class="marginBotton">
+            <span class="eventtypetheme">终审人</span>
+            <el-select v-model="secondExamineUserId"
+                       class="EventTheme"
+                       placeholder="请输入 \ 选择">
+              <el-option :key="item.userId"
+                         :label="item.nick"
+                         :value="item.userId"
+                         v-for="(item,index) in options1"></el-option>
+            </el-select>
+          </el-col>
+
+        </el-row>
+        <div class="clear"></div>
+
+        <div class="EntryTitle"><img src="./img/jflr_icon07@3x.png"><span>填写事件</span></div>
+        <template v-for="(item,index) in event">
+          <div class="EntryEvent"><img src="./img/jflr_icon08@3x.png"><span>事件{{index+1}}</span>
+            <el-button type="primary"
+                       @click="toggleIsBool(index)">事件库</el-button>
+            <!-- <router-link to="/EventLibrary">
+              <el-button type="primary" @click="toggleIsSelectedEventLib()">事件库</el-button>
+            </router-link> -->
+          </div>
+          <!-- <ul class="Event">
+            <li class="EventItem">
+              <span class="title">事件类型</span>
+              <span class="content">{{$store.state.eventInfo.eventTypeName}}</span>
+            </li>
+            <li class="EventItem">
+              <span class="title">备&emsp;&emsp;注</span>
+              <input type="text" placeholder="请输入备注内容" v-model="$store.state.eventInfo.remark">
+            </li>
+            <li class="EventItem">
+              <span class="title">事件内容</span>
+              <span class="eventContent">{{$store.state.eventInfo.content}}</span>
+            </li>
+          </ul> -->
+          <el-row class="">
+            <el-col :span="24"
+                    class="marginBotton">
+              <span class="eventtypetheme">事件类型</span>
+              <el-select v-model="form[index].eventTypeId"
+                         placeholder="请选择"
+                         :disabled="isSelectedEventLib[index]">
+                <el-option :key="this"
+                           :label="item.name"
+                           :value="item.id"
+                           v-for="(item,index) in eventList"></el-option>
+              </el-select>
+            </el-col>
+            <el-col :span="24"
+                    class="marginBotton">
+              <span class="eventtypetheme">备 注</span>
+              <el-input class="inputRemake"
+                        placeholder="选填"
+                        v-model="form[index].remark"></el-input>
+            </el-col>
+            <el-col :span="24"
+                    class="marginBotton">
+              <span class="eventtypetheme">事件内容</span>
+              <el-input type="textarea"
+                        :rows="4"
+                        placeholder="请输入事件内容"
+                        v-model="form[index].content"
+                        :disabled="isSelectedEventLib[index]"></el-input>
+            </el-col>
+          </el-row>
+          <div class="entryHeader">奖扣对象</div>
+          <el-row>
+            <el-col :span="12"
+                    :key="this"
+                    class="objectList"
+                    v-for="(items,indexs) in form[index].userList">
+              <div class="objectListBox">
+                <img class="logo"
+                     src="./img/u=1752349347,1084259068&fm=27&gp=0.jpg">
+                <div class="objectListBoxName">
+                  <div class="objectListBoxNameTop">{{items.name}}</div>
+                  <div class="objectListBoxNameBottom">{{items.department}}</div>
+                </div>
+                <div class="objectListBoxNum">
+                  <el-input-number v-model="defaultWorderScore[index]"
+                                   @change="handleChange"
+                                   label="描述文字"
+                                   :disabled="isSelectedEventLib[index]"
+                                   v-if="isSelectedEventLib[index]"></el-input-number>
+                  <el-input-number v-model="items.value"
+                                   @change="handleChange"
+                                   label="描述文字"
+                                   :disabled="isSelectedEventLib[index]"
+                                   v-else></el-input-number> 分
+                </div>
+                <img class="close"
+                     src="./img/jkdx_close@3x.png"
+                     @click="removeEvent(form[index].userList,indexs)">
+              </div>
+            </el-col>
+          </el-row>
+          <div class="clear"></div>
+          <div class="addEntry"
+               @click="showDialogVisible(index)"><img src="./img/jkdx_add@3x.png"><span>添加奖扣对象</span></div>
+        </template>
+        <div class="clear"></div>
+        <div class="addEntry backgroundB"
+             @click="addEvent(index)"><img src="./img/jkdx_add@3x.png"><span>添加事件</span></div>
+        <div class="forBtn">
+          <el-button type="primary"
+                     @click="saveEvent(0)">保存</el-button>
+          <el-button plain
+                     @click="saveEvent(1)">提交</el-button>
+        </div>
+      </div>
+
+
+      <!-- <el-dialog title="添加成员" :visible.sync="dialogVisible" center>
+        <div class="treeBox">
+          <div class="leftTree">
+                <el-tree :data="data4" show-checkbox node-key="id" :props="prop9" :expand-on-click-node="false" @check-change="check_right_change" :default-expanded-keys="[2, 1]" ref="tree">
+                  <span class="custom-tree-node" slot-scope="{ node, data }">
+                    <span>{{ node.label }}</span>
+                    <span>
+                      <el-button type="text" size="mini" @click="() => append(data)">
+                        {{data.hasOwnProperty('account') ==true ? '设为常选' : ''}}
+                      </el-button>
+                    </span>
+                  </span>
+                </el-tree>
+
+
+                    <div>
+                      <span>常选人员</span>
+                      <el-tree :data="data6" show-checkbox :props="prop11" @check-change="check_right_change_Common" ref="treechangxaun">
+                        <span class="custom-tree-node" slot-scope="{ node, data }">
+                          <span>{{ node.label }}</span>
+                          <span>
+                            <el-button type="text" size="mini" @click="() => noAppend(data)">
+                              <p>取消常选</p>
+                            </el-button>
+                          </span>
+                        </span>
+                      </el-tree>
+                      <el-button @click="add()" type="primary" size="small" style="text-align:right">确定</el-button>
+                    </div>
+          </div>
+                      <div class="rightTree">
+                        <div>
+                          <ul v-for="(item,index) in checkList" :key="index">
+                            <li>
+                              <el-button plain size="small" @click="delDepId(item.id)">{{item.name}}</el-button>
+                            </li>
+                          </ul>
+                        </div>
+                        <div>
+                          <ul v-for="(cols,colIndex) in checkListUser" :key="colIndex">
+                            <li>
+                              <el-button @click="delId(cols.id)" plain size="small">{{cols.realName}}</el-button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+        </div>
+      </el-dialog> -->
+      <el-dialog title="添加成员"
+                 :visible.sync="dialogVisible">
+        <div class="treeBox">
+          <div class="leftTree">
+            <el-tree :data="data4"
+                     show-checkbox
+                     node-key="id"
+                     :props="prop9"
+                     :expand-on-click-node="false"
+                     @check-change="check_right_change"
+                     :default-expanded-keys="[2, 1]"
+                     ref="tree">
+              <span class="custom-tree-node"
+                    slot-scope="{ node, data }">
+                <span>{{ node.label }}</span>
+                <span>
+                  <el-button type="text"
+                             size="mini"
+                             @click="() => append(data)">
+                             {{data.hasOwnProperty('account') ==true ? '设为常选' : ''}}
+                    <!-- 设为常选 -->
+                  </el-button>
+                </span>
+              </span>
+            </el-tree>
+
+
+            <div>
+              <span>常选人员</span>
+              <el-scrollbar style="height:500px;overflow-x: hidden;">
+                <el-tree :data="data6"
+                         show-checkbox
+                         :props="prop11"
+                         @check-change="check_right_change_Common"
+                         ref="treechangxaun">
+                  <span class="custom-tree-node" slot-scope="{ node, data }">
+                          <span>{{ node.label }}</span>
+                          <span>
+                            <el-button type="text" size="mini" @click="() => noAppend(data)">
+                              <p>取消常选</p>
+                            </el-button>
+                          </span>
+                        </span>
+                </el-tree>
+              </el-scrollbar>
+
+              <el-button @click="add()"
+                         type="primary"
+                         size="small"
+                         style="text-align:right">确定</el-button>
+            </div>
+          </div>
+
+          <div class="rightTree">
+            <!-- <div>
+              <ul v-for="(item,index) in checkList"
+                  :key="index">
+                <li>
+                  <el-button plain
+                             size="small"
+                             @click="delDepId(item.id)">{{item.name}}</el-button>
+                </li>
+              </ul>
+            </div> -->
+            <el-scrollbar style="height:100%;overflow-x: hidden;">
+              <ul v-for="(cols,colIndex) in checkListUser"
+                  :key="colIndex">
+                <li>
+                  <el-button @click="delId(cols.id)"
+                  style="margin-top:10px"
+                             plain
+                             size="small">{{cols.realName}}</el-button>
+                </li>
+              </ul>
+            </el-scrollbar>
+          </div>
+        </div>
+      </el-dialog>
+      <!--
+        <el-dialog title=" " :visible.sync="dialogMessageVisible" center width="30%">
+          <mt-cell title="提交失败">
+            <img slot="icon" src="./img/fail_icon@2x.png" style="margin-right: 10px;" width="24" height="24">
+          </mt-cell>
+          <div class="MessageCode">事件1与系统中已有事件存在重复项，请检查<p>修改后重新提交！</p></div>
+        </el-dialog> -->
+
+
+      <div class="fixedMark"
+           v-show="bool">
+        <div class="EventLibrary">
+          <div class="EventLibraryBox">
+            <div class="EventLibraryBoxSelect">
+              <el-select v-model="eventTypeId"
+                         placeholder="请选择">
+                <!-- <el-cascader placeholder="全部" v-model="eventTypeId" :options="options"filterable change-on-select class="EventTheme"> -->
+                <el-option :key="item.name"
+                           :label="item.name"
+                           :value="item.id"
+                           v-for="(item,index) in eventType"></el-option>
+                <!-- </el-cascader>  -->
+              </el-select>
+              <el-input class="searchInput"
+                        v-model="keyword1"
+                        placeholder="请输入内容"></el-input>
+              <el-button type="primary"
+                         @click="getList1">搜索</el-button>
+              <el-button plain
+                         @click="toggleIsBool">返回</el-button>
+              <!-- <router-link to="/WebEntry"><el-button plain>返回</el-button></router-link> -->
+            </div>
+          </div>
+          <el-table :data="tableData1"
+                    stripe
+                    style="width: 100%">
+            <el-table-column prop="eventTypeId"
+                             label="序号"
+                             align="center"
+                             type="index"
+                             :index="setIndex"
+                             ></el-table-column>
+            <el-table-column prop="content"
+                             label="事件内容"
+                             align="center">
+              <!-- <template slot-scope="scope">
+                <router-link :to="'/DetailsOfTheEvent/'+scope.row.id+'/1'"
+                             class="EventTitle">{{scope.row.content}}</router-link>
+              </template> -->
+            </el-table-column>
+            <el-table-column prop="value"
+                             label="分值"
+                             align="center"></el-table-column>
+            <el-table-column prop="address"
+                             label="操作"
+                             align="center">
+              <template slot-scope="scope">
+                <!-- <router-link to="/WebEntry"> -->
+                <el-button type="danger"
+                           size="mini"
+                           @click="clodeEventInfo(scope.row)"
+                           v-if="selectEventId[eventIndex] == scope.row.id">取消选择</el-button>
+                <el-button type="primary"
+                           size="mini"
+                           @click="pushEventInfo(scope.row)"
+                           v-else>确认选择</el-button>
+                <!-- </router-link> -->
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination @size-change="handleSizeChange1"
+                         @current-change="handleCurrentChange1"
+                         :current-page="pageNumber1"
+                         :page-sizes="[10, 20, 30, 40]"
+                         :page-size="pageSize1"
+                         layout="total, sizes, prev, pager, next, jumper"
+                         :total="total1">
+          </el-pagination>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</template>
+
+<script>
+  import {
+    Message
+  } from 'element-ui'
+  import {
+    publishTask,
+    getExamineUserByBusiness,
+    getEventTypeName,
+    getDepartment,
+    getCommonUserList,
+    getAllDepartment,
+    setCommonUser,
+    cancelCommonUser
+  } from '@/utils/axios/axios'
+  import {
+    transformRequestFn
+  } from '@/utils/transformRequestFn/transformRequestFn'
+  import {
+    curentYearMonthDay
+  } from '@/utils/date/getDate'
+  export default {
+    name: 'WebEntry',
+    data() {
+      const generateData = _ => {
+        const data = []
+        const old = []
+        for (let i = 0; i < old.length; i++) {
+          data.push({
+            key: i,
+            label: old[i]
+            // label: `备选项 ${i}`
+            // disabled: i % 4 === 0
+          })
+        }
+        return data
+      }
+      const data4 = [];
+      const data5 = [];
+      const data6 = [];
+      return {
+        prop10: {
+          value: 'id',
+          children: 'children',
+          label: 'name'
+        },
+        prop9: {
+          value: 'id',
+          children: 'children',
+          label: 'name'
+        },
+        prop11: {
+          value: 'userId',
+          label: 'realName'
+        },
+        data4: JSON.parse(JSON.stringify(data4)),
+        data5: JSON.parse(JSON.stringify(data5)),
+        data6: JSON.parse(JSON.stringify(data6)),
+        checkList: [],
+        checkListbufen: [],
+        checkListUser: [],
+        data: generateData(),
+        title: '', // 事件主题
+        happenTime: '',
+        firstExamineUserId: [],
+        secondExamineUserId: '',
+        event: 1,
+        radio2: 1,
+        dialogEventVisible: false,
+        dialogMessageVisible: false,
+        form: [{
+          eventTypeId: '',
+          remark: '',
+          content: '',
+          userList: []
+        }],
+        num1: 1,
+        num2: 1,
+        dialogVisible: false,
+        data: [{
+            key: 1,
+            label: '昵称昵称'
+          },
+          {
+            key: 2,
+            label: '昵称昵称'
+          },
+          {
+            key: 3,
+            label: '昵称昵称'
+          },
+          {
+            key: 4,
+            label: '昵称昵称'
+          },
+          {
+            key: 5,
+            label: '昵称昵称'
+          },
+          {
+            key: 6,
+            label: '昵称昵称'
+          }
+        ],
+        options: [],
+        selectedOptions: [],
+        options1: [],
+        selectedOptions1: [],
+        eventList: [],
+        addIndex: 0,
+        vals: [],
+        isSelectedEventLib: [false],
+        steadyScore: [],
+        address: '',
+        keyword1: '',
+        eventType: [],
+        eventTypeId: [],
+        tableData1: [],
+        pageNumber1: 1,
+        pageSize1: 10,
+        total1: 0,
+        bool: false,
+        eventIndex: 0,
+        selectEventId: [], //事件库被选中的id
+        defaultWorderScore: [0],
+        leftTreeSelectList: [], //奖扣对象, 左侧被选中列表
+        targetId: '',
+      }
+    },
+    // computed: {
+    //   isSelectedEventLib() {
+    //     if(!this.$store.state.eventInfo) {
+    //       return false
+    //     }
+    //     return true
+    //   }
+    // },
+    mounted() {
+      //do something after updating vue instance
+      // console.log(this.firstExamineUserId);
+    },
+    created() {
+      if(this.$route.query.id) {
+        this.getEventTitle(this.$route.query.id)
+      }else {
+        this.getDefaultSecond()
+        this.getDefaultFirst()
+      }
+      this.getFirstUserByName()
+      this.getFirstUserByName1()
+      this.getFirstUserByName2()
+      this.getDepartmentPeople()
+      this.getCommonUserListPeople()
+      this.getList1()
+      this.getEventType()
+      this.happenTime = curentYearMonthDay()
+      console.log("sadsafaaaaaaaaaaa", this.happenTime);
+    },
+    methods: {
+      getEventTitle(eventTitleId) {
+        this.$axios({
+          url: 'event/getEventTitle',
+          method: 'POST',
+          data: {
+            sessionId: localStorage.getItem('sessionId'),
+            eventTitleId
+          },
+          transformRequest: transformRequestFn
+        }).then(res => {
+          console.log(res);
+          this.firstExamineUserName = res.data.data.firstExamineUserName
+          // this.firstExamineUserId = res.data.data.firstExamineUserId
+          this.targetId = res.data.data.firstExamineUserId
+          this.secondExamineUserId = res.data.data.secondExamineUserId
+          this.secondExamineUserName = res.data.data.secondExamineUserName
+          this.form = res.data.data.eventList.map(item => {
+            return {
+              eventTypeId: item.eventTypeId,
+              remark: item.remark,
+              content: item.content,
+              userList: item.eventUserList.map(ite => {
+                return {
+                  userId: ite.userId,
+                  name: ite.name,
+                  department: ite.department,
+                  head: ite.head,
+                  value: ite.value
+                }
+              })
+            }
+          })
+        })
+      },
+      delId (col)  {
+        console.log(col,'===============================',this.checkListUser);
+        // for ( let i =0;i<this.checkListUser.length;i++) {
+        //   if (this.checkListUser[i].id == col) {
+        //     this.checkListUser.splice(i,1)
+        //   }
+        // }
+        this.checkListUser = this.checkListUser.filter((item, index) => {
+          return item.id !==col
+        })
+            console.log(this.checkListUser,'截取数组');
+      },
+      setIndex(index) {
+        return index + 1
+      },
+      setTime(e) {
+        console.log(e);
+        this.happenTime = e
+      },
+      getDefaultFirst() {
+        this.$axios({
+          url: 'examiner/getDefaultFirst',
+          method: 'POST',
+          data: {
+            sessionId: localStorage.getItem('sessionId')
+          },
+          transformRequest: transformRequestFn
+        }).then(res => {
+          if (res.data.code === 1) {
+            this.targetId = res.data.data.id
+            // console.log('targetId', targetId);
+            // console.log(this.firstExamineUserId);
+            // this.firstExamineUserId = [res.data.data.id]
+            this.firstExamineUserName = res.data.data.realName
+          }
+        })
+      },
+      getDefaultSecond() {
+        this.$axios({
+          url: 'examiner/getDefaultSecond',
+          method: 'POST',
+          data: {
+            sessionId: localStorage.getItem('sessionId')
+          },
+          transformRequest: transformRequestFn
+        }).then(res => {
+          this.secondExamineUserId = res.data.data.id
+          this.secondExamineUserName = res.data.data.realName
+        })
+      },
+      pushEventInfo(row) {
+        console.log(row);
+        // this.selectEventId[this.eventIndex] = row.id
+        this.$set(this.selectEventId, this.eventIndex, row.id)
+        this.$set(this.defaultWorderScore, this.eventIndex, row.value)
+        this.form[this.eventIndex] = {
+          eventTypeId: row.eventTypeId,
+          eventLibraryId: row.id,
+          remark: row.remark,
+          content: row.content,
+          value: row.value,
+          type: 1,
+          userList: []
+        }
+        this.isSelectedEventLib[this.eventIndex] = true
+        this.bool = !this.bool
+        console.log(this.selectEventId);
+      },
+      clodeEventInfo(row) {
+        // this.selectEventId[this.eventIndex] = 0
+        this.$set(this.selectEventId, this.eventIndex, 0)
+        this.$set(this.defaultWorderScore, this.eventIndex, 0)
+        this.form[this.eventIndex] = {
+          eventTypeId: '',
+          remark: '',
+          content: '',
+          value: '',
+          type: 0,
+          userList: []
+        }
+        this.isSelectedEventLib[this.eventIndex] = false
+        this.bool = !this.bool
+        console.log(this.selectEventId);
+      },
+      toggleIsBool(index) {
+        // this.$router.push('/EventLibrary')
+        this.eventIndex = index
+        this.bool = !this.bool
+      },
+      getFirstExamineUserName(res, ress, resss) {
+        this.vals = this.getCascaderObj(this.firstExamineUserId, this.options);
+        console.log(this.vals);
+
+      },
+      getCascaderObj(val, opt) {
+        return val.map(function (value, index, array) {
+          for (var itm of opt) {
+            if (itm.value == value) {
+              opt = itm.children;
+              return itm;
+            }
+          }
+          return null;
+        });
+      },
+      // getCascaderObj(val, opt) {
+      //   return val.map(function(value, index, array) {
+      //     for (var itm of opt) {
+      //       if (itm.value == value) {
+      //         opt = itm.children;
+      //         return itm;
+      //       }
+      //     }
+      //     return null;
+      //   });
+      // },
+      removeEvent(items, indexs) {
+        items.splice(indexs, 1)
+      },
+      saveEvent(index) {
+        var firstExamineUserId = this.firstExamineUserId[this.firstExamineUserId.length - 1]
+        var firstExamineUserName = this.vals[this.vals.length - 1].realName
+        var secondExamineUserName = ''
+
+
+
+        // for (var i = 0; i < this.vals.length; i++) {
+        //   if (this.vals[i].departmentId == this.firstExamineUserId) {
+        //     firstExamineUserName =this.vals[i].label
+        //   }
+        // }
+        for (var i = 0; i < this.options1.length; i++) {
+          if (this.options1[i].userId == this.secondExamineUserId) {
+            secondExamineUserName = this.options1[i].nick
+          }
+        }
+        // console.log(firstExamineUserName)
+        // console.log(secondExamineUserName)
+        // return
+        console.log("初审人ID: ", firstExamineUserId);
+        console.log("初审人Name: ", firstExamineUserName);
+        console.log("终审人Id: ", this.secondExamineUserId);
+        console.log("终审人Name: ", secondExamineUserName);
+        console.log("奖扣日期: ", this.happenTime);
+        this.$axios({
+          url: 'event/saveEvent',
+          method: 'POST',
+          data: {
+            sessionId: localStorage.getItem('sessionId'),
+            state: index,
+            title: this.title,
+            firstExamineUserId: firstExamineUserId,
+            firstExamineUserName: firstExamineUserName,
+            secondExamineUserId: this.secondExamineUserId,
+            secondExamineUserName: secondExamineUserName,
+            happenTime: this.happenTime,
+            jsonData: JSON.stringify(this.form)
+          },
+          transformRequest: transformRequestFn
+        }).then((res) => {
+          if (res.data.code === 1) {
+            Message.success({
+              message: res.data.desc,
+              customClass: 'messageClass',
+              center: true
+            })
+            setTimeout(() => {
+              this.form =  [{
+                eventTypeId: '',
+                remark: '',
+                content: '',
+                userList: []
+              }]
+              this.isSelectedEventLib = [false]
+              this.eventIndex = 0
+              this.selectEventId = [] //事件库被选中的id
+              this.defaultWorderScore = [0]
+              this.title = ''
+            })
+          } else {
+            Message.error({
+              message: res.data.desc,
+              customClass: 'messageClass',
+              center: true
+            })
+          }
+        })
+      },
+      showDialogVisible(index) {
+        this.dialogVisible = true
+        this.addIndex = index
+      },
+      add() {
+        console.log(this.checkListUser);
+        if(this.isSelectedEventLib[this.eventIndex]) {
+          this.form[this.eventIndex].userList = this.checkListUser.map(item => {
+            return item = {
+              userId: item.userId,
+              name: item.name,
+              department: item.department,
+              head: item.head,
+              value: 0
+            }
+          })
+        }else {
+          this.form[this.eventIndex].userList = this.checkListUser.map(item => {
+            return item = {
+              userId: item.userId,
+              name: item.name,
+              department: item.department,
+              head: item.head,
+              value: this.defaultWorderScore[this.eventIndex]
+            }
+          })
+        }
+        // let arrIn = this.$refs.tree.getCheckedNodes()
+          // this.form[this.eventIndex].userList = this.checkListUser
+        // arrIn = arrIn.filter(item => {
+        //   for (var key in item) {
+        //     if (key == 'account') {
+        //       return item
+        //     }
+        //   }
+        // })
+        //
+        // if (this.isSelectedEventLib[this.eventIndex]) {
+        //   for (var i = 0; i < arrIn.length; i++) {
+        //     this.form[this.addIndex].userList.push({
+        //       userId: arrIn[i].userId,
+        //       name: arrIn[i].name,
+        //       department: arrIn[i].department,
+        //       head: arrIn[i].head,
+        //       value: this.defaultWorderScore[this.eventIndex]
+        //     })
+        //   }
+        // } else {
+        //   for (var i = 0; i < arrIn.length; i++) {
+        //     this.form[this.addIndex].userList.push({
+        //       userId: arrIn[i].userId,
+        //       name: arrIn[i].name,
+        //       department: arrIn[i].department,
+        //       head: arrIn[i].head,
+        //       value: 0
+        //     })
+        //   }
+        // }
+        this.dialogVisible = false
+        // this.ccList = this.doUserId.split(',')
+      },
+      getFirstUserByName() {
+        this.$axios({
+          url: 'department/getJsonFirst',
+          method: 'POST',
+          data: {
+            sessionId: localStorage.getItem('sessionId')
+          },
+          transformRequest: transformRequestFn
+        }).then((res) => {
+          console.log(res)
+          if (res.data.code === 1) {
+            this.options = res.data.data
+            console.log('获取的this.options', this.options, this.targetId)
+            try {
+              this.options.forEach((item1, index1) => {
+                item1.children.forEach((item2, index2) => {
+                  if (item2.id == this.targetId) {
+                    this.firstExamineUserId = [item1.id, item2.id]
+                    throw new Error("error")
+                  }
+                  item2.children.forEach((item3, index3) => {
+                    if (item3.id == this.targetId) {
+                      this.firstExamineUserId = [item1.id, item2.id, item3.id]
+                      throw new Error("error")
+                    }
+                    item3.children.forEach((item4, index4) => {
+                      if (item4.id == this.targetId) {
+                        this.firstExamineUserId = [item1.id, item2.id, item3.id, item4.id]
+                        throw new Error("error")
+                      }
+                    })
+                  })
+                })
+              })
+            } catch (e) {
+              console.log(e.message);
+            }
+
+            console.log('this.firstExamineUserId => ', this.firstExamineUserId);
+            this.getFirstExamineUserName()
+            // for (var i=0;i<res.data.data.length;i++) {
+            // this.options.push({value: res.data.data[i].businessId, label: res.data.data[i].name})
+            // }
+          }
+        })
+      },
+      getFirstUserByName1() {
+        this.$axios({
+          url: 'user/getExamineUserByBusiness',
+          method: 'POST',
+          data: {
+            sessionId: localStorage.getItem('sessionId')
+          },
+          transformRequest: transformRequestFn
+        }).then((res) => {
+          if (res.data.code === 1) {
+            console.log(res)
+            this.options1 = res.data.data
+            // for (var i=0;i<res.data.data.length;i++) {
+            //   this.options1.push({value: res.data.data[i].departmentId, label: res.data.data[i].nick})
+            // }
+          }
+        })
+      },
+      getFirstUserByName2() {
+        this.$axios({
+          url: 'eventtype/getEventTypeName',
+          method: 'POST',
+          data: {
+            sessionId: localStorage.getItem('sessionId')
+          },
+          transformRequest: transformRequestFn
+        }).then((res) => {
+          if (res.data.code === 1) {
+            this.eventList = res.data.data
+          }
+        })
+      },
+      handleChange(value) {
+        console.log(value)
+      },
+      addEvent(index) {
+        this.event += 1
+        this.eventIndex = index
+        this.isSelectedEventLib[this.eventIndex] = false
+        this.form.push({
+          eventTypeId: '',
+          remark: '',
+          content: '',
+          userList: []
+        })
+      },
+      // 选中标签
+      check_right_change() {
+        this.checkListUser = this.$refs.tree.getCheckedNodes(true)
+        let hash = {}
+        this.checkListUser = this.checkListUser.reduce((item, next) => {
+          hash[next.userId] ? '' : hash[next.userId] = true && item.push(next);
+          return item
+        }, [])
+      },
+      getDepartmentPeoplebufen() {
+        // let departmentId = this.departmentId
+        let params = {
+          sessionId: localStorage.getItem('sessionId'),
+        }
+        getAllDepartment(this.$qs.stringify(params)).then(res => {
+          if (res.code === 1) {
+            this.data5 = res.data
+            // console.log(this.data5,'集团');
+          }
+        })
+      },
+      getDepartmentPeople() {
+        // let departmentId = this.departmentId
+        let params = {
+          sessionId: localStorage.getItem('sessionId'),
+        }
+        getDepartment(this.$qs.stringify(params)).then(res => {
+          if (res.code === 1) {
+            this.data4 = res.data
+            // console.log(this.data4,'集团');
+
+          }
+        })
+      },
+      // 追加常选
+      append(data) {
+        console.log(data);
+        // const newChild = { id: id++, label: 'testtest', children: [] };
+        // if (!data.children) {
+        //   this.$set(data, 'children', []);
+        // }
+        // data.children.push(newChild);
+        // console.log(data,'追加常选');
+        // 设为常选人员
+        let params = {
+          sessionId: localStorage.getItem('sessionId'),
+          selectUserId: data.userId
+        }
+        setCommonUser(this.$qs.stringify(params)).then(res => {
+          if (res.code === 1) {
+            // console.log(res.desc,'----------------------------------');
+            this.getCommonUserListPeople()
+          } else {
+            Message.error({
+              message: res.desc,
+              customClass: 'messageClass',
+              center: true
+            })
+          }
+        })
+      },
+      // 取消常选
+      noAppend(data) {
+        // console.log('取消',data);
+        let params = {
+          sessionId: localStorage.getItem('sessionId'),
+          selectUserId: data.userId
+        }
+        cancelCommonUser(this.$qs.stringify(params)).then(res => {
+          if (res.code === 1) {
+            // console.log(res.desc,'----------------------------------');
+            this.getCommonUserListPeople()
+          }
+        })
+      },
+      // 指定常选人员
+      check_right_change_Common() {
+        var arr = this.$refs.treechangxaun.getCheckedNodes()
+        this.checkListUser = this.checkListUser.concat(arr)
+        let hash = {}
+        this.checkListUser = this.checkListUser.reduce((item, next) => {
+          hash[next.userId] ? '' : hash[next.userId] = true && item.push(next);
+          return item
+        }, [])
+        // this.checkListUser.concat(arr)
+        console.log(arr,'选中的常选');
+        console.log(this.checkListUser, '去重');
+        // for (let item of arr) {
+        //   this.checkListUser.push(item)
+        //   this.checkListUser = [...new Set(this.checkListUser)]
+        // }
+      },
+      // 获取常选名单
+      getCommonUserListPeople() {
+        let params = {
+          sessionId: localStorage.getItem('sessionId')
+        }
+        getCommonUserList(this.$qs.stringify(params)).then(res => {
+          // console.log(res,'常选');
+          if (res.code === 1) {
+            this.data6 = res.data
+          } else {
+            Message.error({
+              message: res.desc,
+              customClass: 'messageClass',
+              center: true
+            })
+          }
+        })
+      },
+      getEventType() {
+        this.$axios({
+          url: 'eventtype/list',
+          method: 'POST',
+          data: {
+            sessionId: localStorage.getItem('sessionId')
+          },
+          transformRequest: transformRequestFn
+        }).then((res) => {
+          console.log(res)
+          if (res.data.code === 1) {
+            this.eventType = res.data.data
+          }
+        })
+      },
+      getList1() {
+        this.$axios({
+          url: 'eventlibrary/getEventLibrary',
+          method: 'POST',
+          data: {
+            sessionId: localStorage.getItem('sessionId'),
+            eventTypeId: this.eventTypeId,
+            keyword: this.keyword1,
+            pageNumber: this.pageNumber1,
+            pageSize: this.pageSize1,
+          },
+          transformRequest: transformRequestFn
+        }).then((res) => {
+          console.log(res)
+          if (res.data.code === 1) {
+            this.total1 = res.data.data.totalRow
+            this.tableData1 = res.data.data.list
+          }
+        })
+      },
+      handleSizeChange1(val) {
+        this.pageSize1 = val
+        this.getList1()
+      },
+      handleCurrentChange1(val) {
+        this.pageNumber1 = val
+        this.getList1()
+      }
+    }
+  }
+
+</script>
+
+<style lang="sass" scoped>
+  ul.Event
+    list-style-type: none
+    padding: 12px 0
+    li.EventItem
+      padding: 0
+      font-size: 12px
+      color: #202020
+      margin-bottom: 15px
+      span.title
+        display: inline-block
+        margin-right: 30px
+      span.content
+        display: inline-block
+        min-width: 350px
+        padding: 20px 15px
+        border: 1px solid #CDCDCD
+        background-color: #ffffff
+        border-radius: 5px
+        input
+          display: inline-block
+          min-width: 350px
+          padding: 20px 15px
+          border: 1px solid #CDCDCD
+          background-color: #ffffff
+          border-radius: 5px
+          overflow: hidden
+          span.eventContent
+            display: inline-block
+            min-width: 350px
+            height: 100px
+            padding: 20px 15px
+            border: 1px solid #CDCDCD
+            background-color: #ffffff
+            border-radius: 5px
+            overflow: hidden
+
+</style>
+
+<style scoped>
+  .marginBotton {
+    margin-bottom: 15px;
+  }
+
+  .inputRemake {
+    width: 600px;
+  }
+
+  .eventtypetheme {
+    width: 70px;
+    display: inline-block;
+  }
+
+  .EventTheme {
+    width: 250px;
+  }
+
+  .backgroundB {
+    background-color: #f1f5f8;
+    margin-right: -10px;
+    margin-left: -10px;
+    padding: 0 10px;
+    height: 60px;
+    line-height: 75px;
+  }
+
+  .WebEntry {
+    min-height: 1000px;
+    position: relative;
+  }
+
+  .el-radio {
+    width: 100%;
+    margin-left: 10px !important;
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+
+  .mint-cell {
+    text-align: center;
+  }
+
+  .MessageTips {
+    font-size: 20px;
+    font-family: MicrosoftYaHei;
+    font-weight: 400;
+    color: rgba(1, 1, 1, 1);
+    text-align: center;
+  }
+
+  .MessageTips img {
+    top: 10px
+  }
+
+  .MessageCode {
+    font-size: 16px;
+    text-align: center;
+    color: rgba(1, 1, 1, 0.7);
+  }
+
+  ul,
+  li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .navTitle {
+    display: inline-block;
+    width: 100%;
+    background-color: white;
+    padding-top: 12px;
+  }
+
+  .navTitle li {
+    float: left;
+    padding: 1px 30px 1px 30px;
+    margin-bottom: 13px;
+    border-right: 1px solid #ABABAB;
+    font-size: 18px;
+    font-family: MicrosoftYaHei;
+    font-weight: 400;
+    color: rgba(38, 45, 57, 1);
+  }
+
+  .navTitle a {
+    text-decoration: none;
+    color: rgba(21, 21, 21, 1);
+  }
+
+  .navTitle .active a {
+    color: rgba(0, 131, 255, 1) !important;
+
+  }
+
+  .Entry {
+    padding: 16px;
+    background: rgba(248, 249, 250, 1);
+  }
+
+  .EntryTitle {
+    position: relative;
+    margin-bottom: 19px;
+  }
+
+  .EntryTitle img {
+    width: 28px;
+    height: 23px;
+  }
+
+  .entryHeader {
+    font-size: 16px;
+    color: #000;
+  }
+
+  .EntryTitle span {
+    font-size: 20px;
+    font-family: MicrosoftYaHei;
+    font-weight: 400;
+    color: rgba(21, 21, 21, 1);
+    position: absolute;
+    top: -2px;
+    left: 36px;
+  }
+
+  .EntryEvent {
+    font-size: 20px;
+    font-family: MicrosoftYaHei;
+    font-weight: 400;
+    color: rgba(21, 21, 21, 1);
+    position: relative;
+    margin-bottom: 19px;
+  }
+
+  .EntryEvent img {
+    width: 28px;
+    height: 23px;
+  }
+
+  .EntryEvent span {
+    margin-left: 5px;
+  }
+
+  .EntryEvent button {
+    margin-left: 25px;
+  }
+
+  .objectList {
+    margin-top: 13px;
+  }
+
+  .objectListBox {
+    /* width: 386px;
+  height: 50px;*/
+    width: 80%;
+    padding: 11px 13px;
+    background: rgba(237, 242, 246, 1);
+    border-radius: 5px;
+    position: relative;
+  }
+
+  .objectList .logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+  }
+
+  .objectListBoxName {
+    position: absolute;
+    left: 70px;
+    top: 15px;
+  }
+
+  .objectListBoxNameTop {
+    font-size: 16px;
+    font-family: PingFang-SC-Medium;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 1);
+  }
+
+  .objectListBoxNameBottom {
+    font-size: 13px;
+    font-family: PingFang-SC-Regular;
+    font-weight: 400;
+    color: rgba(97, 97, 97, 1);
+  }
+
+  .objectList .close {
+    position: absolute;
+    right: 10px;
+    top: 24px;
+    width: 27px;
+    height: 27px;
+  }
+
+  .objectListBoxNum {
+    position: absolute;
+    right: 47px;
+    top: 15px;
+    font-size: 17px;
+  }
+
+  .objectListBoxNum .el-input-number {
+    width: 150px;
+  }
+
+  .addEntry {
+    margin-top: 30px;
+    font-size: 24px;
+    font-family: PingFang-SC-Medium;
+    font-weight: 500;
+    color: rgba(12, 130, 221, 1) !important;
+    position: relative;
+  }
+
+  .addEntry span {
+    position: absolute;
+    left: 50px;
+    top: -7px;
+    cursor: pointer;
+  }
+
+  .addEntry img {
+    width: 32px;
+    height: 32px;
+    margin-top: -20px;
+    margin-right: 10px;
+  }
+
+  .forBtn {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 30px;
+  }
+
+  .el-textarea {
+    width: 800px;
+  }
+
+
+  .fixedMark {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .EventLibrary {
+    width: 50%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 10%;
+    bottom: 10%;
+    margin: auto;
+    background-color: #ffffff;
+  }
+
+  .EventLibraryBox {
+    padding: 26px 0 10px 0;
+    background: rgba(242, 249, 255, 1);
+    border-radius: 5px 5px 0px 0px;
+  }
+
+  .EventLibraryBoxSelect {
+    padding: 0 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .searchInput {
+    /* width: 430px; */
+    flex: 1;
+    overflow: hidden;
+    margin: 0 10px;
+    /* height: 46px; */
+  }
+
+  .el-table {
+    margin-top: 37px;
+  }
+
+  .el-pagination {
+    margin-top: 43px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+</style>
+<style lang="scss"
+       >
+  .treeBox {
+    position: relative;
+  }
+
+  .leftTree {
+    display: inline-block;
+    // border: 1px solid #000;
+    width: 50%;
+    // height: 200px;
+    border-right: 1px solid black;
+  }
+
+  .rightTree {
+    margin-left: 55%;
+    text-align: left;
+    // border: 1px solid #000;
+    height: 100%;
+    width: 200px;
+    overflow-y: auto;
+    top: 0;
+    position: absolute;
+    // right: 0;
+  }
+
+</style>

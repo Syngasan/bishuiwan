@@ -1,0 +1,778 @@
+<template>
+<div class="DetailsOfTheEvent">
+  <div class="title"><span>事项详情</span>
+    <el-button @click="routerBack" class="backBtn" type="primary">返回</el-button>
+  </div>
+  <div class="EventBox" v-for="(item,index) in list.eventList">
+    <div class="EventBoxIndex">{{index + 1}}</div>
+    <div class="EventBoxImg" v-if="item.type == 1"><img src="./img/csth_pic_gray@2X.png"></div>
+    <div class="eventName">{{item.eventTypeName}}</div>
+    <div class="event">事件内容：</div>
+    <div class="eventTips">{{item.content}}</div>
+    <div class="eventDesc">{{item.remark}}</div>
+    <div class="event">奖扣对象：</div>
+    <el-row>
+      <el-col :key="this" :span="8" class="objectList" v-for="(items,index) in item.eventUserList">
+        <div class="objectListBox">
+          <img class="logo" :src="items.head">
+          <div class="objectListBoxName">
+            <div class="left">
+              <div class="objectListBoxNameTop">{{items.realName}}</div>
+              <div class="objectListBoxNameBottom">{{items.name}}</div>
+            </div>
+            <div class="objectListBoxNum">
+              <input type="text" v-model="items.value" :disabled="type !== 0 || isExamine == 1" :class="items.value < 0 && 'negative'" :min="deduction" :max="reward" maxlength="5">
+              <!-- <span>{{item.value}}</span> -->
+              分</div>
+          </div>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
+  <ul class="detail">
+    <li class="item" v-if="firstExamineTime">初审时间: {{firstExamineTime}}</li>
+    <li class="item" v-if="firstExamineReason">初审意见: {{firstExamineReason}}</li>
+    <li class="item" v-if="secondExamineTime">终审时间: {{secondExamineTime}}</li>
+    <li class="item" v-if="secondExamineReason">终审意见: {{secondExamineReason}}</li>
+  </ul>
+  <div class="textCen">
+    <el-button class="btn" type="primary" @click="eventTitle()" v-if="isDetail != '1'">同意</el-button>
+    <el-button class="btn" type="primary" v-if="isExamine == 1" @click="recall()">撤回</el-button>
+    <el-button class="btn" v-else type="primary" @click="togglePopup()">退回</el-button>
+  </div>
+  <div class="popup-mark" v-show="showPopup">
+    <div class="popup-body">
+      <div class="title">请填写退回意见</div>
+      <div class="select-box">
+        <span><i class="select-icon" @click="selectState(2)"><i class="active" :style="{display: exitStateCode === 2 ? 'block' : 'none' }"></i></i>退回至"拟稿"步骤</span>
+        <span><i class="select-icon" @click="selectState(3)"><i class="active" :style="{display: exitStateCode === 3 ? 'block' : 'none' }"></i></i>退回至"初审"步骤</span>
+      </div>
+      <textarea placeholder="请输入退回意见" v-model="opinion"></textarea>
+      <div class="footer">
+        <button class="cancel" @click="closePopup()">取消</button>
+        <button class="ok" @click="eventBack()">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+</template>
+
+<script>
+import { Message } from 'element-ui'
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+import config from '@/config'
+export default {
+  name: 'DetailsOfTheEvent',
+  data() {
+    return {
+      list: '',
+      showPopup: false,
+      exitStateCode: 2,
+      opinion: '',
+      state: 0,
+      typeList: [],
+      secondExamineReason: '',
+      secondExamineTime: '',
+      firstExamineTime: '',
+      firstExamineReason: '',
+      url: config.url,
+      deduction: 0,
+      reward: 0,
+      isExamine: 0, // 0-未审核, 1-已审核
+      isDetail: '',
+    }
+  },
+  created() {
+    // console.log(this.$route.params);
+    this.isDetail = this.isExamine = this.$route.params.isDetail
+
+    // this.getList()
+    if(this.$route.params.isDetail == 1){
+      console.log("详情");
+      this.getDetail()
+    }else {
+      console.log("非详情");
+      this.getList()
+    }
+  },
+  methods: {
+    getDetail() {
+      this.$axios({
+        url: 'event/getEventTitle',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          eventTitleId: this.$route.params.id
+        },
+        transformRequest: transformRequestFn
+      }).then(res => {
+        if (res.data.code === 1) {
+          this.list = res.data.data
+          this.state = res.data.data.state
+          this.deduction = res.data.data.deduction
+          this.reward = res.data.data.reward
+          if(res.data.data.firstExamineReason) {
+            this.firstExamineReason = res.data.data.firstExamineReason
+          }
+          if(res.data.data.firstExamineTime) {
+            this.firstExamineTime = res.data.data.firstExamineTime.split(' ')[0] + ''
+          }
+          if(res.data.data.secondExamineTime) {
+            this.secondExamineTime = res.data.data.secondExamineTime.split(' ')[0] + ''
+          }
+          if(res.data.data.secondExamineReason) {
+            this.secondExamineReason = res.data.data.secondExamineReason
+          }
+        }
+      })
+    },
+    closePopup() {
+      this.showPopup = false
+    },
+    recall() {
+      this.$axios({
+        url: 'examiner/recallExamineEvent',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          id: this.$route.params.id
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if(res.data.code === 1) {
+          Message.success({
+            message: '撤回成功！',
+            customClass: 'messageClass',
+            center: true
+          })
+          setTimeout(() => {
+            this.$router.back(-1)
+          }, 2000)
+        }else {
+          Message.error({
+            message: `${res.data.desc}`,
+            customClass: 'messageClass',
+            center: true
+          })
+        }
+      })
+    },
+    getList() {
+      this.$axios({
+        url: 'eventTitle/getExamineEventTitle',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          id: this.$route.params.id
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.list = res.data.data
+          this.state = res.data.data.state
+          this.type  =res.data.data.type
+          this.deduction = res.data.data.deduction
+          this.reward = res.data.data.reward
+          this.isExamine  = res.data.data.isExamine
+          console.log(res.data.data.isExamine);
+          if(res.data.data.firstExamineReason) {
+            this.firstExamineReason = res.data.data.firstExamineReason
+          }
+          if(res.data.data.firstExamineTime) {
+            this.firstExamineTime = res.data.data.firstExamineTime.split(' ')[0] + ''
+          }
+          if(res.data.data.secondExamineTime) {
+            this.secondExamineTime = res.data.data.secondExamineTime.split(' ')[0] + ''
+          }
+          if(res.data.data.secondExamineReason) {
+            this.secondExamineReason = res.data.data.secondExamineReason
+          }
+          console.log(res)
+        }
+      })
+    },
+    togglePopup() {
+      if (this.$route.params.state == '1') {
+        this.$prompt('请填写退回意见：', ' ', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(({
+          value
+        }) => {
+          let dataList = []
+          let data = {}
+          this.list.eventList.forEach(item => {
+            data.id = item.id
+            data.type = item.type
+            data.userList = []
+            item.eventUserList.forEach(userItem => {
+              data.userList.push({
+                userId: userItem.userId,
+                value: userItem.value
+              })
+            })
+          })
+          dataList.push(data)
+          data = {}
+          this.$axios({
+            url: 'eventTitle/examineFirst',
+            method: 'POST',
+            data: {
+              firstExamineReason: value,
+              firstExamineState: this.exitStateCode,
+              sessionId: localStorage.getItem('sessionId'),
+              id: this.$route.params.id,
+              jsonData: JSON.stringify(dataList)
+            },
+            transformRequest: transformRequestFn
+          }).then((res) => {
+            if (res.data.code === 1) {
+              Message.success({
+                message: '退回成功！',
+                customClass: 'messageClass',
+                center: true
+              })
+              setTimeout(() => {
+                this.$router.back(-1)
+              }, 2000)
+            }
+          })
+        })
+      } else if (this.$route.params.state == '2') {
+        this.showPopup = !this.showPopup
+      }
+    },
+    routerBack() {
+      this.$router.back(-1)
+    },
+    eventTitle() {
+      this.$prompt('请填写审核意见：', '', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+      }).then(({
+        value
+      }) => {
+        console.log(value)
+        if (!value) {
+          Message.error({
+            message: '请填写审核意见',
+            customClass: 'messageClass',
+            center: true
+          })
+          return
+        }
+        let dataList = []
+        let data = {}
+        this.list.eventList.forEach(item => {
+          data.id = item.id
+          data.type = item.type
+          data.userList = []
+          item.eventUserList.forEach(userItem => {
+            data.userList.push({
+              userId: userItem.userId,
+              value: userItem.value
+            })
+          })
+          dataList.push(data)
+          data = {}
+        })
+        console.log(dataList);
+        if (this.$route.params.state == '1') {
+          this.$axios({
+            url: 'eventTitle/examineFirst',
+            method: 'POST',
+            data: {
+              firstExamineReason: value,
+              firstExamineState: 1,
+              sessionId: localStorage.getItem('sessionId'),
+              id: this.$route.params.id,
+              jsonData: JSON.stringify(dataList)
+            },
+            transformRequest: transformRequestFn
+          }).then((res) => {
+            if (res.data.code === 1) {
+              Message.success({
+                message: '审核成功！',
+                customClass: 'messageClass',
+                center: true
+              })
+              setTimeout(() => {
+                this.$router.back(-1)
+              }, 2000)
+            }
+          })
+        } else if (this.$route.params.state == '2') {
+          this.$axios({
+            url: 'eventTitle/examineSecond',
+            method: 'POST',
+            data: {
+              secondExamineReason: value,
+              secondExamineState: 1,
+              sessionId: localStorage.getItem('sessionId'),
+              id: this.$route.params.id,
+              jsonData: JSON.stringify(dataList)
+            },
+            transformRequest: transformRequestFn
+          }).then((res) => {
+            if (res.data.code === 1) {
+              Message.success({
+                message: '审核成功！',
+                customClass: 'messageClass',
+                center: true
+              })
+              setTimeout(() => {
+                this.$router.back(-1)
+              }, 2000)
+            }
+          })
+        }
+      }).catch(() => {});
+    },
+    eventBack() {
+      let dataList = []
+      let data = {}
+      this.list.eventList.forEach(item => {
+        data.id = item.id
+        data.type = item.type
+        data.userList = []
+        item.eventUserList.forEach(userItem => {
+          data.userList.push({
+            userId: userItem.userId,
+            value: userItem.value
+          })
+        })
+        dataList.push(data)
+        data = {}
+      })
+      this.$axios({
+        url: 'eventTitle/examineSecond',
+        method: 'POST',
+        data: {
+          secondExamineReason: this.opinion,
+          secondExamineState: this.exitStateCode,
+          sessionId: localStorage.getItem('sessionId'),
+          id: this.$route.params.id,
+          jsonData: JSON.stringify(dataList)
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          Message.success({
+            message: '退回成功！',
+            customClass: 'messageClass',
+            center: true
+          })
+          this.showPopup = false
+          this.opinion = ''
+          setTimeout(() => {
+            this.$router.back(-1)
+          }, 2000)
+        }else {
+          Message.console.error();({
+            message: `${res.data.desc}`,
+            customClass: 'messageClass',
+            center: true
+          })
+        }
+      })
+    },
+    selectState(code) {
+      this.exitStateCode = code
+    }
+  }
+}
+</script>
+
+<style lang="sass" scoped>
+  .objectListBox
+    display: flex
+    align-items: center
+    img.logo
+      display: inline-block
+      width: 48px
+      height: 48px
+      border-radius: 50%
+      background-repeat: no-repeat
+      background-position: center
+      background-size: cover
+      margin-right: 10px
+    .objectListBoxName
+      flex: 1
+      overflow: hidden
+      display: flex
+      align-items: center
+      justify-content: space-between
+      .left
+        .objectListBoxNameTop
+          color: #000
+          font-size: 16px
+          padding-bottom: 5px
+          font-weight: bold
+        .objectListBoxNameBottom
+          color: #616161
+          font-size: 13px
+      .objectListBoxNum
+        font-weight: bold
+        input
+          display: inline-block
+          width: 60px
+          height: 30px
+          line-height: 30px
+          padding: 5px 15px
+          overflow: hidden
+          border: none
+          border-radius: 5px
+          background-color: #ffffff
+          color: #010101
+          font-size: 17px
+          font-weight: bold
+          text-align: center
+          margin-right: 5px
+          &[disabled]
+            background-color: #D5D5D5
+          &.negative
+            color: #FF2727
+
+  .publisher
+    position: absolute
+    top: 30px
+    right: 10px
+    i.head-photo
+      display: block
+      width: 48px
+      height: 48px
+      margin: 0 auto 15px
+      border-radius: 50%
+      background-repeat: no-repeat
+      background-position: center
+      background-size: cover
+      border: 1px solid #cccccc
+    p.name
+      color: #666666
+      font-size: 16px
+
+  ul.detail
+    list-style-type: none
+    color: #727272
+    font-weight: bold
+    font-size: 15px
+    li.item
+      padding: 5px 15px
+</style>
+
+<style scoped>
+.MatterTitle {
+  padding: 16px;
+  /* background:rgba(248,249,250,1);*/
+  background-color: red;
+  position: relative;
+}
+
+.titleL {
+  text-align: left;
+  margin-left: 28X;
+  width: 81px;
+  height: 20px;
+  font-size: 20px;
+  font-family: PingFang-SC-Regular;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 1);
+  line-height: 0px;
+}
+
+.itleR {
+  /*text-align: right;
+  margin-left: 19px;*/
+  margin: 0 100px 0 0;
+}
+
+.forBtn {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.DetailsOfTheEvent {
+  padding: 13px 10px 19px 5px;
+}
+
+.textCen {
+  margin-top: 35px;
+  text-align: center;
+}
+
+.title {
+  font-size: 16px;
+  font-family: PingFang-SC-Regular;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 1);
+  padding-left: 18px;
+  margin-bottom: 20px;
+}
+
+.title span {
+  padding-top: 20px;
+  display: inline-block;
+}
+
+.backBtn {
+  width: 80px;
+  height: 15px;
+  line-height: 3px;
+  float: right;
+}
+
+.EventBox {
+  border-radius: 4px;
+  position: relative;
+  margin-bottom: 20px;
+  padding: 5px 15px;
+}
+
+.EventBoxIndex {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 36px;
+  font-weight: bold;
+}
+
+.EventBoxImg {
+  position: absolute;
+  right: 60px;
+  top: 14px;
+}
+
+.EventBoxImg img {
+  width: 60px;
+  height: 60px;
+}
+
+.eventName {
+  font-size: 24px;
+  font-family: PingFang-SC-Bold;
+  font-weight: bold;
+  color: rgba(51, 51, 51, 1);
+}
+
+.event {
+  font-size: 16px;
+  font-family: PingFang-SC-Bold;
+  font-weight: bold;
+  color: rgba(51, 51, 51, 1);
+  margin-top: 18px;
+  padding-left: 10px;
+  border-left: 4px solid rgba(124, 113, 203, 1);
+}
+
+.eventTips {
+  font-size: 16px;
+  font-family: PingFang-SC-Regular;
+  font-weight: 400;
+  color: rgba(114, 114, 114, 1);
+  margin-top: 18px;
+}
+
+.eventDesc {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 6px 8px 6px 10px;
+  background: rgba(238, 238, 238, 1);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: PingFang-SC-Regular;
+  font-weight: 400;
+  color: rgba(153, 153, 153, 1);
+}
+
+.objectList {
+  margin-top: 13px;
+}
+
+/* .objectListBox {
+  width: 386px;
+  height: 50px;
+  padding: 11px 13px;
+  border-radius: 5px;
+  position: relative;
+}
+
+.objectList .logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.objectListBoxName {
+  position: absolute;
+  left: 70px;
+  top: 15px;
+}
+
+.objectListBoxNameTop {
+  font-size: 16px;
+  font-family: PingFang-SC-Medium;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 1);
+}
+
+.objectListBoxNameBottom {
+  font-size: 13px;
+  font-family: PingFang-SC-Regular;
+  font-weight: 400;
+  color: rgba(97, 97, 97, 1);
+}
+
+.objectList .close {
+  position: absolute;
+  right: 10px;
+  top: 24px;
+  width: 27px;
+  height: 27px;
+}
+
+.objectListBoxNum {
+  position: absolute;
+  right: 47px;
+  top: 20px;
+  font-size: 17px;
+}
+
+.objectListBoxNum .el-input-number {
+  width: 150px;
+}
+
+.objectListBoxNum span {
+  background: rgba(213, 213, 213, 1);
+  border-radius: 1px;
+  padding: 5px 13px;
+  font-family: PingFang-SC-Medium;
+  font-weight: 500;
+  color: rgba(1, 1, 1, 1);
+} */
+
+.btn {
+  width: 80px;
+  height: 15px;
+  line-height: 3px;
+}
+
+.popup-mark {
+  position: fixed;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-mark .popup-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 30%;
+  width: 30%;
+  background-color: #ffffff;
+  font-size: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  margin: auto;
+  padding: 30px;
+  border-radius: 5px;
+}
+
+.popup-mark .popup-body .title {
+  width: 100%;
+  text-align: center;
+  padding: 0 0 30px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.popup-mark .popup-body .select-box {
+  width: 100%;
+  padding: 0 0 24px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.popup-mark .popup-body .select-box span {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-mark .popup-body .select-box span i.select-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #cccccc;
+  margin-right: 7px;
+  position: relative;
+}
+
+.popup-mark .popup-body .select-box span i.select-icon i.active {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #0A8FF6;
+}
+
+.popup-mark .popup-body textarea {
+  width: 100%;
+  height: 100px;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #333333;
+  padding: 14px 16px;
+  margin-bottom: 40px;
+  border: 1px solid #cccccc;
+}
+
+.popup-mark .popup-body textarea:placeholder {
+  color: #A4A4A4
+}
+
+.popup-mark .popup-body .footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+}
+
+.popup-mark .popup-body .footer button {
+  width: 80px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  border: none;
+  border-radius: 4px;
+}
+
+.popup-mark .popup-body .footer button.cancel {
+  background-color: #ffffff;
+  border: 1px solid #868686;
+  color: #868686;
+  margin-right: 28px;
+}
+
+.popup-mark .popup-body .footer button.ok {
+  background-color: #0A8FF6;
+  color: #ffffff;
+}
+</style>

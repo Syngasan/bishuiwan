@@ -1,0 +1,357 @@
+<template>
+  <div class="Prizes">
+    <ul class="navTitle">
+      <li><router-link to="/integralSelect">积分构成</router-link></li>
+      <li class="active"><router-link to="/Prizes">奖扣明细</router-link></li>
+      <li><router-link to="/BuckleExecution">奖扣执行</router-link></li>
+    </ul>
+    <el-row class="IntegralAuditBox">
+      <el-col :span="8">
+        选 择 部 门：
+        <el-select v-model="AllConcatTypeId" class="EventTheme" placeholder="请选择部门">
+          <el-option :key="index" :label="item.concatName" :value="item.id" v-for="(item,index) in AllConcatType"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="8">
+        奖扣对象：
+        <el-input class="EventTheme" placeholder="请输入奖扣对象" v-model="name"></el-input>
+      </el-col>
+      <el-col :span="8">
+        初审人：
+        <el-input class="EventTheme" placeholder="请输入初审人" v-model="firstExamineName"></el-input>
+      </el-col>
+      <el-col :span="10">
+        奖扣日期：
+        <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="happenTimeBegin"></el-date-picker>
+        至 
+        <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="happenTimeEnd"></el-date-picker>
+      </el-col>
+      <el-col :span="6">
+        分值：
+        <el-input class="EventThemeNum" v-model="valueBegin"></el-input>
+        到
+        <el-input class="EventThemeNum" v-model="valueEnd"></el-input>
+      </el-col>
+      <el-col :span="8">
+        终审人：
+        <el-input class="EventTheme" placeholder="请输入终审人" v-model="secondExamineName"></el-input>
+      </el-col>
+      <el-col :span="10">
+        录入日期：
+        <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="createTimeBegin"></el-date-picker>
+        至 
+        <el-date-picker class="EventThemeDate" type="date" format="yyyy-MM-dd" value-format="yyyy-MM-dd" placeholder="选择日期" v-model="createTimeEnd"></el-date-picker>
+      </el-col>
+      <el-col :span="6">
+        事件主题：
+        <el-input class="EventTheme" placeholder="请输入事件主题" v-model="keyword"></el-input>
+      </el-col>
+      <el-col :span="8">
+        事件内容：
+        <el-input class="EventTheme" placeholder="请输入事件内容" v-model="content"></el-input>
+      </el-col>
+      <el-col :span="8">
+        事件类型：
+        <el-select v-model="eventTypeId" class="EventTheme" placeholder="请选择事件类型">
+          <el-option :key="item.name" :label="item.name" :value="item.id" v-for="(item,index) in eventType"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="8">
+        排序依据：
+        <el-select v-model="sort" class="EventTheme" placeholder="请选择排序依据">
+          <el-option label="用户" value="0"></el-option>
+          <el-option label="录入事件" value="1"></el-option>
+          <el-option label="奖扣时间" value="2"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="8" class="textR">
+        <el-button type="primary" @click="getList">查询</el-button>
+      </el-col>
+    </el-row>
+    <el-table :data="tableData" stripe>
+      <el-table-column align="center" min-width="100px" prop="userName" label="奖扣对象"></el-table-column>
+      <el-table-column align="center" min-width="90px" prop="eventTypeName" label="事件类型"></el-table-column>
+      <el-table-column align="center" min-width="80px" prop="title" label="事件主题"></el-table-column>
+      <el-table-column align="center" min-width="80px" prop="content" label="事件内容"></el-table-column>
+      <el-table-column align="center" min-width="85px"  prop="value" label="分值" :render-header="renderHeader1" v-if="hiddenHeader1"></el-table-column>
+      <el-table-column align="center" min-width="100px" prop="firstExamineName" label="初审人" :render-header="renderHeader2" v-if="hiddenHeader2"></el-table-column>
+      <el-table-column align="center" min-width="100px" prop="secondExamineName" label="终审人" :render-header="renderHeader3" v-if="hiddenHeader3"></el-table-column>
+      <el-table-column align="center" min-width="100px" prop="recordName" label="记录人" :render-header="renderHeader4" v-if="hiddenHeader4"></el-table-column>
+      <el-table-column align="center" min-width="120px" prop="happenTime" label="奖扣日期" :render-header="renderHeader5" v-if="hiddenHeader5"></el-table-column>
+      <el-table-column align="center" min-width="120px" prop="createTime" label="录入日期" :render-header="renderHeader6" v-if="hiddenHeader6"></el-table-column>
+    </el-table>
+    
+    <el-row>
+      <el-col :span="4">
+        <el-button type="primary" @click="exportExcel">导出excel</el-button>
+      </el-col>
+      <el-col :span="20">
+        <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNumber" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next,  jumper" :total="total">
+        </el-pagination>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+import { transformRequestFn } from '@/utils/transformRequestFn/transformRequestFn'
+export default {
+  name: 'Prizes',
+  data () {
+    return {
+      keyword: '',
+      eventTypeName: '',
+      content: '',
+      hiddenHeader1: true,
+      hiddenHeader2: true,
+      hiddenHeader3: true,
+      hiddenHeader4: true,
+      hiddenHeader5: true,
+      hiddenHeader6: true,
+      tableData: [],
+      eventType: [],
+      eventTypeId: '',
+      AllConcatType:[],
+      AllConcatTypeId: '',
+      sort: '',
+      name: '',
+      firstExamineName: '',
+      secondExamineName: '',
+      valueBegin: '',
+      valueEnd: '',
+      happenTimeBegin: '',
+      happenTimeEnd: '',
+      createTimeBegin: '',
+      createTimeEnd: '',
+      pageNumber: 1,
+      pageSize: 10,
+      total: 0,
+      department: [],
+      departmentId: ''
+    }
+  },
+  created() {
+    this.getEventType()
+    this.getAllConcatType()
+    this.getList()
+  },
+  mounted () {
+    this.$nextTick(() => {
+      var _this = this
+      document.getElementById('hiden1').onclick = function () {
+        _this.hiddenHeader1 = false
+      }
+      document.getElementById('hiden2').onclick = function () {
+        _this.hiddenHeader2 = false
+      }
+      document.getElementById('hiden3').onclick = function () {
+        _this.hiddenHeader3 = false
+      }
+      document.getElementById('hiden4').onclick = function () {
+        _this.hiddenHeader4 = false
+      }
+      document.getElementById('hiden5').onclick = function () {
+        _this.hiddenHeader5 = false
+      }
+      document.getElementById('hiden6').onclick = function () {
+        _this.hiddenHeader6 = false
+      }
+    })
+  },
+  methods: {
+    exportExcel () {
+      window.location.href = 'http://112.74.105.6:8080/bishuiwan/api/score/ExportIntegralDeTailPCExcel?sessionId='+localStorage.getItem('sessionId')+'&name='+this.name+'&departmentId='+ this.departmentId+'&firstExamineName='+this.firstExamineName+'&secondExamineName='+this.secondExamineName+'&happenTimeBegin='+this.happenTimeBegin+'&happenTimeEnd='+this.happenTimeEnd+'&createTimeBegin='+ this.createTimeBegin+'&createTimeEnd='+this.createTimeEnd+'&valueBegin='+this.valueBegin+'&valueEnd='+this.valueEnd+'&keyword='+this.keyword+'&eventTypeId='+this.eventTypeId+'&sort='+this.sort+'&pageNumber='+this.pageNumber+'&pageSize='+this.pageSize
+    },
+    getList () {
+      this.$axios({
+        url: 'score/integralDeTailPC',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId'),
+          name: this.name,
+          departmentId: this.AllConcatTypeId,
+          firstExamineName: this.firstExamineName,
+          secondExamineName: this.secondExamineName,
+          happenTimeBegin: this.happenTimeBegin,
+          happenTimeEnd: this.happenTimeEnd,
+          createTimeBegin: this.createTimeBegin,
+          createTimeEnd: this.createTimeEnd,
+          valueBegin: this.valueBegin,
+          valueEnd: this.valueEnd,
+          keyword: this.keyword,
+          eventTypeId: this.eventTypeId,
+          sort: this.sort,
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        console.log(res)
+        if (res.data.code === 1) {
+          this.total = res.data.data.totalRow
+          this.tableData = res.data.data.list
+        }
+      })
+    },
+    getAugrment () {
+      this.$axios({
+        url: 'department/getAllConcatName',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.department = res.data.data
+        }
+      })
+    },
+    getEventType () {
+      this.$axios({
+        url: 'eventtype/getEventTypeName',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.eventType = res.data.data
+        }
+      })
+    },
+    getAllConcatType () {
+      this.$axios({
+        url: 'department/getAllConcatName',
+        method: 'POST',
+        data: {
+          sessionId: localStorage.getItem('sessionId')
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        if (res.data.code === 1) {
+          this.AllConcatType = res.data.data
+        }
+      })
+    },
+    
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.getList()
+    },
+    handleCurrentChange(val) {
+      this.pageNumber = val
+      this.getList()
+    },
+    renderHeader1() {
+      return (
+        <div>
+          <span>分值</span>
+          <i class="iconfont icon-xianshi" id="hiden1"></i>
+        </div>
+      )
+    },
+    renderHeader2() {
+      return (
+        <div>
+          <span>初审人</span>
+          <i class="iconfont icon-xianshi" id="hiden2"></i>
+        </div>
+      )
+    },
+    renderHeader3() {
+      return (
+        <div>
+          <span>终审人</span>
+          <i class="iconfont icon-xianshi" id="hiden3"></i>
+        </div>
+      )
+    },
+    renderHeader4() {
+      return (
+        <div>
+          <span>记录人</span>
+          <i class="iconfont icon-xianshi" id="hiden4"></i>
+        </div>
+      )
+    },
+    renderHeader5() {
+      return (
+        <div>
+          <span>奖扣日期</span>
+          <i class="iconfont icon-xianshi" id="hiden5"></i>
+        </div>
+      )
+    },
+    renderHeader6() {
+      return (
+        <div>
+          <span>录入日期</span>
+          <i class="iconfont icon-xianshi" id="hiden6"></i>
+        </div>
+      )
+    }
+  }
+}
+</script>
+
+<style scoped>
+.icon-xianshi {
+  cursor: pointer;
+}
+.navTitle {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0 0 0;
+  display: inline-block;
+  width: 100%;
+  background-color: white;
+}
+.navTitle li{
+  list-style: none;
+  margin: 0;
+  float: left;
+  padding: 1px 30px 1px 30px;
+  margin-bottom: 13px;
+  border-right: 1px solid #ABABAB;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(38,45,57,1);
+}
+.navTitle a{
+  text-decoration:none;
+  color:rgba(21,21,21,1);
+}
+.navTitle .active a{
+  color:rgba(0,131,255,1) !important;
+}
+.EventTheme {
+  width: 155px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 135px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 63px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+  padding-right: 90px;
+}
+</style>

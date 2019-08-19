@@ -1,0 +1,183 @@
+<template>
+  <div class="login">
+    <div class="logo"><img src="../../images/logo_w@2x.png"><span>员工积分管理系统</span></div>
+    <div class="loginCon">
+      <div class="loginTitle">SYSTEM</div>
+      <div class="welcome">欢迎登录</div>
+      <el-input v-model="userName" class="ForInputPadding" placeholder="请输入登录账号或手机号"><i slot="prefix" class="el-input__icon iconfont icon-suo iconStyle"></i></el-input>
+      <el-input v-model="passWord" class="ForInputPadding ForInput" placeholder="请输入密码" type="password"><i slot="prefix" class="el-input__icon iconfont icon-suo iconStyle"></i></el-input>
+      <el-input v-model="businessNumber" class="ForInputPadding ForInput" placeholder="请输入企业ID"><i slot="prefix" class="el-input__icon iconfont icon-id iconStyle"></i></el-input>
+      <el-row>
+        <el-col :span="12" class="rememberCon"><el-checkbox class="remember">记住登录状态</el-checkbox></el-col>
+        <el-col :span="12" class="forGet"><router-link to="/forget">忘记密码？</router-link></el-col>
+        <el-col :span="24"><el-button class="sureBtn" type="primary" @click="loginBtn">登录</el-button></el-col>
+        <el-col :span="24" class="downPhone">手机客户端下载</el-col>
+        <el-col :span="12" class="downPhoneImg" @click.native="showDialog"><img src="../../images/Login_tc_pic01@2x.png"></el-col>
+        <el-col :span="12" class="downPhoneImgs" @click.native="showDialog"><img src="../../images/Login_tc_pic02@2x.png"></el-col>
+      </el-row>
+    </div>
+  </div>
+</template>
+
+<script>
+import {checkLogin} from '@/utils/axios/axios'
+// import qs from 'qs'
+export default {
+  name: 'login',
+  data () {
+    return {
+      userName: '',
+      passWord: '',
+      loginPage: '',
+      businessNumber: ''
+    }
+  },
+  methods: {
+    loginBtn () {
+      console.log(3)
+
+      this.$router.push({ path: '/home' })
+      // let login = {account: this.userName, businessNumber: this.businessNumber, password: this.passWord}
+      // console.log(login, '登录数组', this.$qs.stringify(login))
+
+      // checkLogin(this.$qs.stringify(login)).then(res => {
+      //   // console.log(res)
+      //   if (res.code == 1) {
+      //     // localStorage.setItem('ryToken', res.data.sessionId)
+      //     this.$router.push({ path: '/home' })
+      //   }
+      // })
+    },
+    showDialog () {
+      //
+      this.$alert('<div class="PromptBox"><div class="banner"><img src="static/img/Login_tc_pic01@2x.png"/></div><div class="code"><img src="static/img/and_ewm@2x.png"/></div><span>扫二维码下载手机客户端</span></div>', '' , {
+        closeOnClickModal: true,
+        distinguishCancelAndClose: true,
+        dangerouslyUseHTMLString: true,
+        showClose: false,
+        showConfirmButton: false
+      })
+    }
+  },
+  mounted () {
+    // getLoginPic({name: 'loginPage'}).then(res => {
+    //   console.log(res.code)
+    //   if (res.code == 1) {
+    //     this.loginPage = res.data
+    //   }
+    // })
+  }
+}
+</script>
+
+<style scoped>
+.login {
+  width: 100%;
+  height: 100%;
+  background-image: url(../../images/bg@2x.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+.logo {
+  text-align: left;
+}
+.logo span{
+  font-size:27px;
+  font-family:MicrosoftYaHei;
+  font-weight:bold;
+  color:rgba(10,143,246,1);
+  line-height:39px;
+  margin-left:30px;
+  position: absolute;
+  top: 58px;
+}
+.logo img {
+  width: 105px;
+  height: 54px;
+  margin-left: 43px;
+  margin-top: 38px;
+}
+.loginCon {
+  width: 386px;
+  height: 561px;
+  background-image: url(../../images/Login_bg@2x.png);
+  margin:200px auto;
+  padding: 0px 41px 37px 42px;
+}
+.loginTitle {
+  width:121px;
+  height:23px;
+  font-size:30px;
+  font-weight:500;
+  font-family:PingFang-SC-Medium;
+  color:rgba(55,61,65,1);
+  line-height:0px;
+  margin: 0 auto;
+  padding-top: 42px;
+}
+.ForInputPadding {
+  width:385px;
+  height: 49px;
+}
+.welcome{
+  font-size:18px;
+  font-weight:500;
+  color:rgba(115,119,122,1);
+  line-height:0px;
+  margin-top: 36px;
+  margin-left: 8px;
+  text-align: left;
+  height:28px;
+}
+.ForInput{
+  margin-top: 23px;
+}
+.iconStyle{
+ font-size:17px;
+ margin-left:5px;
+ margin-top:-30px;
+}
+.rememberCon {
+  text-align: left;
+}
+.remember {
+  font-size:15px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(90,90,90,1);
+  margin-top:22px;
+}
+.forGet {
+  text-align: right;
+  font-size:15px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(10,143,246,1);
+  margin-top:22px;
+}
+.sureBtn {
+  width: 100%;
+  height:47px;
+  margin-top:35px
+}
+.downPhone {
+  font-size:17px;
+  font-weight:400;
+  color:rgba(63,63,63,1);
+  line-height:0px;
+  margin-top: 30px;
+  height:17px;
+}
+.downPhoneImg img{
+  width: 182px;
+  height: 57px;
+  margin-top:20px;
+  margin-right:10px
+}
+.downPhoneImgs img{
+  width: 182px;
+  height: 57px;
+  margin-top:20px;
+  margin-left:10px
+}
+</style>

@@ -1,0 +1,222 @@
+<template>
+  <div class="hall">
+    <router-view></router-view>
+    <div class="title_header title_header_font">
+      <span class="sp_t">所有小组</span>
+      <el-button  icon="el-icon-edit" class="newGroup" size="small" @click="newBuild()">新建小组</el-button>
+    </div>
+
+      <el-table
+        :data="tableData"
+        style="width:980px"
+        :row-style="tableRowStyle"
+        header-row-class-name="center"
+        :header-cell-style="{background:'rgba(66,172,254,1)',width:'980px',height:'55px','text-align':'center'}">
+        <el-table-column
+          label="小组名称"
+          width="180">
+          <template slot-scope="scope">
+            <span style="margin-left: 10px" class="pointer" @click="tableDetail()">{{ scope.row.date }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="小组创建人"
+          width="180">
+          <template slot-scope="scope">
+            <el-popover  placement="top">
+              <p>姓名: {{ scope.row.name }}</p>
+              <p>住址: {{ scope.row.address }}</p>
+              <div slot="reference" class="name-wrapper">
+                <el-tag size="medium">{{ scope.row.name }}</el-tag>
+              </div>
+            </el-popover>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+            <el-button
+              size="mini"
+              type="danger"
+              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+       <div class="block mt">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage4"
+          :page-sizes="[100, 200, 300, 400]"
+          :page-size="100"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="400">
+        </el-pagination>
+                      <!-- 详情弹窗 -->
+      <el-dialog title="" :visible.sync="dialogFormVisible">
+        <el-form :model="form">
+          <el-form-item label="填写小组名称" :label-width="formLabelWidth">
+            <el-input v-model="form.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="填写小组描述" :label-width="formLabelWidth">
+            <el-input v-model="form.content" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="commitEdit()">确 定</el-button>
+        </div>
+      </el-dialog>
+      <!-- 修改小组信息 -->
+      <el-dialog title="" :visible.sync="dialogFormVisibleEdit">
+        <el-form :model="formEdit">
+          <el-form-item label="修改小组名称" :label-width="formLabelWidth">
+            <el-input v-model="form.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="修改小组描述" :label-width="formLabelWidth">
+            <el-input v-model="form.content" autocomplete="off"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisibleEdit = false">取 消</el-button>
+          <el-button type="primary" @click="commitEdit()">确 定</el-button>
+        </div>
+      </el-dialog>
+      </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'customGrouping',
+  data () {
+    return {
+      tableData: [{
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        date: '2016-05-04',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1517 弄'
+      }, {
+        date: '2016-05-01',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1519 弄'
+      }, {
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      }],
+      currentPage4: 4,
+        dialogFormVisible:false,
+        dialogFormVisibleEdit:false,
+      form: {
+        name: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: '',
+        content: ''
+      },
+      formEdit: {
+        name: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: '',
+        content: ''
+      },
+      formLabelWidth: '120px'
+    }
+  },
+  methods: {
+    handleEdit (index, row) {
+      console.log(index, row)
+      // this.$router.push('/groupDetail')
+      this.dialogFormVisibleEdit = true
+    },
+    handleDelete (index, row) {
+      console.log(index, row)
+    },
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`)
+    },
+    handleCurrentChange (val) {
+      console.log(`当前页: ${val}`)
+    },
+    tableRowStyle ({ row, rowIndex }) {
+      return 'background-color: #F2F9FF'
+    },
+     newBuild () {
+      this.dialogFormVisible = true
+    },
+    tableDetail () {
+      
+      this.$router.push('/groupDetail')
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.pointer {
+  cursor: pointer;
+}
+.hall {
+  min-height: 750px;
+  margin-bottom: 50px;
+}
+  .title_header{
+    width:980px;
+    height:72px;
+    background:rgba(242,249,255,1);
+    border-radius:5px 5px 0px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left:  15px;
+    padding-right:  15px;
+    box-sizing: border-box
+  }
+  .sp_t{
+  width:81px;
+  height:20px;
+  font-size:20px;
+  font-family:PingFang-SC-Regular;
+  font-weight:bold;
+  color:rgba(0,0,0,1);
+  line-height:0px;
+}
+//   .title_header_font {
+//     width:81px;
+// height:20px;
+// font-size:20px;
+// font-family:PingFang-SC-Regular;
+// font-weight:bold;
+// color:rgba(0,0,0,1);
+// line-height:0px;
+//   }
+  .nav_header{
+    width:980px;
+    height:55px;
+    background:rgba(66,172,254,1);
+  }
+  .newGroup{
+    background-image: url('../../images/customGroup/fz_btn_add@3x.png'   ) no-repeat;
+    border-style:dashed;
+  }
+  .mt{
+    margin-top: 10px
+  }
+  .hall {
+    background-color: #F2F9FF;
+
+  }
+</style>

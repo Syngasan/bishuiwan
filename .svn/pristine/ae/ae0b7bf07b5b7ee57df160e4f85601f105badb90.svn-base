@@ -1,0 +1,67 @@
+<template>
+  <div class="EventLibrary">
+    <div class="EventLibraryBox">
+      <div class="EventLibraryBoxSelect">
+        <el-select v-model="select" placeholder="请选择">
+          <el-option label="全部" value="all"></el-option>
+          <el-option label="全部" value="all"></el-option>
+        </el-select>
+        <el-input class="searchInput" v-model="input" placeholder="请输入内容"></el-input>
+        <el-button type="primary">搜索</el-button>
+        <el-button plain>返回</el-button>
+      </div>
+    </div>
+    <el-table :data="tableData" stripe style="width: 100%">
+      <el-table-column prop="date" label="序号" align="center"></el-table-column>
+      <el-table-column prop="name" label="事件内容" align="center"></el-table-column>
+      <el-table-column prop="address" label="分值" align="center"></el-table-column>
+      <el-table-column prop="address" label="操作" align="center"></el-table-column>
+    </el-table>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage4" :page-sizes="[10, 20, 30, 40]" :page-size="100" layout="total, sizes, prev, pager, next, jumper" :total="100">
+    </el-pagination>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'EventLibrary',
+  data () {
+    return {
+      select: '',
+      input: '',
+      tableData: []
+    }
+  },
+  methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+    }
+  }
+}
+</script>
+
+<style scoped>
+.EventLibraryBox {
+  padding: 26px 0 0 0;
+  background:rgba(242,249,255,1);
+  border-radius:5px 5px 0px 0px;
+}
+.EventLibraryBoxSelect {
+  padding: 0 18px;
+}
+.searchInput {
+  width: 430px;
+  height: 46px;
+}
+.el-table {
+  margin-top: 37px;
+}
+.el-pagination {
+  margin-top: 43px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+</style>

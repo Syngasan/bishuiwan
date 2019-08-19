@@ -1,0 +1,242 @@
+<template>
+  <div class="DetailsOfTheEvent">
+  	<div class="title"><span>事项详情</span><router-link to="/WebEntry"><el-button class="backBtn" type="primary">返回</el-button></router-link></div>
+  	<div class="EventBox">
+      <div class="EventBoxIndex">1</div>
+      <div class="EventBoxImg"><img src="./img/csth_pic_gray@2X.png"></div>
+  	  <div class="eventName">工作类-安全类</div>
+  	  <div class="event">事件内容：</div>
+  	  <div class="eventTips">在规定时间前完成了系统需求梳理工作。</div>
+  	  <div class="eventDesc">备注内容备注内容备注内容。</div>
+  	  <div class="event">奖扣对象：</div>
+  	  <el-row>
+  	  	<el-col :span="8" class="objectList">
+          <div class="objectListBox">
+            <img class="logo" src="./img/u=1752349347,1084259068&fm=27&gp=0.jpg">
+            <div class="objectListBoxName">
+              <div class="objectListBoxNameTop">昵称昵称</div>
+              <div class="objectListBoxNameBottom">昌文酒店-房务部</div>
+            </div>
+            <div class="objectListBoxNum"><span>+5</span>分</div>
+          </div>
+        </el-col>
+        <el-col :span="8" class="objectList">
+          <div class="objectListBox">
+            <img class="logo" src="./img/u=1752349347,1084259068&fm=27&gp=0.jpg">
+            <div class="objectListBoxName">
+              <div class="objectListBoxNameTop">昵称昵称</div>
+              <div class="objectListBoxNameBottom">昌文酒店-房务部</div>
+            </div>
+            <div class="objectListBoxNum"><span>+5</span>分</div>
+          </div>
+        </el-col>
+        <el-col :span="8" class="objectList">
+          <div class="objectListBox">
+            <img class="logo" src="./img/u=1752349347,1084259068&fm=27&gp=0.jpg">
+            <div class="objectListBoxName">
+              <div class="objectListBoxNameTop">昵称昵称</div>
+              <div class="objectListBoxNameBottom">昌文酒店-房务部</div>
+            </div>
+            <div class="objectListBoxNum"><span>+5</span>分</div>
+          </div>
+        </el-col>
+        <el-col :span="8" class="objectList">
+          <div class="objectListBox">
+            <img class="logo" src="./img/u=1752349347,1084259068&fm=27&gp=0.jpg">
+            <div class="objectListBoxName">
+              <div class="objectListBoxNameTop">昵称昵称</div>
+              <div class="objectListBoxNameBottom">昌文酒店-房务部</div>
+            </div>
+            <div class="objectListBoxNum"><span>+5</span>分</div>
+          </div>
+        </el-col>
+  	  </el-row>
+  	</div>
+  	<div class="textCen">
+  		<!-- <el-button class="btn" type="primary">同意</el-button> -->
+  		<router-link to="/DetailsOfTheEvent"><el-button class="btn">修改</el-button></router-link>
+  	</div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'DetailsOfTheEvent',
+  data () {
+    return {
+
+    }
+  }
+}
+</script>
+
+<style scoped>
+.MatterTitle{
+  padding: 16px;
+ /* background:rgba(248,249,250,1);*/
+  background-color: red;
+  position: relative;
+}
+.titleL {
+  text-align: left;
+  margin-left: 28X;
+  width:81px;
+  height:20px;
+  font-size:20px;
+  font-family:PingFang-SC-Regular;
+  font-weight:bold;
+  color:rgba(0,0,0,1);
+  line-height:0px;
+}
+.itleR {
+  /*text-align: right;
+  margin-left: 19px;*/
+  margin: 0 100px 0 0;
+}
+.forBtn {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+.DetailsOfTheEvent {
+  padding: 13px 10px 19px 5px;
+}
+.textCen {
+	margin-top: 35px;
+	text-align: center;
+}
+.title {
+  font-size:10px;
+font-family:PingFang-SC-Regular;
+font-weight:bold;
+color:rgba(0,0,0,1);
+padding-left: 9px;
+margin-bottom: 19px;
+}
+.title span {
+  padding-top: 10px;
+  display: inline-block;
+}
+.backBtn {
+  width:80px;
+  height:15px;
+  line-height: 3px;
+  float: right;
+}
+.EventBox {
+  padding: 9px 10px;
+  background:rgba(241,245,248,1);
+border-radius:2px;
+position: relative;
+}
+.EventBoxIndex {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 36px;
+  font-weight: bold;
+}
+.EventBoxImg {
+  position: absolute;
+  right: 60px;
+  top: 14px;
+}
+.EventBoxImg img {
+  width: 60px;
+  height: 60px;
+}
+.eventName {
+	font-size:12px;
+font-family:PingFang-SC-Bold;
+font-weight:bold;
+color:rgba(51,51,51,1);
+}
+.event {
+	font-size:8px;
+font-family:PingFang-SC-Bold;
+font-weight:bold;
+color:rgba(51,51,51,1);
+margin-top: 9px;
+padding-left: 5px;
+border-left: 2px solid rgba(124,113,203,1);
+}
+.eventTips {
+	font-size:8px;
+font-family:PingFang-SC-Regular;
+font-weight:400;
+color:rgba(114,114,114,1);
+margin-top: 9px;
+}
+.eventDesc {
+	margin-top: 8px;
+	padding: 3px 4px 3px 5px;
+	background:rgba(238,238,238,1);
+border-radius:2px;
+font-size:7px;
+font-family:PingFang-SC-Regular;
+font-weight:400;
+color:rgba(153,153,153,1);
+}
+.objectList {
+  margin-top: 13px;
+}
+.objectListBox {
+ /* width: 386px;
+  height: 50px;*/
+  padding: 11px 13px;
+  border-radius:5px;
+  position: relative;
+}
+.objectList .logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+.objectListBoxName {
+  position: absolute;
+  left: 70px;
+  top: 15px;
+}
+.objectListBoxNameTop {
+  font-size:16px;
+  font-family:PingFang-SC-Medium;
+  font-weight:500;
+  color:rgba(0,0,0,1);
+}
+.objectListBoxNameBottom {
+  font-size:13px;
+  font-family:PingFang-SC-Regular;
+  font-weight:400;
+  color:rgba(97,97,97,1);
+}
+.objectList .close {
+  position: absolute;
+  right: 10px;
+  top: 24px;
+  width: 27px;
+  height: 27px;
+}
+.objectListBoxNum {
+  position: absolute;
+  right:47px;
+  top: 20px;
+  font-size:8px;
+  font-size:17px;
+}
+.objectListBoxNum .el-input-number {
+  width: 150px;
+}
+.objectListBoxNum span {
+	background:rgba(213,213,213,1);
+border-radius:1px;
+padding: 5px 13px;
+font-family:PingFang-SC-Medium;
+font-weight:500;
+color:rgba(1,1,1,1);
+}
+.btn {
+	width:80px;
+  height:15px;
+  line-height: 3px;
+}
+</style>

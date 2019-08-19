@@ -1,0 +1,852 @@
+<template>
+  <!-- 发布任务 -->
+  <div class="task">
+    <div class="caogao" >
+      <el-button type="primary" size="small" @click="caogao()">草稿箱</el-button>
+    </div>
+    <!-- <div class="header_title mt">
+      <div class="header_title_left">编辑任务</div>
+      <div class="header_title_right">
+        <el-button type="primary" plain size="small">返回</el-button>
+      </div>
+    </div> -->
+    <div class="contentDetail mt">
+      <el-form :inline="true">
+        <div class="content_header" >
+          <i class="el-icon-edit-outline"></i>
+          填写发布任务
+        </div>
+         <el-row class="mt">
+           <el-col :span="8">
+             <el-form-item label="事件主题">
+              <el-input placeholder="请输入事件主题" size="small" style="width:200px" v-model="title"></el-input>
+            </el-form-item>
+           </el-col>
+           <el-col :span="8">
+             <el-form-item label="事件类型">
+              <el-select v-model="eventTypeId" placeholder="请选择" size='small' style="width:200px">
+                <el-option
+                  v-for="item in option"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+           </el-col>
+         </el-row>
+         <el-row class="mt" >
+           <el-col :span="8">
+             <el-form-item label="终  审 人">
+              <el-select v-model="secondExamineUserId" placeholder="请输入 \ 选择" size='small' style="width:200px" filterable @change="getinput(secondExamineUserId)">
+                <el-option
+                  v-for="item in options"
+                  :key="item.id"
+                  :label="item.nick"
+                  :value="item.userId">
+                </el-option>
+              </el-select>
+            </el-form-item>
+           </el-col>
+           <el-col :span="5">
+             <el-form-item label="完成奖分">
+              <el-input placeholder="" size="small" style="width:80px" v-model="reward"></el-input>&nbsp;分
+            </el-form-item>
+           </el-col>
+           <el-col :span="5">
+             <el-form-item label="未完成扣分" >
+              <el-input  size="small" style="width:80px" v-model="deduction"></el-input> &nbsp;分
+            </el-form-item>
+           </el-col>
+         </el-row>
+         <el-row class="mt">
+           <el-col :span="8">
+             <el-form-item label="备      注">
+              <el-input placeholder="请输入备注内容" size="small" style="width:200px" v-model="remark"></el-input>
+            </el-form-item>
+           </el-col>
+         </el-row>
+         <el-row  class="mt">
+           <el-col :span="8">
+             <el-form-item label="任务内容">
+             <el-input
+            type="textarea"
+            :rows="2"
+            placeholder="请输入事件内容" v-model="content">
+          </el-input>
+           </el-form-item>
+           </el-col>
+         </el-row>
+         <el-row class="mt">
+           <el-col :span="8">
+             <el-form-item label=" 推送范围">
+              <el-select v-model="example0" placeholder="请选择推送范围" size='small' style="width:200px" @change="tuisong(example0)">
+                <el-option
+                  v-for="item in optionsa"
+                  :key="item.id"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+           </el-col>
+           <el-col :span="8">
+             <el-form-item label="数量上限">
+              <el-input placeholder="请输入数量上限" size="small" style="width:200px" v-model="number"></el-input>
+            </el-form-item>
+           </el-col>
+         </el-row>
+         <!-- 设置推送范围 -->
+         <el-row > 
+           <el-col :span="4">
+             <el-form-item id="canSee" style="display:none">
+              <el-radio v-model="radio" label="1" class="font" >设置可见范围</el-radio>
+            </el-form-item>
+           </el-col>
+         </el-row>
+
+         <el-row >
+           <div class="can" id="canSee1" style="display:none">
+             <el-col :span="8" >
+             <el-form-item > 
+               <div class="checkBox" >
+                 <div class="checkBox_left">房务部</div>
+                 <div class="checkBox_right">
+                  X
+                 </div>
+             </div>
+             </el-form-item>
+           </el-col>
+           <el-col :span="8">
+             <el-form-item>
+               <div class="checkBox">
+                 <div class="checkBox_left">房务部</div>
+                 <div class="checkBox_right">
+                  X
+                 </div>
+             </div>
+             </el-form-item>
+           </el-col>
+           </div>
+         </el-row>
+
+         <el-row>
+           <el-col :span="8">
+              <el-form-item label="完成期限"  >
+              <el-date-picker type="datetime" placeholder="请选择完成期限"  size="small" style="width:200px"  value-format="yyyy-MM-dd HH:mm:ss" v-model="happenTime" @change="getHappenTime"></el-date-picker>
+            </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="截止日期"  >
+              <el-date-picker type="datetime" placeholder="请选择截止期限"  size="small" style="width:200px" value-format="yyyy-MM-dd HH:mm:ss" v-model="endTime" @change="getEndTime"></el-date-picker>
+            </el-form-item>
+            </el-col>
+         </el-row>
+      </el-form>
+      <div style="text-align:center">
+        <el-button type="primary" size="small" @click="toCommit()">发布</el-button>
+        <el-button  size="small" @click="save()">保存</el-button>
+      </div>
+    </div>
+    <el-dialog
+      title="可见范围"
+      :visible.sync="dialogVisible"
+      >
+           <div class="treeBox">
+            <div class="leftTree">
+              <el-tree
+                :data="data5"
+                show-checkbox
+                node-key="id"
+                :props="prop10"
+                default-expand-all
+                :expand-on-click-node="false"
+                @check-change="check_right_change_bufen"
+                :default-expanded-keys="[2, 1]"
+                ref="treebufen"
+                >
+              </el-tree>
+              </div>
+              <div class="rightTree">
+                <el-scrollbar style="height:100%;overflow-x: hidden;">
+                    <ul v-for="(item,index) in checkListbufen" :key="index">
+                      <li>
+                        <!-- <el-checkbox :label="item.name" @change="part( item.id )"></el-checkbox> -->
+                        <el-button @click="part(item.id)" plain size="small">{{item.name}}</el-button>
+                        
+                      </li>
+                    </ul>
+                </el-scrollbar>
+              
+              </div>
+            
+          </div> 
+        <el-button @click="bufenCommit()" type="primary" size="small" style="text-align:right">确定</el-button>
+    </el-dialog>
+
+
+    <el-dialog
+      title="指定人员"
+      :visible.sync="dialogVisible1"
+      >
+     <div class="treeBox">
+       <div class="leftTree">
+         <el-tree
+          :data="data4"
+          show-checkbox
+          node-key="id"
+          :props="prop9"
+          :expand-on-click-node="false"
+          @check-change="check_right_change"
+          :default-expanded-keys="[2, 1]"
+          ref="tree"
+          >
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span>{{ node.label }}</span>
+            <span>
+              <el-button
+                type="text"
+                size="mini"
+                @click="() => append(data)">
+                设为常选
+              </el-button>
+            </span>
+          </span>
+        </el-tree>
+        
+
+        <div >
+            <span>常选人员</span>
+            <el-scrollbar style="height:500px;overflow-x: hidden;">
+              <el-tree
+                :data="data6"
+                show-checkbox
+                :props="prop11"
+                @check-change="check_right_change_Common"
+                ref="treechangxaun"
+                >
+                <span class="custom-tree-node" slot-scope="{ node, data }">
+                  <span>{{ node.label }}</span>
+                  <span>
+                    <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => noAppend(data)">
+                      取消常选
+                    </el-button>
+                  </span>
+                </span>
+              </el-tree>
+            </el-scrollbar>
+              
+        <el-button @click="add()" type="primary" size="small" style="text-align:right">确定</el-button>
+          </div>
+       </div>
+        
+                  <div class="rightTree">
+                  <div >
+                    <ul v-for="(item,index) in checkList" :key="index">
+                      <li>
+                        <el-button plain size="small" @click="delDepId(item.id)">{{item.name}}</el-button>
+                      </li>
+                    </ul>     
+                  </div>
+                  <el-scrollbar style="height:100%;overflow-x: hidden;">
+                    <ul v-for="(cols,colIndex) in checkListUser" :key="colIndex">
+                    <li>
+                      <el-button @click="delId(cols.id)" plain size="small">{{cols.realName}}</el-button>
+                    </li>
+                  </ul>
+                  </el-scrollbar>
+                </div>
+     </div>
+    </el-dialog>
+  </div>
+</template>
+<script>
+import {publishTask ,getExamineUserByBusiness,getEventTypeName,getDepartment ,getCommonUserList ,getAllDepartment,setCommonUser,cancelCommonUser} from '@/utils/axios/axios'
+export default {
+  data () {
+    const generateData = _ => {
+      const data = []
+      const old = []
+      for (let i = 0; i <old.length; i++) {
+        data.push({
+          key: i,
+          label: old[i]
+          // label: `备选项 ${i}`
+          // disabled: i % 4 === 0
+        })
+      }
+      return data
+    }
+    const data4 = [];
+    const data5 = [];
+    const data6 = [];
+    return {
+      ccList: [],
+      seltedRights:[],
+      checkList:[],
+      checkListbufen:[],
+      checkListUser:[],
+      prop10:{
+        value: 'id',
+        children: 'children',
+        label: 'name'
+      },
+      prop9: {
+        value: 'id',
+        children: 'children',
+        label: 'name'
+      },
+      prop11: {
+        value: 'userId',
+        label: 'realName'
+      },
+      data4: JSON.parse(JSON.stringify(data4)),
+      data5: JSON.parse(JSON.stringify(data5)),
+      data6: JSON.parse(JSON.stringify(data6)),
+      data: generateData(),
+      value4: [1],
+      renderFunc (h, option) {
+        return <span>{ option.key } - { option.label }</span>
+      },
+      option:[],
+      options: [],
+      optionsa: [{
+        value: 1,
+        label: '部分可见'
+      }, {
+        value: 2,
+        label: '定向推送'
+      }
+      , {
+        value: 0,
+        label: '全员'
+      }],
+      title: '',
+      valuetuisong: 10,
+      radio: true,
+      dialogVisible: false,
+      dialogVisible1: false,
+      example0: '',
+      eventTypeId:this.eventTypeId,
+      secondExamineUserId:'',
+      secondExamineUserName:'',
+      reward:'',
+      deduction:'',
+      content:'',
+      remark:'',
+      ranges:"",
+      number:"",
+      endTime:'',
+      happenTime:'',
+      groupId:'',
+      optionPeople:[],
+      value:[],
+      www: {
+        value: 'id',
+        children: 'children',
+        label: 'name'
+      },
+      selectedOptions2:[],
+      departmentId:'',
+      state:0,
+      changxuan:'',
+      doUserId:'',
+      doUserIds:''
+    }
+  },
+  methods: {
+    // 选中部分
+    check_right_change_bufen() {
+      let arr = this.$refs.treebufen.getCheckedNodes( )   
+      console.log(arr,'部门');
+      
+      for (let item in arr) {
+        this.checkListbufen.push(arr[item])
+        this.checkListbufen = [...new Set(this.checkListbufen)] 
+        console.log(arr[item],'数组',item);
+        let newArr = []
+        for(let index of this.checkListbufen) {
+          newArr.push(index.id)
+        this.departmentId = newArr.join(',')          
+          console.log('参数',this.departmentId);
+        }   
+      }
+    },
+    // 选中标签
+    check_right_change() {
+      var arr = this.$refs.tree.getCheckedNodes( )       
+      console.log(arr,'数组' );
+        for ( let item of arr ) {
+          console.log(item,'区分');
+          if(item.series) {
+            this.checkList.push(item)
+            let newArr = []
+            for( let itemNew of this.checkList) {
+              newArr.push(itemNew.id)
+              // this.checkList = newArr
+              this.checkList = [...new Set(this.checkList)] 
+            }
+            this.departmentId = newArr.join(',')
+            console.log('部门',this.departmentId);
+          } else if (item.account) {
+            this.checkListUser.push(item)
+            let userArr = []
+            this.checkListUser = [...new Set(this.checkListUser)] 
+            for(let itemUser of this.checkListUser) {
+              userArr.push(itemUser.id)
+              userArr = [...new Set(userArr)] 
+              this.checkListUser = [...new Set(this.checkListUser)] 
+            }
+          }       
+        } 
+    },
+    // 确认选中的人 拼接 
+      add() {
+      let arr = []
+      let newArr = []
+      for (let item of this.checkListUser ) {
+        arr.push(item.id)
+        
+      }
+      for (let items of this.checkList ) {
+        newArr.push(items.id)
+        
+      }
+      this.doUserId = arr.join(',')
+      this.departmentId = newArr.join(',')
+      console.log(this.doUserId,'结果数组',this.departmentId);
+      this.dialogVisible1 = false
+      // this.ccList = this.doUserId.split(',')
+    },
+    aaaaa() {
+      let arr = this.ccList.filter(item => {
+        return item != "-1"
+      })
+      console.log(arr);
+      
+    },
+    // 删除指定用户id
+    delId (col)  {
+      console.log(col,'===============================',this.checkListUser);
+      for ( let i =0;i<this.checkListUser.length;i++) {
+        if (this.checkListUser[i].id == col) {
+          this.checkListUser.splice(i,1)            
+        }
+      } 
+          console.log(this.checkListUser,'截取数组');
+    },
+    // 删除部门id
+    delDepId(col) {
+      for ( let i =0;i<this.checkList.length;i++) {
+          if (this.checkList[i].id == col) {
+            this.checkList.splice(i,1)              
+          }
+        } 
+    },
+    // 追加常选
+    append(data) {
+          // const newChild = { id: id++, label: 'testtest', children: [] };
+          // if (!data.children) {
+          //   this.$set(data, 'children', []);
+          // }
+          // data.children.push(newChild);
+          console.log(data,'追加常选');
+          // 设为常选人员
+          let params = {
+              sessionId:localStorage.getItem('sessionId'),
+              selectUserId:data.userId
+            }
+            setCommonUser( this.$qs.stringify(params) ).then(res=>{
+              if (res.code ===1 ) {
+                console.log(res.desc,'----------------------------------');
+                  this.getCommonUserListPeople()
+              }
+            })
+        },
+        // 取消常选
+        noAppend(data) {
+          console.log('取消',data);
+          let params = {
+              sessionId:localStorage.getItem('sessionId'),
+              selectUserId:data.userId
+            }
+            cancelCommonUser( this.$qs.stringify(params) ).then(res=>{
+              if (res.code ===1 ) {
+                console.log(res.desc,'----------------------------------');
+                  this.getCommonUserListPeople()
+              }
+            })
+        },
+    // 指定常选人员
+    check_right_change_Common() {
+      var arr = this.$refs.treechangxaun.getCheckedNodes( )
+      console.log(arr,'选中的常选',this.doUserId);
+      let newArr = []
+      for(let item of arr ) {
+        this.checkListUser.push(item)
+        this.checkListUser = [...new Set(this.checkListUser)] 
+        // console.log(this.checkListUser);
+        // newArr.push(item.userId)
+        // newArr = [...new Set(newArr)]
+        // console.log(newArr,'常选');
+
+
+
+        
+      }
+      this.ccList = [...new Set(newArr)]
+        // if (this.checkListUser.length != 0) {
+        //       this.checkListUser = this.checkListUser.concat(this.ccList)
+        //     }
+        // this.changxuan=newArr.join(',')
+      
+        // this.doUserId = this.changxuan+','+this.doUserIds
+        // console.log(this.changxuan,'常选',this.doUserId);
+      
+    },
+    caogao () {
+      console.log(1)
+
+      this.$router.push('/releaseTask')
+    },
+    // handleChange (value, direction, movedKeys) {
+    //   console.log(value, direction, movedKeys)
+    // },
+    // 完成时间
+    getHappenTime(val) {
+                this.happenTime=val;//这个sTime是在data中声明的，也就是v-model绑定的值
+                // console.log(this.month,val);            
+    },
+    // 截止时间
+    getEndTime(val) {
+                this.endTime=val;//这个sTime是在data中声明的，也就是v-model绑定的值
+                // console.log(this.month,val);            
+    },
+    handleChangeTo(value) {
+      console.log(value,'选中');
+      
+    },
+    handleChange (value) {
+      console.log(this.optionPeople,'选中部门',value)
+      // for( let item of this.optionPeople ) {
+      //   for (let item2 of this.data) {
+      //     item2.label = item.name
+      //     this.doUserId = item2.key
+      //   }
+      // }
+      // this.optionPeople.forEach((item, index) => {
+      //   if(value == item.id) {
+      //     this.data.push({
+      //       key: value,
+      //       label: item.name
+      //     })
+      //   }
+      // })
+      // console.log(this.doUserId,this.data,'hhhhhhhhh');    
+    },
+    // 发布
+    toCommit() {
+      this.state=1
+      this.commit()
+    },
+    // 保存
+    save() {
+      this.state =0
+      this.commit()
+    },
+    commit () {
+      // this.state = 1
+      let params = {
+        sessionId:localStorage.getItem('sessionId'),
+        title:this.title,
+        eventTypeId:this.eventTypeId,
+        secondExamineUserId:this.secondExamineUserId,
+        secondExamineUserName:this.secondExamineUserName,
+        reward:this.reward,
+        deduction:this.deduction,
+        content:this.content,
+        remark:this.remark,
+        ranges:this.example0,
+        number:this.number,
+        endTime:this.endTime,
+        happenTime:this.happenTime,
+        groupId:this.groupId == false?'':this.groupId ,
+        departmentId:this.departmentId == false ? '' : this.departmentId,
+        doUserId:this.doUserId == false ? ''  : this.doUserId,
+        state:this.state
+      }
+      publishTask( this.$qs.stringify(params) ).then(res=>{
+        if(res.code === 1) {
+            this.$confirm('您可以继续发布新的任务，也可以查看刚才发布的任务！', '保存成功',{
+            confirmButtonText: '去看看',
+            cancelButtonText: '取消',
+            // type: 'warning',
+            center: true
+          }).then(() => {
+            if(res.desc === '发布成功') {
+
+              console.log('发布成功');
+              let taskParams = {
+              sessionId:localStorage.getItem('sessionId'),
+              taskId:res.data
+            }
+            this.$router.push({path:'/publishedTaskDetailDid',query:taskParams})
+            } else if(res.desc === '保存成功') {
+              console.log('保存成功');
+              // releaseTaskDetailEdit
+              let taskParams = {
+              sessionId:localStorage.getItem('sessionId'),
+              taskId:res.data
+            }
+            this.$router.push({path:'/releaseTaskDetailDraft',query:taskParams})
+            }
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '取消'
+            });
+          });
+        }
+        
+      })      
+    },
+    // 可见范围 删除
+    part(value) {
+      console.log(value,'范围',this.checkListbufen)
+      // for(let item of this.checkListbufen) {
+      //   // if(item.)
+      // } 
+
+      for ( let i =0;i<this.checkListbufen.length;i++) {
+          if (this.checkListbufen[i].id == value) {
+            this.checkListbufen.splice(i,1)              
+          }
+        } 
+    },
+    bufenCommit() {
+      console.log(this.checkListbufen,'可见范围');
+      let arr = []
+      for (let item of this.checkListbufen ) {
+        arr.push(item.id)
+      }
+      this.departmentId = arr.join(',')
+      this.dialogVisible = false
+    },
+    handleNodeClick() {
+      console.log(4);
+      
+    },
+    init() {
+      let params = {
+        sessionId:localStorage.getItem('sessionId')
+      }
+      // 终审人
+      getExamineUserByBusiness( this.$qs.stringify(params) ).then(res=>{
+        if(res.code === 1) {
+          this.options = res.data
+          // console.log(this.options,'dd');
+        }
+      })
+      // 事件类型
+      getEventTypeName( this.$qs.stringify(params) ).then(res=>{
+        if(res.code === 1) {
+          this.option = res.data
+          console.log(this.option,'dd');
+        }
+      })
+    },
+    // 同时获取value和label 终审
+    getinput(val) {
+     let obj = {};
+      obj = this.options.find((item)=>{//这里的userList就是上面遍历的数据源
+          return item.userId === val;//筛选出匹配数据
+      });
+      console.log(obj,val,'终审');//我这边的name就是对应label的
+      this.secondExamineUserName=obj.nick
+    },
+    getDepartmentPeople () {
+      let sessionId = localStorage.getItem('sessionId')
+      // let departmentId = this.departmentId
+      let params = {
+        sessionId:sessionId,
+      }      
+      getDepartment( this.$qs.stringify(params) ).then(res => {
+        if ( res.code === 1){
+          this.data4 = res.data
+          console.log(this.data4,'集团');
+                   
+        }        
+      })
+    },
+    getDepartmentPeoplebufen () {
+      let sessionId = localStorage.getItem('sessionId')
+      // let departmentId = this.departmentId
+      let params = {
+        sessionId:sessionId,
+      }      
+      getAllDepartment( this.$qs.stringify(params) ).then(res => {
+        if ( res.code === 1){
+          this.data5= res.data
+          console.log(this.data5,'集团');                    
+        }        
+      })
+    },
+    renderContent(h, { node, data, store }) {    
+      },
+      // 获取常选名单
+    getCommonUserListPeople() {
+      let params = {
+        sessionId: localStorage.getItem('sessionId')
+      }
+      getCommonUserList( this.$qs.stringify(params) ).then(res=>{
+        console.log(res,'常选');    
+        if (res.code===1 ) {
+          this.data6 = res.data
+        }
+      })
+    },
+    // 推送
+    tuisong(val) {
+      if ( val ===1) {
+        // 部分
+          this.dialogVisible = true
+          this.ranges=val
+          this.getDepartmentPeoplebufen()
+      } else if (val ===2) {
+        // 定向
+        this.dialogVisible1 = true
+        this.ranges = val
+        this.getDepartmentPeople()
+        this.getCommonUserListPeople()
+      }  else if (val ===3) {
+        this.ranges = val
+      }
+    }
+  },
+  mounted () {
+    this.init()
+  },
+  watch: {
+    // example0 (curVal, oldVal) {
+    //   console.log(curVal, oldVal)
+    //   if (curVal === 1) {
+    //     this.dialogVisible = true
+    //     // console.log(this.$refs.canSee,'可见');
+    //     console.log(document.getElementById('canSee'));
+    //     document.getElementById('canSee').style.display='block'
+    //     document.getElementById('canSee1').style.display='block'
+    //   } else if (curVal === 2) {
+    //     this.dialogVisible1 = true
+    //     document.getElementById('canSee').style.display='none'
+    //     document.getElementById('canSee1').style.display='none'
+    //   }
+    // }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+  li {
+    list-style: none;
+  }
+  .task {
+    background-color: #F2F9FF;
+    padding: 15px;
+    box-sizing: border-box;
+    padding-left: 20px;
+    width: 100%;
+    min-height: 750px
+  }
+  .caogao {
+    display: flex;
+    justify-content: flex-start;
+    // margin-left: 10px;
+  }
+  .header_title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+  .header_title_left {
+    // width:60px;
+    height:20px;
+    font-size:20px;
+    font-family:PingFang-SC-Regular;
+    font-weight:bold;
+    color:rgba(0,0,0,1);
+    line-height:0px;
+  }
+  .content_header {
+    width:160px;
+    height:20px;
+    font-size:20px;
+    font-family:MicrosoftYaHei;
+    font-weight:400;
+    color:rgba(21,21,21,1);
+  }
+  .mt {
+    margin-top: 15px;
+  }
+  .font {
+    width:107px;
+  height:18px;
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(6,147,255,1);
+  line-height:0px;
+  }
+  .checkBox {
+    width:217px;
+    height:38px;
+    // background:rgba(97,97,97,1);
+    // background-color: red;
+    border: 1px solid black;
+    border-radius:5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing:  border-box;
+    padding: 0 10px;
+  }
+  .checkBox_right {
+    width:27px;
+    height:27px;
+    line-height: 27px;
+    font-size: 20px;
+    vertical-align: middle;
+    color: #979797;
+    border-radius:50%;
+    border: 1px solid black;
+  }
+  .treeBox {
+    position: relative;
+  }
+  .leftTree {
+    display: inline-block;
+    // border: 1px solid #000;
+    width: 50%;
+    // height: 200px;
+    border-right: 1px solid black;
+  }
+  .rightTree {
+    margin-left: 50%;
+    text-align: left;
+    // border: 1px solid #000;
+    height: 100%;
+    width: 200px;
+    overflow-y:auto;
+    top: 0;
+    position: absolute;
+    // right: 0;
+  }
+</style>
+<style>
+  .el-select-dropdown .el-scrollbar .el-scrollbar__wrap{
+    overflow: scroll;
+}
+</style>

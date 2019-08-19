@@ -1,0 +1,254 @@
+<template>
+  <div class="BuckleTask">
+    <el-row class="IntegralAuditBox">
+      <el-col :span="8">
+        选择月份：
+        <el-date-picker class="EventTheme" v-model="month" format="yyyy-MM" value-format="yyyy-MM" type="month" placeholder="选择月"></el-date-picker>
+      </el-col>
+      <el-col :span="8">
+        任务名称：
+        <el-input class="EventTheme" placeholder="请输入任务名称" v-model="name"></el-input>
+      </el-col>
+      <el-col :span="8">
+        姓名：
+        <el-input class="EventTheme" placeholder="请输入员工姓名" v-model="realName"></el-input>
+      </el-col>
+      <el-col :span="8">
+        部门名称：
+        <el-select v-model="AllConcatTypeId" class="EventTheme" placeholder="请选择部门">
+          <el-option :key="index" :label="item.concatName" :value="item.id" v-for="(item,index) in AllConcatType"></el-option>
+        </el-select>
+        </el-select>
+      </el-col>
+      <el-col :span="8">
+        完成状态：
+        <el-select v-model="state" class="EventTheme" placeholder="请选择状态">
+          <el-option label="全部" value="-1"></el-option>
+          <el-option label="未达标" value="0"></el-option>
+          <el-option label="已达标" value="1"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="8">
+        <el-button type="primary" @click="getList">查询</el-button>
+        <el-button type="primary" @click="dialogVisible=true">结算</el-button>
+      </el-col>
+      <el-col :span="24" class="textR"><router-link to="/BuckleLogt">查看结算日志</router-link></el-col>
+    </el-row>
+    <el-table :data="tableData" stripe highlight-current-row @current-change="handleCurrent">
+      <el-table-column align="center" prop="splitTime" label="任务周期"></el-table-column>
+      <el-table-column align="center" prop="realName" label="姓名"></el-table-column>
+      <el-table-column align="center" prop="departmentName" label="部门"></el-table-column>
+      <el-table-column align="center" prop="name" label="任务名称"></el-table-column>
+      <el-table-column align="center" label="任务指标">
+        <template  slot-scope="scope">
+          <span>{{scope.row.reward}}/{{scope.row.deduction}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="完成值">
+        <template  slot-scope="scope">
+          <span>{{scope.row.completeReward}}/{{scope.row.completePunish}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="state" label="完成状态">
+        <template  slot-scope="scope">
+          <span v-if="scope.row.state == 0">未达标</span>
+          <span v-else-if="scope.row.state == 1">已达标</span>
+          <!-- <span v-else>未知</span> -->
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="punish" label="积分扣罚"></el-table-column>
+      <el-table-column align="center" prop="settlement" label="结算状态">
+        <template  slot-scope="scope">
+          <span v-if="scope.row.settlement == 0">未结算</span>
+          <span v-else-if="scope.row.settlement == 1">已结算</span>
+          <!-- <span v-else>未知</span> -->
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNumber" :page-sizes="[10, 20, 30, 40]" :page-size="pageSize" layout="total, sizes, prev, pager, next,  jumper" :total="total">
+    </el-pagination>
+    </el-dialog>
+    <el-dialog :visible.sync="dialogVisible" width="20%" :center='true'>
+      选 择 月 份：<el-date-picker class="EventTheme" type="month" @change="getSTime" value-format="yyyy-MM-dd" placeholder="选择月份" v-model="dateMonth" ></el-date-picker>
+      <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="dialogVisible=false">取 消</el-button>
+          <el-button type="primary" @click="pushN">确 定</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { Message } from "element-ui";
+import { transformRequestFn } from "@/utils/transformRequestFn/transformRequestFn";
+// import { curentYearMonth } from '@/utils/date/getDate'
+export default {
+  name: "BuckleTask",
+  data() {
+    pickerBeginDateBefore: {
+        disabledDate: time => {
+          let _now = Date.now();
+            return time.getTime() > _now;
+        }
+      }
+    return {
+      dateMonth: "",
+      name: "",
+      state: "-1",
+      realName: "",
+      month: "",
+      // date1: '',
+      tableData: [],
+      AllConcatType: [],
+      AllConcatTypeId: "",
+      dialogVisible: false,
+      pageNumber: 1,
+      pageSize: 10,
+      total: 0,
+      currentRow: []
+    };
+  },
+  created() {
+    // this.date1 = curentYearMonth()
+    this.getList();
+    this.getAllConcatType();
+    // this.getsettlement()
+  },
+  methods: {
+    pushN() {
+  //     if (this.dateMonth == "" || this.dateMonth == null) {
+  //       Message.error({
+  //       message: '請選擇月份',
+  //       customClass: 'messageClass',
+  //       center: true
+  // })
+  //       return false
+  //     }
+      this.$axios({
+        url: "reward/settlement",
+        method: "POST",
+        data: {
+          sessionId: this.$cookie.get("sessionId"),
+          date: this.dateMonth 
+        },
+        transformRequest: transformRequestFn
+      }).then((res) => {
+        console.log(res)
+        if (res.data.code === 1) {
+          this.$message({
+          message: res.data.desc,
+          type: 'success'
+        });
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+        // .then(res => {
+        //   if (res.data.code === 1) {
+        //     this.getList()
+        //     this.dialogVisible = false
+        //   }
+        // })
+
+    },
+    handleCurrent(val) {
+      this.currentRow = val;
+    },
+    getAllConcatType() {
+      this.$axios({
+        url: "department/getAllConcatName",
+        method: "POST",
+        data: {
+          sessionId: this.$cookie.get("sessionId")
+        },
+        transformRequest: transformRequestFn
+      }).then(res => {
+        if (res.data.code === 1) {
+          this.AllConcatType = res.data.data;
+        }
+      });
+    },
+    getList() {
+      // this.month = this.date1.split('-')[1]
+      this.$axios({
+        url: "reward/pageRewardTask",
+        method: "POST",
+        data: {
+          queryType: 2,
+          sessionId: this.$cookie.get("sessionId"),
+          // date: this.date1 + '-01',
+          state: this.state,
+          name: this.name,
+          realName: this.realName,
+          month: this.month,
+          AllConcatTypeId: this.AllConcatTypeId,
+          pageNumber: this.pageNumber,
+          pageSize: this.pageSize
+        },
+        transformRequest: transformRequestFn
+      }).then(res => {
+        console.log(res);
+        if (res.data.code === 1) {
+          this.total = res.data.data.totalRow
+          for (var i = 0; i < res.data.data.list.length; i++) {
+            res.data.data.list[i].splitTime = res.data.data.list[i].createTime.split('-')[1]
+          }
+          this.tableData = res.data.data.list
+        }
+      });
+    },
+     // 时间
+    getSTime(val) {
+                this.dateMonth=val;//这个sTime是在data中声明的，也就是v-model绑定的值
+                // console.log(this.month,val);
+                
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getList();
+    },
+    handleCurrentChange(val) {
+      this.pageNumber = val;
+      this.getList();
+    }
+  }
+};
+</script>
+
+<style scoped>
+.EventTheme {
+  width: 195px;
+  height: 46px;
+}
+.EventThemeDate1 {
+  width: 250px;
+  height: 46px;
+}
+.EventThemeDate {
+  width: 150px;
+  height: 46px;
+}
+.EventThemeNum {
+  width: 83px;
+  height: 46px;
+}
+.IntegralAuditBox {
+  margin-top: 20px;
+  padding: 0px 19px;
+}
+.el-table {
+  margin-top: 19px;
+}
+.el-pagination {
+  text-align: center;
+  margin-top: 19px;
+}
+.textR {
+  text-align: right;
+  padding-right: 90px;
+}
+.textR a {
+  color: rgba(10, 143, 246, 1);
+  text-decoration: none;
+}
+</style>

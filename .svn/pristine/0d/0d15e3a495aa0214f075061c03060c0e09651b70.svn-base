@@ -1,0 +1,192 @@
+<template>
+  <div class="BulletinList">
+  <div class="BulletinListDetails">
+    <div class="BulletinListNavigation">首页 -> 公告列表 -> <span class="colorB">公告详情</span></div>
+    <div class="leftBox">
+      <div class="title">面试时HR一定会问的5大问题和你需要的一个对策！</div>
+      <div class="time">发布时间：2017-11-29</div>
+      <div class="contain">
+        题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容
+        <img src="./img/timg.jpg">
+        话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容话题内容。
+      </div>
+    </div>
+    <div class="rightBox">
+      <div class="rightBoxTop"><span class="moreBulletin">更多公告</span><router-link to="/BulletinList"><span class="more">更多 ></span></router-link></div>
+      <div class="rightImgBox"><img src="./img/u=2170225557,758070829&fm=27&gp=0.jpg"></div>
+      <div class="moreListBox">
+        <el-row>
+          <el-col :span="8"><img src="./img/u=2170225557,758070829&fm=27&gp=0.jpg"></el-col>
+          <el-col :span="16">
+            <div class="moreTitle">面试时HR一定会问的5大问题和你 需要的一个对策！</div>
+            <div class="moreTime">发布时间：2017-07-06</div>
+          </el-col>
+        </el-row>
+      </div>
+
+      <div class="moreListBox">
+        <el-row>
+          <el-col :span="8"><img src="./img/u=2170225557,758070829&fm=27&gp=0.jpg"></el-col>
+          <el-col :span="16">
+            <div class="moreTitle">面试时HR一定会问的5大问题和你 需要的一个对策！</div>
+            <div class="moreTime">发布时间：2017-07-06</div>
+          </el-col>
+        </el-row>
+      </div>
+
+      <div class="moreListBox">
+        <el-row>
+          <el-col :span="8"><img src="./img/u=2170225557,758070829&fm=27&gp=0.jpg"></el-col>
+          <el-col :span="16">
+            <div class="moreTitle">面试时HR一定会问的5大问题和你 需要的一个对策！</div>
+            <div class="moreTime">发布时间：2017-07-06</div>
+          </el-col>
+        </el-row>
+      </div>
+    </div>
+    <div class="clear"></div>
+  </div>
+ </div> 
+</template>
+
+<script>
+export default {
+  name: 'BulletinListDetails',
+  data () {
+    return {
+
+    }
+  }
+}
+</script>
+
+<style scoped>
+.clear {
+  clear: both;
+}
+.BulletinList {
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  background-color: #f8fbfe !important;
+}
+.BulletinListDetails{
+  width: 1200px;
+  display: inline-block;
+  margin: 30px auto 0 auto;
+}
+.BulletinListNavigation {
+  text-align: left;
+  font-size:13px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(28,28,28,1);
+  line-height:26px;
+}
+.colorB {
+  color: rgb(131,196,249);
+}
+.leftBox {
+  width: 710px;
+  display: inline-block;
+  float: left;
+  margin-top:22px;
+  padding: 31px 18px 20px 18px;
+  text-align: left;
+  background-color: white;
+}
+.rightBox {
+  width: 366px;
+  display: inline-block;
+  float: right;
+  margin-top: 22px;
+  margin-left: 20px;
+  padding: 24px 19px 20px 21px;
+  text-align: left;
+  background-color: white;
+}
+.title {
+  font-size:22px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(23,25,25,1);
+  line-height:83px;
+  margin-top: -31px
+}
+.time {
+  font-size:13px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(169,169,169,1);
+  line-height:83px;
+  margin-top:-47px; 
+}
+.contain {
+  font-size:15px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(110,110,110,1);
+  line-height:28px;
+}
+.contain img {
+  width: 710px;
+  height: 452px;
+}
+.rightBoxTop {
+  padding-bottom: 19px;
+  border-bottom: 1px dashed #cccccc;
+}
+.moreBulletin {
+  font-size:18px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(23,25,25,1);
+  line-height:28px;
+  padding-left: 10px;
+  border-left: 2px solid blue;
+}
+.more {
+  font-size:16px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(10,143,246,1);
+  float: right;
+}
+.rightImgBox {
+  width: 100%;
+  text-align: center;
+  margin-top: 19px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ccc;
+}
+.rightImgBox img {
+  width:326px;
+  height:185px;
+  background:rgba(0,0,0,1);
+  opacity:0.2;
+}
+.moreListBox {
+  margin-top: 24px;
+  padding-bottom: 19px;
+  border-bottom: 1px solid #ccc;
+}
+.moreListBox img{
+  width: 96px;
+  height: 72px;
+  display: inline-block;
+}
+.moreTitle {
+  font-size:14px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(67,68,68,1);
+  line-height:22px;
+}
+.moreTime{
+  font-size:12px;
+  font-family:MicrosoftYaHei;
+  font-weight:400;
+  color:rgba(118,118,118,1);
+  line-height:33px;
+}
+</style>
